@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Full Blueprint | PAT Scan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-code: #1e293b;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #667eea;
+            --accent-light: #818cf8;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --border: #e2e8f0;
+            --gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-code: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #818cf8;
+            --accent-light: #a5b4fc;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
+
+        /* Theme Toggle & Navigation */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle .sun { display: none; }
+        .theme-toggle .moon { display: block; }
+        [data-theme="dark"] .theme-toggle .sun { display: block; }
+        [data-theme="dark"] .theme-toggle .moon { display: none; }
+
+        .back-btn {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            background: var(--gradient);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .reading-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .reading-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .part-header {
+            text-align: center;
+            padding: 2rem 0;
+            margin: 3rem 0;
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .part-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            padding: 0;
+            margin: 0;
+            display: block;
+        }
+
+        .part-header p {
+            margin: 0.5rem 0 0;
+            font-size: 0.95rem;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .highlight {
+            background: linear-gradient(180deg, transparent 60%, rgba(102, 126, 234, 0.2) 60%);
+        }
+
+        /* Analogy Cards */
+        .analogy-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .analogy-card .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .analogy-card h4 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            margin-top: 0;
+        }
+
+        .analogy-card p {
+            margin-bottom: 0;
+        }
+
+        /* Quote */
+        blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.4rem;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin: 0 0 0.25rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--bg-code);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .code-header {
+            background: rgba(255,255,255,0.05);
+            padding: 0.75rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-header .lang {
+            color: var(--accent-light);
+        }
+
+        .code-content {
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .code-content .comment { color: #6b7280; }
+        .code-content .keyword { color: #c084fc; }
+        .code-content .function { color: #60a5fa; }
+        .code-content .string { color: #4ade80; }
+        .code-content .number { color: #f97316; }
+        .code-content .operator { color: #f472b6; }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-secondary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--accent);
+        }
+
+        /* Equation Box */
+        .equation-box {
+            background: var(--bg-code);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        .equation-box .label {
+            font-size: 0.75rem;
+            color: var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .equation-box .equation {
+            font-size: 1.2rem;
+        }
+
+        .equation-box .explanation {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Comparison Grid */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .comparison-item.easy {
+            border-top: 3px solid var(--accent-green);
+        }
+
+        .comparison-item.hard {
+            border-top: 3px solid var(--accent-red);
+        }
+
+        .comparison-item h4 {
+            font-size: 1rem;
+            margin: 0 0 0.75rem;
+        }
+
+        .comparison-item p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .data-table code {
+            font-size: 0.8em;
+        }
+
+        /* Pipeline Diagram */
+        .pipeline {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .pipeline-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .pipeline-step.highlight {
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .pipeline-step .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-step .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-arrow {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Architecture Diagram */
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .arch-flow {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 1rem;
+            min-width: 700px;
+        }
+
+        .arch-block {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 120px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .arch-block.input { border-color: var(--accent-green); }
+        .arch-block.network { border-color: var(--accent); }
+        .arch-block.physics { border-color: var(--accent-orange); }
+        .arch-block.output { border-color: var(--accent-purple); }
+
+        .arch-block .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .arch-block .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .arch-block .dims {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .arch-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card.warning {
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .info-card.tip {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .info-card.note {
+            border-left: 4px solid var(--accent);
+        }
+
+        .info-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Concept Cards */
+        .concept-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card.highlight {
+            border-left: 4px solid var(--accent);
+        }
+
+        .concept-card h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin: 0 0 0.75rem;
+        }
+
+        .concept-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* File Tree */
+        .file-tree {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .file-tree .dir { color: #60a5fa; }
+        .file-tree .file { color: #94a3b8; }
+        .file-tree .comment { color: #6b7280; font-style: italic; }
+
+        /* Visual Break */
+        .visual-break {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .visual-break img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .visual-break figcaption {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Key Insight Box */
+        .key-insight, .key-takeaway {
+            background: var(--gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .key-insight h4, .key-takeaway h3 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .key-insight p, .key-takeaway p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .toc-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .toc-section h5 {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .toc li {
+            font-size: 0.9rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        /* Navigation */
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .nav-btn.next {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .reading-info { flex-direction: column; gap: 0.5rem; }
+            .arch-flow { flex-direction: column; min-width: auto; }
+            .arch-arrow { transform: rotate(90deg); justify-content: center; }
+            .nav-footer { flex-direction: column; gap: 1rem; }
+            .nav-btn { width: 100%; justify-content: center; }
+            .comparison { grid-template-columns: 1fr; }
+            .pipeline-row { flex-direction: column; }
+            .pipeline-arrow { transform: rotate(90deg); }
+            .toc-columns { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Home</a>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="sun">☀</span>
+        <span class="moon">🌙</span>
+    </button>
+
+    <header class="hero">
+        <div class="hero-content">
+            <span class="badge">⚙️ Advanced</span>
+            <h1>The Full Blueprint</h1>
+            <p>From intuition to implementation: the complete PAT Scan story with code.</p>
+            <div class="reading-info">
+                <span>📖 ~45 min read</span>
+                <span>💻 Code examples</span>
+                <span>🔬 Complete implementation</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h4>Complete Guide</h4>
+            <div class="toc-columns">
+                <div class="toc-section">
+                    <h5>Part I: Foundations</h5>
+                    <ol>
+                        <li><a href="#ancient-art">The Doctor's Hands</a></li>
+                        <li><a href="#ct-inspiration">Learning from CT Scans</a></li>
+                        <li><a href="#ai-student">The AI That Checks Its Work</a></li>
+                        <li><a href="#forward-inverse">Forward vs. Inverse Problems</a></li>
+                        <li><a href="#fem-concept">The FEM Equation</a></li>
+                        <li><a href="#architecture">Training Architecture</a></li>
+                        <li><a href="#loss">Loss & Regularization</a></li>
+                    </ol>
+                </div>
+                <div class="toc-section">
+                    <h5>Part II: Implementation</h5>
+                    <ol start="8">
+                        <li><a href="#create-sample">Create Sample</a></li>
+                        <li><a href="#stiffness">Stiffness Matrix Assembly</a></li>
+                        <li><a href="#data-collection">Data Collection</a></li>
+                        <li><a href="#material-mask">Building the Material Mask</a></li>
+                        <li><a href="#training">Training</a></li>
+                        <li><a href="#levelset">Level-Set Post-Processing</a></li>
+                    </ol>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- PART I: FOUNDATIONS                        -->
+        <!-- ========================================== -->
+
+        <div class="part-header">
+            <h2>Part I: Foundations</h2>
+            <p>The intuition, concepts, and architecture behind PAT Scan</p>
+        </div>
+
+        <!-- Section 1: The Ancient Art -->
+        <section class="section" id="ancient-art">
+            <h2>1. The Doctor's Hands</h2>
+
+            <p>
+                Close your eyes and imagine a doctor examining a patient. They press gently on the abdomen,
+                feeling for something that shouldn't be there. <span class="highlight">This is palpation</span>—one
+                of the oldest diagnostic techniques in medicine, practiced for over 3,000 years.
+            </p>
+
+            <p>
+                What are they feeling for? <strong>Stiffness.</strong> A tumor is like a hidden pebble in a
+                bowl of jelly—when you press on the surface, the stiff spot reveals itself through how the
+                surrounding tissue deforms.
+            </p>
+
+            <div class="analogy-card">
+                <div class="emoji">🍮</div>
+                <h4>The Jello Analogy</h4>
+                <p>
+                    Imagine a bowl of Jello with a marble hidden inside. When you poke the surface, the
+                    Jello near the marble doesn't jiggle the same way as the rest. An experienced chef
+                    (or doctor) can feel where the marble is just by how the surface responds to touch.
+                    <strong>That's exactly what our AI learns to do.</strong>
+                </p>
+            </div>
+
+            <p>
+                But here's the challenge: what if you could only feel the edges of the bowl, not poke
+                anywhere you want? What if you had to figure out where the marble is using only
+                <em>boundary measurements</em>? That's the puzzle we're solving.
+            </p>
+        </section>
+
+        <!-- Section 2: CT Inspiration -->
+        <section class="section" id="ct-inspiration">
+            <h2>2. Learning from CT Scans</h2>
+
+            <p>
+                In 1971, Godfrey Hounsfield did something remarkable. He took X-ray images from many
+                different angles around a patient and used mathematics to reconstruct what was inside.
+                This became the CT scan, and it won him a Nobel Prize.
+            </p>
+
+            <blockquote>
+                "What if we could do for touch what CT did for X-rays?"
+            </blockquote>
+
+            <p>
+                We borrowed this insight. Instead of taking one measurement, we press on the tissue
+                from <strong>many different angles</strong>, like a CT scanner rotating around a patient.
+                Each press gives us a piece of the puzzle. Combine them all, and suddenly the hidden
+                structure becomes visible.
+            </p>
+
+            <figure class="visual-break">
+                <img src="angular_scanning.gif" alt="Multi-angle scanning animation">
+                <figcaption>
+                    Just like CT scans use multiple X-ray angles, we use multiple pressing angles
+                </figcaption>
+            </figure>
+        </section>
+
+        <!-- Section 3: The AI Student -->
+        <section class="section" id="ai-student">
+            <h2>3. The AI That Checks Its Work</h2>
+
+            <p>
+                Here's where the AI magic comes in. We train a neural network—think of it as a very
+                eager student—to guess what the stiffness map looks like inside the tissue.
+            </p>
+
+            <p>
+                But here's the clever part: <strong>we don't just accept the guess.</strong> We check it.
+            </p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Step 1: The Student Guesses</h4>
+                    <p>The AI looks at how the surface deformed and guesses: "I think there's a stiff blob right here."</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 2: Physics Checks the Homework</h4>
+                    <p>We use physics simulation to ask: "If that guess were true, how would the surface actually deform?"</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 3: Compare & Learn</h4>
+                    <p>If the simulated deformation doesn't match reality, the AI learns from its mistake and tries again.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 4: Repeat Until Perfect</h4>
+                    <p>After thousands of iterations, the AI becomes remarkably good at guessing correctly.</p>
+                </div>
+            </div>
+
+            <div class="analogy-card">
+                <div class="emoji">📝</div>
+                <h4>The Math Test Analogy</h4>
+                <p>
+                    Imagine a student learning to solve word problems. They don't just memorize answers—they
+                    guess a solution, plug it back into the original problem to check if it works, and adjust
+                    if it doesn't. Our AI does exactly this, using physics as its "answer key."
+                    <strong>It's learning physics by doing physics.</strong>
+                </p>
+            </div>
+
+            <h3>Why Should You Care?</h3>
+
+            <ul>
+                <li><strong>MRI-based elastography:</strong> $1-3 million machines</li>
+                <li><strong>Ultrasound elastography:</strong> $50,000-200,000 systems</li>
+                <li><strong>PAT Scan vision:</strong> Potentially just sensors on a flexible band</li>
+            </ul>
+
+            <div class="key-takeaway">
+                <h3>💡 The Big Idea</h3>
+                <p>
+                    We're teaching AI the ancient skill of palpation—the doctor's intuition encoded into
+                    algorithms. By combining the wisdom of physics with the pattern-recognition power of
+                    neural networks, we can make the invisible visible using nothing but touch.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: Forward vs Inverse -->
+        <section class="section" id="forward-inverse">
+            <h2>4. Forward vs. Inverse Problems</h2>
+
+            <p>
+                Now let's get more precise. At the heart of PAT Scan lies a fundamental distinction
+                in physics: the difference between <strong>forward problems</strong> (easy) and
+                <strong>inverse problems</strong> (hard).
+            </p>
+
+            <div class="comparison">
+                <div class="comparison-item easy">
+                    <h4>✅ Forward Problem</h4>
+                    <p>
+                        <strong>Given:</strong> Material properties + Applied forces<br>
+                        <strong>Find:</strong> Resulting deformation<br><br>
+                        <em>"If I know what the tissue is made of and how hard I push, what shape does it become?"</em>
+                    </p>
+                </div>
+                <div class="comparison-item hard">
+                    <h4>❌ Inverse Problem</h4>
+                    <p>
+                        <strong>Given:</strong> Observed deformation + Applied forces<br>
+                        <strong>Find:</strong> Material properties<br><br>
+                        <em>"Given how the tissue deformed when I pushed, what must it be made of?"</em>
+                    </p>
+                </div>
+            </div>
+
+            <p>
+                The forward problem has a <strong>unique, stable solution</strong>. The inverse problem is
+                <strong>ill-posed</strong>: multiple material distributions could produce similar boundary measurements.
+            </p>
+
+            <div class="concept-card highlight">
+                <h4>🎯 The Core Insight</h4>
+                <p>
+                    This is precisely what we described in the "student checking homework" analogy! Instead
+                    of trying to directly solve the ill-posed inverse problem, we train a neural network to
+                    <em>propose</em> material distributions, then use the well-posed forward problem to
+                    <em>check</em> if the proposal matches observations.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: FEM Concept -->
+        <section class="section" id="fem-concept">
+            <h2>5. The FEM Equation</h2>
+
+            <p>
+                To simulate how tissue deforms (the "physics checking homework" step), we discretize the
+                continuous material into a mesh of triangular elements.
+            </p>
+
+            <div class="equation-box">
+                <span class="label">Linear Elasticity (FEM Form)</span>
+                <div class="equation">F = K · U</div>
+                <div class="explanation">
+                    Force vector = Stiffness matrix × Displacement vector
+                </div>
+            </div>
+
+            <ul>
+                <li><strong>F</strong> — Applied forces at each node (what we control)</li>
+                <li><strong>K</strong> — Global stiffness matrix (encodes ALL material properties)</li>
+                <li><strong>U</strong> — Resulting displacements (what we measure at boundaries)</li>
+            </ul>
+
+            <div class="concept-card">
+                <h4>🧱 What's in the Stiffness Matrix K?</h4>
+                <p>
+                    K is assembled from individual element stiffness matrices. It's like a giant spring network—
+                    K tells you how much each node "resists" when you push on any other node.
+                    <strong>Change the materials → change K → change how forces produce displacements.</strong>
+                </p>
+            </div>
+
+            <p>
+                Given K and F, finding U requires solving <code>K · U = F</code>. We use
+                <code>torch.linalg.solve</code>—this is computationally tractable and well-posed.
+            </p>
+        </section>
+
+        <!-- Section 6: Architecture -->
+        <section class="section" id="architecture">
+            <h2>6. Training Architecture</h2>
+
+            <p>
+                Here's the technical version of our "student checking homework" concept: a
+                <strong>forward-model-in-the-loop</strong> training setup.
+            </p>
+
+            <div class="pipeline">
+                <div class="pipeline-row">
+                    <div class="pipeline-step highlight">
+                        <div class="icon">🧠</div>
+                        <div class="label">U-Net Predicts</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">📍</div>
+                        <div class="label">Sample at Mesh</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">🔧</div>
+                        <div class="label">Build K</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">⚡</div>
+                        <div class="label">FEM Forward</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">📏</div>
+                        <div class="label">Extract Boundary</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step highlight">
+                        <div class="icon">🎯</div>
+                        <div class="label">Compare & Learn</div>
+                    </div>
+                </div>
+            </div>
+
+            <ol>
+                <li><strong>U-Net Predicts:</strong> Given boundary displacements, output 64×64 material field E(x,y)</li>
+                <li><strong>Sample at Mesh:</strong> Get discrete material values at element centroids</li>
+                <li><strong>Build K:</strong> Assemble global stiffness matrix from predictions</li>
+                <li><strong>FEM Forward:</strong> Solve F = KU for predicted displacements</li>
+                <li><strong>Extract Boundary:</strong> Pull out boundary node displacements</li>
+                <li><strong>Compare & Learn:</strong> Backpropagate through entire pipeline</li>
+            </ol>
+
+            <div class="key-insight">
+                <h4>💡 Why This Works</h4>
+                <p>
+                    The network learns physics, not just patterns. Every gradient update incorporates
+                    information about how material changes affect deformation.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 7: Loss -->
+        <section class="section" id="loss">
+            <h2>7. Loss Functions & Regularization</h2>
+
+            <div class="equation-box">
+                <span class="label">Total Loss</span>
+                <div class="equation">L = L_data + λ_TV · L_TV</div>
+                <div class="explanation">
+                    Data fidelity + Total Variation regularization
+                </div>
+            </div>
+
+            <p>
+                <strong>Data Loss:</strong> MSE between predicted and measured boundary displacements.
+            </p>
+
+            <p>
+                <strong>TV Regularization:</strong> Penalizes unnecessary variation, encouraging
+                piecewise-constant solutions with sharp boundaries—exactly what we expect for tissue
+                with distinct inclusions.
+            </p>
+
+            <figure class="visual-break">
+                <img src="tv_regularization_and_smoothing_and_level_set_post_processing.png"
+                     alt="Effect of TV regularization">
+                <figcaption>
+                    Algorithm results with TV regularization
+                </figcaption>
+            </figure>
+
+            <div class="concept-card">
+                <h4>⚖️ The Regularization Trade-off</h4>
+                <p>
+                    Too little TV: Noisy predictions, overfitting<br>
+                    Too much TV: Over-smoothed, loss of details<br>
+                    Sweet spot: λ_TV ≈ 0.001-0.01
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PART II: IMPLEMENTATION                    -->
+        <!-- ========================================== -->
+
+        <div class="part-header">
+            <h2>Part II: Implementation</h2>
+            <p>The actual code that makes it all work</p>
+        </div>
+
+        <!-- Section 8: Create Sample -->
+        <section class="section" id="create-sample">
+            <h2>8. Create Sample</h2>
+
+            <p>
+                Everything begins with a mesh. Our domain is a circular tissue sample with radius <code>R_outer = 1.0</code>,
+                containing a centered circular inclusion with radius <code>R_inner = 0.1</code>. The inclusion represents
+                a stiffer region—perhaps a tumor—that we want to detect from boundary measurements alone.
+            </p>
+
+            <p>
+                We use a structured polar grid because it naturally conforms to our circular geometry. The polar coordinates
+                <code>(r, θ)</code> are converted to Cartesian <code>(x, y)</code>, then triangulated into finite elements.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>create_circle_sample.py</span>
+                </div>
+                <div class="code-content">
+<pre><span class="comment"># Domain parameters</span>
+R_outer = <span class="number">1.0</span>    <span class="comment"># Outer circle radius</span>
+R_inner = <span class="number">0.1</span>    <span class="comment"># Inclusion radius</span>
+E_b = <span class="number">1.0</span>        <span class="comment"># Background Young's modulus</span>
+E_i = <span class="number">1.2</span>        <span class="comment"># Inclusion Young's modulus (20% stiffer)</span>
+nu = <span class="number">0.3</span>         <span class="comment"># Poisson's ratio</span>
+
+n_radial = <span class="number">20</span>    <span class="comment"># Radial divisions</span>
+n_angular = <span class="number">40</span>   <span class="comment"># Angular divisions</span>
+
+<span class="comment"># Create polar grid</span>
+r = torch.linspace(<span class="number">0</span>, R_outer, n_radial)
+theta = torch.linspace(<span class="number">0</span>, <span class="number">2</span>*torch.pi, n_angular+<span class="number">1</span>)[:-<span class="number">1</span>]
+
+<span class="comment"># Convert to Cartesian</span>
+R, Theta = torch.meshgrid(r, theta, indexing=<span class="string">'ij'</span>)
+X = R * torch.cos(Theta)
+Y = R * torch.sin(Theta)</pre>
+                </div>
+            </div>
+
+            <p>
+                The key insight here is the <strong>structured indexing scheme</strong>. Node 0 sits at the center,
+                and subsequent nodes spiral outward in concentric rings. This makes it easy to identify boundary nodes
+                (the outermost ring) and apply forces systematically.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>Node indexing function</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">node_idx</span>(i, j):
+    <span class="string">"""Get node index for radial index i, angular index j"""</span>
+    <span class="keyword">if</span> i == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>  <span class="comment"># Center point</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="number">1</span> + (i - <span class="number">1</span>) * n_angular + (j % n_angular)</pre>
+                </div>
+            </div>
+
+            <p>
+                With our grid established, we create triangular elements. Around the center, triangles fan out like
+                pizza slices. Further from the center, each quadrilateral cell is split into two triangles.
+                Finally, we assign material properties: elements whose centroids fall within <code>R_inner</code>
+                get the stiffer <code>E_i</code>, while the rest get <code>E_b</code>.
+            </p>
+
+            <figure class="visual-break">
+                <img src="circle_sample_plot.png" alt="Circle mesh with stiffness matrix">
+                <figcaption>
+                    Left: Mesh colored by material. Center: Node positions. Right: Stiffness matrix sparsity pattern.
+                </figcaption>
+            </figure>
+
+            <p>
+                The rightmost subplot shows the assembled global stiffness matrix <strong>K</strong>—notice its sparse,
+                banded structure. This sparsity arises because each node only connects to its immediate neighbors,
+                which is what makes FEM computationally tractable.
+            </p>
+        </section>
+
+        <!-- Section 9: Stiffness Matrix Assembly -->
+        <section class="section" id="stiffness">
+            <h2>9. Stiffness Matrix Assembly</h2>
+
+            <p>
+                The stiffness matrix <strong>K</strong> is the heart of our physics simulation. It encodes how every
+                node in the mesh resists deformation based on the underlying material properties. Assembly happens
+                in two stages: first we compute element-level stiffness matrices, then we scatter them into the global matrix.
+            </p>
+
+            <h3>9a. Element Stiffness Matrix</h3>
+
+            <p>
+                For each triangular element with nodes at coordinates <code>(x₁, y₁), (x₂, y₂), (x₃, y₃)</code>,
+                we compute a 6×6 stiffness matrix (2 DOFs per node × 3 nodes). The computation involves three ingredients:
+                the element area <strong>A</strong>, the strain-displacement matrix <strong>B</strong>, and the
+                constitutive matrix <strong>D</strong>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>fem_utils.py - element_stiffness()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">element_stiffness</span>(coords, E, nu, thickness=<span class="number">1.0</span>):
+    <span class="string">"""
+    Compute 6×6 element stiffness matrix for plane stress.
+    K_e = t × A × B^T × D × B
+    """</span>
+    x1, y1 = coords[<span class="number">0</span>]
+    x2, y2 = coords[<span class="number">1</span>]
+    x3, y3 = coords[<span class="number">2</span>]
+
+    <span class="comment"># Element area via cross product</span>
+    A = <span class="number">0.5</span> * torch.abs((x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1))
+
+    <span class="comment"># B matrix coefficients (strain-displacement)</span>
+    b1, b2, b3 = y2 - y3, y3 - y1, y1 - y2
+    c1, c2, c3 = x3 - x2, x1 - x3, x2 - x1
+
+    B = (<span class="number">1.0</span> / (<span class="number">2.0</span> * A)) * torch.tensor([
+        [b1,  <span class="number">0</span>, b2,  <span class="number">0</span>, b3,  <span class="number">0</span>],
+        [ <span class="number">0</span>, c1,  <span class="number">0</span>, c2,  <span class="number">0</span>, c3],
+        [c1, b1, c2, b2, c3, b3]
+    ])
+
+    <span class="comment"># D matrix (plane stress constitutive)</span>
+    D = (E / (<span class="number">1</span> - nu**<span class="number">2</span>)) * torch.tensor([
+        [<span class="number">1</span>,  nu, <span class="number">0</span>],
+        [nu, <span class="number">1</span>,  <span class="number">0</span>],
+        [<span class="number">0</span>,  <span class="number">0</span>,  (<span class="number">1</span> - nu)/<span class="number">2</span>]
+    ])
+
+    K_e = thickness * A * B.T @ D @ B
+    <span class="keyword">return</span> K_e</pre>
+                </div>
+            </div>
+
+            <p>
+                The <strong>B matrix</strong> relates nodal displacements to strains—it captures the element geometry.
+                The <strong>D matrix</strong> relates strains to stresses—it captures the material behavior. Together,
+                <code>K_e = t × A × B^T × D × B</code> tells us how this particular triangle resists deformation.
+            </p>
+
+            <h3>9b. Global Stiffness Matrix</h3>
+
+            <p>
+                Now we assemble all element matrices into one global system. Each element contributes to the global
+                matrix at locations determined by its node indices. This "scatter" operation is the core of FEM assembly.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>fem_utils.py - assemble_stiffness()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">assemble_stiffness</span>(points, elements, element_materials, nu):
+    <span class="string">"""
+    Assemble global stiffness matrix from element contributions.
+    K_global[dof_i, dof_j] += K_element[local_i, local_j]
+    """</span>
+    n_nodes = len(points)
+    n_dof = <span class="number">2</span> * n_nodes
+    K = torch.zeros((n_dof, n_dof), dtype=torch.float64)
+
+    <span class="keyword">for</span> e, elem <span class="keyword">in</span> enumerate(elements):
+        <span class="comment"># Get element coordinates and material</span>
+        coords = points[elem]
+        E = element_materials[e]
+
+        <span class="comment"># Compute 6×6 element stiffness</span>
+        K_e = element_stiffness(coords, E, nu)
+
+        <span class="comment"># Global DOF indices for this element</span>
+        dofs = []
+        <span class="keyword">for</span> node <span class="keyword">in</span> elem:
+            dofs.extend([<span class="number">2</span>*node, <span class="number">2</span>*node + <span class="number">1</span>])
+
+        <span class="comment"># Scatter into global matrix</span>
+        <span class="keyword">for</span> i, di <span class="keyword">in</span> enumerate(dofs):
+            <span class="keyword">for</span> j, dj <span class="keyword">in</span> enumerate(dofs):
+                K[di, dj] += K_e[i, j]
+
+    <span class="keyword">return</span> K</pre>
+                </div>
+            </div>
+
+            <p>
+                The resulting matrix <strong>K</strong> is symmetric, positive semi-definite, and sparse. Its size is
+                <code>(2×n_nodes) × (2×n_nodes)</code> because each node has 2 degrees of freedom (x and y displacement).
+                The sparsity pattern—visible in the rightmost subplot of our mesh figure—reflects the mesh connectivity:
+                non-zero entries appear only where nodes share an element.
+            </p>
+
+            <div class="concept-card highlight">
+                <h4>🔑 Key Property</h4>
+                <p>
+                    The stiffness matrix <strong>K</strong> depends on material properties <strong>E</strong>.
+                    This means when our U-Net predicts a material field, we can build a <em>new</em> K matrix
+                    and simulate what displacements that prediction would produce. This is the physics "checking homework."
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 10: Data Collection -->
+        <section class="section" id="data-collection">
+            <h2>10. Data Collection</h2>
+
+            <p>
+                With our mesh and stiffness matrix ready, we generate training data by applying forces and measuring
+                the resulting boundary displacements. We use two complementary scanning strategies, both inspired by
+                medical imaging: angular scanning and symmetric scanning.
+            </p>
+
+            <h3>10a. Angular Scanning (Multiple Force Pairs)</h3>
+
+            <p>
+                Angular scanning progressively increases the number of opposing force pairs applied to the boundary.
+                Like a CT scanner taking more X-ray projections, more force pairs provide richer information about
+                the internal structure.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>fem_utils.py - apply_multiple_force_pairs()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">apply_multiple_force_pairs</span>(points, boundary_nodes, n_pairs,
+                                force_magnitude, angular_spacing, device):
+    <span class="string">"""
+    Apply n_pairs of opposing force pairs around the boundary.
+    Each pair compresses the sample along one axis.
+    """</span>
+    n_dof = <span class="number">2</span> * len(points)
+    F = torch.zeros(n_dof, dtype=torch.float64, device=device)
+
+    <span class="keyword">for</span> i <span class="keyword">in</span> range(n_pairs):
+        angle = i * angular_spacing
+
+        <span class="comment"># Find boundary nodes at angle and angle + π</span>
+        node_pos = find_boundary_node_at_angle(points, boundary_nodes, angle)
+        node_neg = find_boundary_node_at_angle(points, boundary_nodes, angle + np.pi)
+
+        <span class="comment"># Apply radially inward forces</span>
+        dir_pos = -normalize(points[node_pos])  <span class="comment"># Inward</span>
+        dir_neg = -normalize(points[node_neg])  <span class="comment"># Inward</span>
+
+        F[<span class="number">2</span>*node_pos:<span class="number">2</span>*node_pos+<span class="number">2</span>] = force_magnitude * dir_pos
+        F[<span class="number">2</span>*node_neg:<span class="number">2</span>*node_neg+<span class="number">2</span>] = force_magnitude * dir_neg
+
+    <span class="keyword">return</span> F</pre>
+                </div>
+            </div>
+
+            <p>
+                The animation below shows angular scanning in action. Watch how the deformation pattern changes as
+                we add more force pairs—the stiff inclusion reveals itself through asymmetric displacement patterns.
+            </p>
+
+            <figure class="visual-break">
+                <img src="angular_scanning.gif" alt="Angular scanning animation">
+                <figcaption>
+                    Angular scanning: from 1 to 20 force pairs. More pairs reveal more about the inclusion.
+                </figcaption>
+            </figure>
+
+            <h3>10b. Symmetric Scanning (Single Force Pair, Rotated)</h3>
+
+            <p>
+                Symmetric scanning takes a different approach: we apply just <em>one</em> force pair and rotate it
+                around the boundary. This generates data where all samples are rotationally related—teaching the
+                network that the physics is the same regardless of orientation.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>symmetric_scanning.py</span>
+                </div>
+                <div class="code-content">
+<pre><span class="comment"># Symmetric scanning parameters</span>
+angular_spacing = <span class="number">9.0</span>   <span class="comment"># Rotation increment in degrees</span>
+n_rotations = <span class="number">20</span>        <span class="comment"># Total rotations (covers 180°)</span>
+
+<span class="keyword">for</span> iter_idx <span class="keyword">in</span> range(n_rotations):
+    rotation_angle = iter_idx * angular_spacing
+
+    <span class="comment"># Apply SINGLE force pair at this angle</span>
+    F, node1, node2 = apply_single_force_pair(
+        points, boundary_nodes, force_magnitude, rotation_angle, device
+    )
+
+    <span class="comment"># Solve for displacements</span>
+    U, U_nodes = solve_fem(K, F, fixed_dofs, free_dofs, n_dof, device)
+
+    <span class="comment"># Store boundary displacements for training</span>
+    boundary_displacements_list.append(U_nodes[boundary_nodes].cpu())</pre>
+                </div>
+            </div>
+
+            <figure class="visual-break">
+                <img src="symmetric_scanning.gif" alt="Symmetric scanning animation">
+                <figcaption>
+                    Symmetric scanning: single force pair rotates 0° → 171° in 9° increments.
+                </figcaption>
+            </figure>
+
+            <h3>10c. Hard Boundary Conditions</h3>
+
+            <p>
+                During data generation, we enforce <strong>hard boundary conditions</strong>: all nodes inside the
+                inclusion have zero displacement (rigid inclusion assumption). This is mathematically clean and
+                produces the "ground truth" data we train against.
+            </p>
+
+            <div class="equation-box">
+                <span class="label">Hard Boundary Conditions</span>
+                <div class="equation">U_fixed = 0 for all nodes where √(x² + y²) ≤ R_inner</div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>fem_utils.py - setup_boundary_conditions()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">setup_boundary_conditions</span>(radii, R_inner, n_dof, device):
+    <span class="string">"""
+    Identify fixed vs free DOFs based on inclusion boundary.
+    """</span>
+    fixed_dof_list = []
+    free_dof_list = []
+
+    <span class="keyword">for</span> i, r <span class="keyword">in</span> enumerate(radii):
+        <span class="keyword">if</span> r <= R_inner + <span class="number">1e-6</span>:  <span class="comment"># Inside inclusion</span>
+            fixed_dof_list.extend([<span class="number">2</span>*i, <span class="number">2</span>*i + <span class="number">1</span>])
+        <span class="keyword">else</span>:
+            free_dof_list.extend([<span class="number">2</span>*i, <span class="number">2</span>*i + <span class="number">1</span>])
+
+    <span class="keyword">return</span> torch.tensor(fixed_dof_list), torch.tensor(free_dof_list)</pre>
+                </div>
+            </div>
+
+            <div class="info-card warning">
+                <h5>⚠️ Important Distinction</h5>
+                <p>
+                    Hard BCs are used <em>only for data generation</em>. During training and inference, we use
+                    <strong>soft boundary conditions</strong> because we don't know the inclusion location ahead of time—
+                    that's what we're trying to find! This distinction is crucial for avoiding "inverse crime."
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 11: Building the Material Mask -->
+        <section class="section" id="material-mask">
+            <h2>11. Building the Material Mask</h2>
+
+            <p>
+                The U-Net outputs a 64×64 "material mask" representing predicted stiffness values. To use this
+                prediction in our FEM forward model, we need a series of processing steps: sampling at mesh nodes,
+                thresholding to create binary decisions, smoothing for spatial coherence, and finally converting
+                to element-wise material assignments.
+            </p>
+
+            <h3>11a. U-Net Architecture</h3>
+
+            <p>
+                Our U-Net takes boundary displacements (2 channels: Ux, Uy) interpolated onto a 64×64 grid and
+                outputs a single-channel material field. The encoder-decoder structure with skip connections allows
+                it to capture both global context and fine details.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet.py</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">class</span> <span class="function">UNet</span>(nn.Module):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, in_channels=<span class="number">2</span>, out_channels=<span class="number">1</span>, base_features=<span class="number">32</span>):
+        super().__init__()
+
+        <span class="comment"># Encoder (contracting path)</span>
+        self.enc1 = double_conv(in_channels, base_features)       <span class="comment"># 64→64</span>
+        self.pool1 = nn.MaxPool2d(<span class="number">2</span>)
+        self.enc2 = double_conv(base_features, base_features*<span class="number">2</span>)   <span class="comment"># 32→32</span>
+        self.pool2 = nn.MaxPool2d(<span class="number">2</span>)
+        self.enc3 = double_conv(base_features*<span class="number">2</span>, base_features*<span class="number">4</span>) <span class="comment"># 16→16</span>
+        self.pool3 = nn.MaxPool2d(<span class="number">2</span>)
+
+        <span class="comment"># Bottleneck</span>
+        self.bottleneck = double_conv(base_features*<span class="number">4</span>, base_features*<span class="number">8</span>) <span class="comment"># 8→8</span>
+
+        <span class="comment"># Decoder (expanding path with skip connections)</span>
+        self.upconv3 = nn.ConvTranspose2d(base_features*<span class="number">8</span>, base_features*<span class="number">4</span>, <span class="number">2</span>, <span class="number">2</span>)
+        self.dec3 = double_conv(base_features*<span class="number">8</span>, base_features*<span class="number">4</span>)  <span class="comment"># concat: 8→4</span>
+        <span class="comment"># ... similar for dec2, dec1</span>
+
+        <span class="comment"># Output layer</span>
+        self.out = nn.Conv2d(base_features, out_channels, <span class="number">1</span>)
+        self.sigmoid = nn.Sigmoid()  <span class="comment"># Output in [0, 1]</span></pre>
+                </div>
+            </div>
+
+            <h3>11b. Bilinear Interpolation at Mesh Nodes</h3>
+
+            <p>
+                The U-Net output lives on a regular 64×64 grid, but our mesh has irregularly-spaced element centroids.
+                We use <code>F.grid_sample</code> to bilinearly interpolate predicted values at the exact centroid
+                locations needed for FEM assembly.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v5.py - sample_mask_at_centroids()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">sample_mask_at_centroids</span>(mask, centroids):
+    <span class="string">"""
+    Sample material values at element centroids using bilinear interpolation.
+    mask: (1, 1, H, W) predicted material field
+    centroids: (n_elements, 2) centroid coordinates in [-1, 1]
+    """</span>
+    <span class="comment"># Reshape centroids for grid_sample: (1, n_elements, 1, 2)</span>
+    grid = centroids.view(<span class="number">1</span>, -<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>)
+
+    <span class="comment"># Bilinear interpolation at centroid locations</span>
+    sampled = F.grid_sample(
+        mask, grid,
+        mode=<span class="string">'bilinear'</span>,
+        padding_mode=<span class="string">'border'</span>,
+        align_corners=<span class="keyword">True</span>
+    )
+
+    <span class="keyword">return</span> sampled.squeeze()  <span class="comment"># (n_elements,)</span></pre>
+                </div>
+            </div>
+
+            <h3>11c. Sigmoid Thresholding and Soft Boundary Conditions</h3>
+
+            <p>
+                The raw U-Net output is continuous, but we want a binary material classification: background or inclusion.
+                We use a differentiable soft threshold (sigmoid) with a <strong>temperature parameter</strong> that
+                controls sharpness. Higher temperature = sharper boundary.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v5.py - threshold_mask()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">threshold_mask</span>(mask, temperature=<span class="number">2000.0</span>):
+    <span class="string">"""
+    Soft thresholding using sigmoid function.
+    Higher temperature → sharper transition → more binary-like output.
+    """</span>
+    threshold = mask.mean()  <span class="comment"># Adaptive threshold at mean value</span>
+    <span class="keyword">return</span> torch.sigmoid(temperature * (mask - threshold))</pre>
+                </div>
+            </div>
+
+            <figure class="visual-break">
+                <img src="soft_bc_visual.png" alt="Soft threshold sigmoid curve">
+                <figcaption>
+                    The sigmoid threshold function. Temperature controls transition sharpness.
+                </figcaption>
+            </figure>
+
+            <p>
+                This soft thresholding also implements our <strong>soft boundary conditions</strong>. Rather than
+                hard-coding which nodes are fixed (which requires knowing the inclusion location), the thresholded
+                mask smoothly assigns "inclusion-like" properties where the network predicts high stiffness. This
+                avoids the inverse crime and makes the method applicable to unknown geometries.
+            </p>
+
+            <h3>11d. Gaussian Smoothing</h3>
+
+            <p>
+                To encourage spatial coherence and suppress noise, we apply differentiable Gaussian smoothing.
+                This is implemented via a distance-based weight matrix rather than convolution, maintaining
+                full differentiability.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v5.py - smooth_mask_differentiable()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">def</span> <span class="function">smooth_mask_differentiable</span>(mask, sigma=<span class="number">0.05</span>):
+    <span class="string">"""
+    Apply Gaussian smoothing using distance-weighted averaging.
+    """</span>
+    H, W = mask.shape[-<span class="number">2</span>:]
+
+    <span class="comment"># Create coordinate grids</span>
+    y, x = torch.meshgrid(
+        torch.linspace(-<span class="number">1</span>, <span class="number">1</span>, H),
+        torch.linspace(-<span class="number">1</span>, <span class="number">1</span>, W),
+        indexing=<span class="string">'ij'</span>
+    )
+
+    <span class="comment"># Compute Gaussian weights based on distance</span>
+    dist_sq = (x.unsqueeze(-<span class="number">1</span>) - x.view(-<span class="number">1</span>))**<span class="number">2</span> + (y.unsqueeze(-<span class="number">1</span>) - y.view(-<span class="number">1</span>))**<span class="number">2</span>
+    weights = torch.exp(-dist_sq / (<span class="number">2</span> * sigma**<span class="number">2</span>))
+    weights = weights / weights.sum(dim=-<span class="number">1</span>, keepdim=<span class="keyword">True</span>)
+
+    <span class="comment"># Apply weighted average</span>
+    <span class="keyword">return</span> (weights @ mask.view(-<span class="number">1</span>)).view(H, W)</pre>
+                </div>
+            </div>
+
+            <h3>11e. Element-wise Binary Mask</h3>
+
+            <p>
+                Finally, we convert the processed mask values to actual Young's modulus values for each element.
+                The sampled values (after threshold and smoothing) are scaled from the [0, 1] range to the
+                physical range [E_b, E_i].
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>Material assignment from mask</span>
+                </div>
+                <div class="code-content">
+<pre><span class="comment"># Sample mask at element centroids</span>
+mask_values = sample_mask_at_centroids(processed_mask, centroids)
+
+<span class="comment"># Convert [0, 1] → [E_b, E_i]</span>
+element_materials = E_b + mask_values * (E_i - E_b)
+
+<span class="comment"># Now assemble stiffness matrix with predicted materials</span>
+K_pred = assemble_stiffness(points, elements, element_materials, nu)</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 12: Training -->
+        <section class="section" id="training">
+            <h2>12. Training</h2>
+
+            <p>
+                Training brings everything together: the U-Net makes predictions, we run them through the full
+                FEM forward model, compare predicted and measured boundary displacements, and backpropagate
+                the error through the entire pipeline.
+            </p>
+
+            <h3>12a. Training Loop</h3>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v5.py - main training loop</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">for</span> iteration <span class="keyword">in</span> range(n_iterations):
+    optimizer.zero_grad()
+
+    <span class="comment"># 1. U-Net prediction: boundary displacements → material field</span>
+    material_pred = model(displacement_input)  <span class="comment"># (1, 1, 64, 64)</span>
+
+    <span class="comment"># 2. Process: threshold + smooth + sample at centroids</span>
+    processed = threshold_mask(material_pred, temperature)
+    processed = smooth_mask_differentiable(processed, sigma)
+    element_E = sample_mask_at_centroids(processed, centroids)
+    element_E = E_b + element_E * (E_i - E_b)
+
+    <span class="comment"># 3. Assemble stiffness matrix from predictions</span>
+    K_pred = assemble_stiffness_differentiable(points, elements, element_E, nu)
+
+    <span class="comment"># 4. FEM forward solve: F = K_pred @ U_pred</span>
+    U_pred = torch.linalg.solve(K_pred[free_dofs][:, free_dofs],
+                                 F[free_dofs])
+
+    <span class="comment"># 5. Extract predicted boundary displacements</span>
+    U_boundary_pred = U_pred[boundary_dof_indices]
+
+    <span class="comment"># 6. Compute loss</span>
+    loss_data = F.mse_loss(U_boundary_pred, U_boundary_target)
+    loss_tv = total_variation(material_pred)
+    loss = loss_data + lambda_tv * loss_tv
+
+    <span class="comment"># 7. Backpropagate through entire pipeline</span>
+    loss.backward()
+    optimizer.step()</pre>
+                </div>
+            </div>
+
+            <figure class="visual-break">
+                <img src="training_animation_grid_search_optimized.gif" alt="Training animation">
+                <figcaption>
+                    Watch the AI learn: from random noise to accurate inclusion detection.
+                </figcaption>
+            </figure>
+
+            <h3>12b. Grid Search for Hyperparameter Optimization</h3>
+
+            <p>
+                Finding the right hyperparameters is crucial. We perform grid search over key parameters,
+                tracking both data loss and reconstruction quality to find the optimal configuration.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v9.py - grid search</span>
+                </div>
+                <div class="code-content">
+<pre><span class="comment"># Hyperparameter grid</span>
+learning_rates = [<span class="number">1e-4</span>, <span class="number">5e-4</span>, <span class="number">1e-3</span>]
+lambda_tvs = [<span class="number">0.001</span>, <span class="number">0.005</span>, <span class="number">0.01</span>]
+temperatures = [<span class="number">2000</span>, <span class="number">3000</span>, <span class="number">5000</span>]
+sigmas = [<span class="number">0.01</span>, <span class="number">0.03</span>, <span class="number">0.07</span>]
+
+best_loss = float(<span class="string">'inf'</span>)
+best_params = {}
+
+<span class="keyword">for</span> lr <span class="keyword">in</span> learning_rates:
+    <span class="keyword">for</span> lambda_tv <span class="keyword">in</span> lambda_tvs:
+        <span class="keyword">for</span> temp <span class="keyword">in</span> temperatures:
+            <span class="keyword">for</span> sigma <span class="keyword">in</span> sigmas:
+                loss = train_with_params(lr, lambda_tv, temp, sigma)
+                <span class="keyword">if</span> loss < best_loss:
+                    best_loss = loss
+                    best_params = {<span class="string">'lr'</span>: lr, <span class="string">'lambda_tv'</span>: lambda_tv,
+                                   <span class="string">'temp'</span>: temp, <span class="string">'sigma'</span>: sigma}</pre>
+                </div>
+            </div>
+
+            <h3>12c. Hyperparameters</h3>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Symbol</th>
+                        <th>Typical Range</th>
+                        <th>Effect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Learning rate</td>
+                        <td>η</td>
+                        <td>1e-4 to 1e-3</td>
+                        <td>Convergence speed vs stability</td>
+                    </tr>
+                    <tr>
+                        <td>TV regularization</td>
+                        <td>λ_TV</td>
+                        <td>0.001 to 0.01</td>
+                        <td>Smoothness vs detail preservation</td>
+                    </tr>
+                    <tr>
+                        <td>Temperature</td>
+                        <td>τ</td>
+                        <td>2000 to 5000</td>
+                        <td>Boundary sharpness</td>
+                    </tr>
+                    <tr>
+                        <td>Gaussian σ</td>
+                        <td>σ</td>
+                        <td>0.01 to 0.07</td>
+                        <td>Noise suppression vs blur</td>
+                    </tr>
+                    <tr>
+                        <td>Iterations</td>
+                        <td>N</td>
+                        <td>1000 to 3000</td>
+                        <td>Convergence completeness</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 13: Level-Set Post-Processing -->
+        <section class="section" id="levelset">
+            <h2>13. Level-Set Post-Processing</h2>
+
+            <p>
+                After training, the U-Net outputs a continuous material field. To extract a crisp inclusion
+                boundary for visualization and analysis, we apply level-set post-processing: find the contour
+                where the predicted field crosses its threshold value.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang">Python</span>
+                    <span>unet_train_v5.py - extract_contour_levelset()</span>
+                </div>
+                <div class="code-content">
+<pre><span class="keyword">from</span> skimage <span class="keyword">import</span> measure
+
+<span class="keyword">def</span> <span class="function">extract_contour_levelset</span>(mask, level=<span class="keyword">None</span>):
+    <span class="string">"""
+    Extract inclusion boundary using marching squares algorithm.
+    Returns contour as (N, 2) array of (x, y) coordinates.
+    """</span>
+    mask_np = mask.squeeze().cpu().numpy()
+
+    <span class="keyword">if</span> level <span class="keyword">is</span> <span class="keyword">None</span>:
+        level = mask_np.mean()  <span class="comment"># Use mean as threshold</span>
+
+    <span class="comment"># Find contours at the threshold level</span>
+    contours = measure.find_contours(mask_np, level)
+
+    <span class="keyword">if</span> len(contours) == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+
+    <span class="comment"># Return longest contour (main inclusion boundary)</span>
+    main_contour = max(contours, key=len)
+
+    <span class="comment"># Convert from pixel coordinates to physical coordinates</span>
+    H, W = mask_np.shape
+    x = (main_contour[:, <span class="number">1</span>] / W) * <span class="number">2</span> - <span class="number">1</span>  <span class="comment"># Scale to [-1, 1]</span>
+    y = (main_contour[:, <span class="number">0</span>] / H) * <span class="number">2</span> - <span class="number">1</span>
+
+    <span class="keyword">return</span> np.column_stack([x, y])</pre>
+                </div>
+            </div>
+
+            <p>
+                The level-set method has a beautiful property: it naturally handles topological changes.
+                If the network predicts multiple disconnected inclusions, each will be extracted as a
+                separate contour. The marching squares algorithm (used by <code>find_contours</code>)
+                efficiently traces these boundaries at sub-pixel resolution.
+            </p>
+
+            <figure class="visual-break">
+                <img src="tv_regularization_and_smoothing_and_level_set_post_processing.png"
+                     alt="Final reconstruction with level-set contour">
+                <figcaption>
+                    Final result: raw prediction, smoothed field, and extracted level-set boundary (cyan).
+                </figcaption>
+            </figure>
+
+            <div class="key-insight">
+                <h4>🎯 The Complete Pipeline</h4>
+                <p>
+                    From mesh generation to level-set extraction, every step is designed to work together:
+                    structured meshes enable efficient FEM, multi-angle scanning provides rich data,
+                    soft BCs avoid inverse crime, TV regularization encourages clean boundaries,
+                    and level-set extraction produces crisp final results.
+                </p>
+            </div>
+        </section>
+
+        <!-- Navigation Footer -->
+        <nav class="nav-footer">
+            <a href="intermediate.html" class="nav-btn">← Under the Hood</a>
+            <a href="index.html" class="nav-btn next">Home →</a>
+        </nav>
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    </script>
+</body>
+</html>

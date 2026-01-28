@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAT Scan | Making the Invisible Visible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --border: #e2e8f0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #60a5fa;
+            --accent-hover: #93c5fd;
+            --accent-glow: rgba(96, 165, 250, 0.2);
+            --border: #334155;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Home Button */
+        .home-button {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .home-button:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-toggle .sun { display: none; }
+        .theme-toggle .moon { display: block; }
+        [data-theme="dark"] .theme-toggle .sun { display: block; }
+        [data-theme="dark"] .theme-toggle .moon { display: none; }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, var(--accent-glow) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tagline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .tagline .badge {
+            background: var(--gradient-1);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.5rem, 7vw, 4.2rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-weight: 400;
+        }
+
+        .hero .subtitle strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Main Visual */
+        .hero-visual {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .hero-visual img {
+            width: 100%;
+            display: block;
+        }
+
+        .visual-caption {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Stats/Highlights */
+        .highlights {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .highlight-item {
+            text-align: center;
+        }
+
+        .highlight-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .highlight-item .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Philosophy Section */
+        .philosophy {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .philosophy-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .philosophy h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .philosophy p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .philosophy .callout {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem 2rem;
+            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .philosophy .callout p {
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Audience Cards Section */
+        .audience-section {
+            padding: 6rem 2rem;
+            background: var(--bg-primary);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .audience-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audience-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .audience-card:nth-child(1)::before { background: var(--gradient-1); }
+        .audience-card:nth-child(2)::before { background: var(--gradient-2); }
+        .audience-card:nth-child(3)::before { background: var(--gradient-3); }
+        .audience-card:nth-child(4)::before { background: var(--gradient-4); }
+
+        .audience-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: transparent;
+        }
+
+        .audience-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .audience-card:nth-child(1) .card-icon { background: var(--gradient-1); }
+        .audience-card:nth-child(2) .card-icon { background: var(--gradient-2); }
+        .audience-card:nth-child(3) .card-icon { background: var(--gradient-3); }
+        .audience-card:nth-child(4) .card-icon { background: var(--gradient-4); }
+
+        .audience-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .audience-card .level {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .audience-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .card-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .topic-tag {
+            background: var(--bg-secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .card-arrow {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .audience-card:hover .card-arrow {
+            background: var(--accent);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Architecture Preview */
+        .architecture-preview {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .architecture-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pipeline-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .pipeline-step {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 0.75rem;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer .name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        footer .links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .highlights {
+                gap: 2rem;
+            }
+
+            .pipeline-arrow {
+                display: none;
+            }
+
+            .audience-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+        .fade-in-delay-4 { animation-delay: 0.8s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Button -->
+    <a href="/pat-scan" class="home-button" aria-label="Back to PAT Scan" title="Back to PAT Scan">
+        🏠
+    </a>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <span class="sun">☀️</span>
+        <span class="moon">🌙</span>
+    </button>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="tagline fade-in">
+                <span class="badge">AI for Science</span>
+                <span>Where Physics Meets Machine Learning</span>
+            </div>
+
+            <h1 class="fade-in fade-in-delay-1">Making the Invisible Visible</h1>
+
+            <p class="subtitle fade-in fade-in-delay-2">
+                An <strong>AI microscope that learns from touch</strong>—reconstructing what's hidden beneath the surface
+                using nothing but how it responds to gentle pressure. Like teaching a machine the ancient art of palpation.
+            </p>
+
+            <div class="hero-visual fade-in fade-in-delay-3">
+                <img src="training_animation_grid_search_optimized.gif" alt="PAT Scan training animation">
+                <div class="visual-caption">
+                    Watch the AI learn: from random guesses to accurate tumor detection in 2000 iterations
+                </div>
+            </div>
+
+            <div class="highlights fade-in fade-in-delay-4">
+                <div class="highlight-item">
+                    <div class="icon">🏆</div>
+                    <div class="label">Inspired By</div>
+                    <div class="value">2024 Nobel Prize in AI</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="icon">🔬</div>
+                    <div class="label">Method</div>
+                    <div class="value">Physics-Informed ML</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="icon">🎯</div>
+                    <div class="label">Application</div>
+                    <div class="value">Tumor Detection</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="icon">💡</div>
+                    <div class="label">Innovation</div>
+                    <div class="value">CT-Inspired Acquisition</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <span>Explore</span>
+            <span>↓</span>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="philosophy">
+        <div class="philosophy-content">
+            <h2>The Oldest Diagnostic, Reimagined</h2>
+
+            <p>
+                For thousands of years, physicians have detected tumors through <em>palpation</em>—the simple act of
+                pressing and feeling. Cancerous tissue is typically <strong>5-20× stiffer</strong> than healthy tissue.
+                Your doctor knows this. Now, so does our AI.
+            </p>
+
+            <p>
+                But here's the challenge: when you press on the surface, you only feel the surface. The tumor is hidden
+                inside. How do you reconstruct what you cannot directly see?
+            </p>
+
+            <div class="callout">
+                <p>
+                    "This is not just an engineering problem—it's an <strong>inverse problem</strong>, one of the most
+                    beautiful and challenging classes of problems in mathematics. We're asking: given the effect
+                    (surface deformation), what was the cause (interior stiffness distribution)?"
+                </p>
+            </div>
+
+            <p>
+                <strong>PAT Scan</strong> solves this by combining two powerful ideas: the physics of how materials
+                deform (Finite Element Method) with the pattern-recognition power of deep learning (U-Net).
+                The result? An AI that learns to "see" through touch.
+            </p>
+        </div>
+    </section>
+
+    <!-- Audience Section -->
+    <section class="audience-section">
+        <div class="section-header">
+            <h2>Choose Your Journey</h2>
+            <p>
+                Whether you're curious about the big picture or ready to dive into the equations,
+                we've prepared an explanation just for you.
+            </p>
+        </div>
+
+        <div class="audience-grid">
+            <!-- Beginner -->
+            <a href="beginner.html" class="audience-card">
+                <div class="card-icon">🌟</div>
+                <h3>The Big Picture</h3>
+                <div class="level">Beginner</div>
+                <p>
+                    No math, just intuition. Understand why this matters and how it works through
+                    simple analogies and visual storytelling.
+                </p>
+                <div class="card-topics">
+                    <span class="topic-tag">Analogies</span>
+                    <span class="topic-tag">Why it matters</span>
+                    <span class="topic-tag">5 min read</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <!-- Intermediate -->
+            <a href="intermediate.html" class="audience-card">
+                <div class="card-icon">🔧</div>
+                <h3>Under the Hood</h3>
+                <div class="level">Intermediate</div>
+                <p>
+                    Peek inside the machine. Learn about the key components—FEM, U-Net, the training
+                    loop—without getting lost in the weeds.
+                </p>
+                <div class="card-topics">
+                    <span class="topic-tag">Architecture</span>
+                    <span class="topic-tag">Key equations</span>
+                    <span class="topic-tag">15 min read</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <!-- Advanced -->
+            <a href="advanced.html" class="audience-card">
+                <div class="card-icon">📐</div>
+                <h3>The Full Blueprint</h3>
+                <div class="level">Advanced</div>
+                <p>
+                    Complete technical deep-dive. Loss functions, regularization strategies,
+                    hyperparameter tuning, and implementation details.
+                </p>
+                <div class="card-topics">
+                    <span class="topic-tag">Full math</span>
+                    <span class="topic-tag">Training details</span>
+                    <span class="topic-tag">30 min read</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- Architecture Preview -->
+    <section class="architecture-preview">
+        <div class="architecture-content">
+            <div class="section-header">
+                <h2>How It Works (In 30 Seconds)</h2>
+                <p>A neural network that checks its own physics homework</p>
+            </div>
+
+            <div class="pipeline-visual">
+                <div class="pipeline-step">
+                    <div class="step-icon">🧠</div>
+                    <div class="step-label">U-Net Predicts</div>
+                    <div class="step-desc">Material properties</div>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="step-icon">🔢</div>
+                    <div class="step-label">Build Physics</div>
+                    <div class="step-desc">Stiffness matrix K</div>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="step-icon">⚙️</div>
+                    <div class="step-label">FEM Forward</div>
+                    <div class="step-desc">Solve F = KU</div>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="step-icon">📏</div>
+                    <div class="step-label">Compare</div>
+                    <div class="step-desc">Predicted vs. measured</div>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="step-icon">🔄</div>
+                    <div class="step-label">Learn</div>
+                    <div class="step-desc">Backprop & improve</div>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
+                The magic: the U-Net proposes "here's what I think the stiffness looks like," then physics
+                checks "if that were true, here's how the surface would deform." If the prediction doesn't
+                match reality, the network learns from its mistake. <strong>Physics-in-the-loop learning.</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="name">Vivek Karmarkar</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            PAT Scan: Palpation-Assisted Tomography
+        </p>
+        <div class="links">
+            <a href="https://github.com">GitHub</a>
+            <a href="comps_skeleton_vivek_v3_safe.md">Technical Document</a>
+            <a href="mailto:vivekk@umich.edu">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.audience-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

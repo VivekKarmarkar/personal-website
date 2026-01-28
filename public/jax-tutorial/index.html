@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAX for Scientific ML | Physics St & AI Ave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Thebe for live code execution -->
+    <script src="https://unpkg.com/thebe@latest/lib/index.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-code: #0d1117;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #60a5fa;
+            --accent-hover: #93c5fd;
+            --accent-glow: rgba(96, 165, 250, 0.2);
+            --border: #334155;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --code-keyword: #ff7b72;
+            --code-string: #a5d6ff;
+            --code-function: #d2a8ff;
+            --code-comment: #8b949e;
+            --code-number: #79c0ff;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-code: #f6f8fa;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --border: #e2e8f0;
+            --code-keyword: #cf222e;
+            --code-string: #0a3069;
+            --code-function: #8250df;
+            --code-comment: #6e7781;
+            --code-number: #0550ae;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .home-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .home-link:hover {
+            color: var(--accent);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .kernel-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+        }
+
+        .kernel-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: background 0.3s;
+        }
+
+        .kernel-status.connecting .dot {
+            background: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        .kernel-status.ready .dot {
+            background: var(--success);
+        }
+
+        .kernel-status.error .dot {
+            background: var(--error);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        .theme-toggle .sun { display: none; }
+        .theme-toggle .moon { display: block; }
+        [data-theme="light"] .theme-toggle .sun { display: block; }
+        [data-theme="light"] .theme-toggle .moon { display: none; }
+
+        /* Main content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 6rem 1.5rem 4rem;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 1.6rem;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .section > p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Code cells */
+        .code-cell {
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-code);
+        }
+
+        .code-cell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-cell-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .run-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .run-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .run-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .run-btn.running {
+            background: var(--warning);
+        }
+
+        .code-input {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-code);
+            overflow-x: auto;
+        }
+
+        .code-input pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-output {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            min-height: 2rem;
+            display: none;
+        }
+
+        .code-output.has-output {
+            display: block;
+        }
+
+        .code-output.error {
+            color: var(--error);
+        }
+
+        /* Explanation boxes */
+        .explanation {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .explanation h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .explanation ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .explanation li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .explanation li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .highlight-box .stat {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box .label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* Table of contents */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.4rem 0;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+        }
+
+        .toc-list .num {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 5rem 1rem 3rem;
+            }
+
+            .toc-list {
+                grid-template-columns: 1fr;
+            }
+
+            .code-input {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Thebe overrides */
+        .thebelab-cell {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .thebelab-input {
+            background: var(--bg-code) !important;
+        }
+
+        .thebelab-run-button {
+            display: none !important;
+        }
+
+        .jp-OutputArea-output {
+            background: var(--bg-secondary) !important;
+            color: var(--text-secondary) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-left">
+            <a href="/" class="home-link">
+                <span>←</span>
+                <span>Physics St & AI Ave</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <div class="kernel-status" id="kernelStatus">
+                <span class="dot"></span>
+                <span class="text">Initializing...</span>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="sun">☀️</span>
+                <span class="moon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <header class="hero">
+            <div class="hero-badge">
+                <span>🚀</span>
+                <span>Interactive Tutorial</span>
+            </div>
+            <h1>JAX for Scientific ML</h1>
+            <p class="subtitle">
+                Master the Python concepts that power Physics-Informed Neural Networks.
+                Run code live in your browser — no setup required.
+            </p>
+        </header>
+
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h3>What You'll Learn</h3>
+            <ul class="toc-list">
+                <li><a href="#lambda"><span class="num">01</span> Lambda Functions</a></li>
+                <li><a href="#comprehension"><span class="num">02</span> List Comprehension</a></li>
+                <li><a href="#enumerate"><span class="num">03</span> Enumerate & Zip</a></li>
+                <li><a href="#decorators"><span class="num">04</span> Decorators & JIT</a></li>
+                <li><a href="#slicing"><span class="num">05</span> Array Slicing</a></li>
+                <li><a href="#random"><span class="num">06</span> Random Keys</a></li>
+                <li><a href="#vmap"><span class="num">07</span> vmap (Vectorization)</a></li>
+                <li><a href="#autodiff"><span class="num">08</span> Automatic Differentiation</a></li>
+                <li><a href="#oop"><span class="num">09</span> OOP for Physics</a></li>
+            </ul>
+        </nav>
+
+        <!-- Import Libraries -->
+        <section class="section" id="imports">
+            <h2>Setup</h2>
+            <p>First, let's import the libraries we'll be using throughout this tutorial.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [1]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="0">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python">import jax
+import jax.numpy as jnp
+import time
+
+print(f"JAX version: {jax.__version__}")
+print("Ready to go! 🚀")</pre>
+                </div>
+                <div class="code-output" id="output-0"></div>
+            </div>
+        </section>
+
+        <!-- Lambda Functions -->
+        <section class="section" id="lambda">
+            <h2>The Lambda Function</h2>
+            <p>Lambda functions are anonymous one-liners — perfect for automatic differentiation.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [2]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="1">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Lambda vs regular function
+sq_fn = lambda x: jnp.square(x)
+
+def reg_sq_fn(x):
+    return jnp.square(x)
+
+# Both work identically
+print(f"Lambda: {sq_fn(3)}")
+print(f"Regular: {reg_sq_fn(3)}")
+
+# But notice the difference
+print(f"\nLambda repr: {sq_fn}")
+print(f"Regular repr: {reg_sq_fn}")</pre>
+                </div>
+                <div class="code-output" id="output-1"></div>
+            </div>
+
+            <div class="explanation">
+                <h4>Key Insights</h4>
+                <ul>
+                    <li>Lambda functions are "anonymous" — they have no name in the function signature</li>
+                    <li>The syntax <code>lambda x: f(x)</code> maps directly to differentiation: "derivative of f with respect to x"</li>
+                    <li>This makes lambdas perfect for JAX's autodiff: <code>jax.grad(lambda x: f(x))</code></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- List Comprehension -->
+        <section class="section" id="comprehension">
+            <h2>List Comprehension</h2>
+            <p>Compact syntax for creating lists — a Pythonic alternative to loops.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [3]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="2">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># List comprehension vs for loop
+y_lc = [jnp.square(x) for x in range(5)]
+
+y_reg = []
+for x in range(5):
+    y_reg.append(jnp.square(x))
+
+print("List comprehension:", y_lc)
+print("For loop:", y_reg)</pre>
+                </div>
+                <div class="code-output" id="output-2"></div>
+            </div>
+        </section>
+
+        <!-- Enumerate & Zip -->
+        <section class="section" id="enumerate">
+            <h2>Enumerate & Zip</h2>
+            <p>Essential tools for iterating with indices and combining multiple sequences.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [4]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="3">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Enumerate: loop with index
+squares = [0, 1, 4, 9, 16]
+print("Enumerate example:")
+for idx, item in enumerate(squares):
+    print(f"  Index {idx}: {idx}² = {item}")
+
+# Zip: combine multiple lists
+print("\nZip example:")
+list_one = [1, 2, 3]
+list_two = [99, 98, 97]
+for a, b in zip(list_one, list_two):
+    print(f"  {a} + {b} = {a + b}")</pre>
+                </div>
+                <div class="code-output" id="output-3"></div>
+            </div>
+        </section>
+
+        <!-- Decorators & JIT -->
+        <section class="section" id="decorators">
+            <h2>Decorators & JIT Compilation</h2>
+            <p>Decorators enhance functions. JAX's <code>@jit</code> decorator compiles for massive speedups.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [5]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="4">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># A simple decorator example
+def my_decorator(func):
+    def wrapper():
+        print("Before the function runs...")
+        func()
+        print("After the function runs!")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("Hello, World!")
+
+say_hello()</pre>
+                </div>
+                <div class="code-output" id="output-4"></div>
+            </div>
+
+            <div class="explanation">
+                <h4>Why This Matters</h4>
+                <ul>
+                    <li>JAX's <code>@jit</code> decorator uses the same pattern to compile functions</li>
+                    <li>The compiled version runs on XLA, enabling massive speedups</li>
+                    <li>Combined with <code>vmap</code>, this is what makes JAX so powerful for PINNs</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Array Slicing -->
+        <section class="section" id="slicing">
+            <h2>Array Slicing</h2>
+            <p>Extract portions of arrays with intuitive syntax.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [6]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="5">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python">arr = [1, 2, 3, 4, 5]
+
+print(f"Original: {arr}")
+print(f"arr[:3]  = {arr[:3]}")   # First 3
+print(f"arr[2:4] = {arr[2:4]}")  # Index 2 to 3
+print(f"arr[:-1] = {arr[:-1]}")  # All but last
+print(f"arr[-1]  = {arr[-1]}")   # Last element</pre>
+                </div>
+                <div class="code-output" id="output-5"></div>
+            </div>
+        </section>
+
+        <!-- Random Keys -->
+        <section class="section" id="random">
+            <h2>Random Keys in JAX</h2>
+            <p>JAX requires explicit random state management for reproducibility.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [7]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="6">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Create a PRNG key
+key = jax.random.PRNGKey(42)
+print(f"Initial key: {key}")
+
+# Split the key for multiple uses
+key, subkey1, subkey2 = jax.random.split(key, 3)
+
+# Generate random numbers
+rand1 = jax.random.normal(subkey1, shape=(3,))
+rand2 = jax.random.uniform(subkey2, shape=(3,))
+
+print(f"\nNormal samples: {rand1}")
+print(f"Uniform samples: {rand2}")</pre>
+                </div>
+                <div class="code-output" id="output-6"></div>
+            </div>
+
+            <div class="explanation">
+                <h4>Why Explicit Keys?</h4>
+                <ul>
+                    <li>JAX is designed for pure, functional programming</li>
+                    <li>Global random state would break reproducibility in parallel/distributed settings</li>
+                    <li>Always split your key before use — never reuse the same key!</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- vmap -->
+        <section class="section" id="vmap">
+            <h2>Vectorized Mapping (vmap)</h2>
+            <p>Transform scalar functions into batch operations — without loops.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [8]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="7">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Function that computes norm of a 2D vector
+def vec_norm(vec):
+    x, y = vec[0], vec[1]
+    return jnp.square(x) + jnp.square(y)
+
+# Create 10000 unit vectors
+theta = jnp.linspace(0, jnp.pi, 10000)
+vecs = jnp.stack([jnp.cos(theta), jnp.sin(theta)], axis=1)
+
+# Method 1: List comprehension (slow!)
+start = time.time()
+norms_loop = [vec_norm(v) for v in vecs]
+time_loop = time.time() - start
+
+# Method 2: vmap (fast!)
+start = time.time()
+norms_vmap = jax.vmap(vec_norm)(vecs)
+time_vmap = time.time() - start
+
+print(f"Loop time: {time_loop:.3f}s")
+print(f"vmap time: {time_vmap:.3f}s")
+print(f"Speedup: {time_loop/time_vmap:.1f}x")</pre>
+                </div>
+                <div class="code-output" id="output-7"></div>
+            </div>
+
+            <div class="highlight-box">
+                <div class="stat">~200x</div>
+                <div class="label">Typical speedup with vmap over Python loops</div>
+            </div>
+        </section>
+
+        <!-- Automatic Differentiation -->
+        <section class="section" id="autodiff">
+            <h2>Automatic Differentiation</h2>
+            <p>Compute exact derivatives — the foundation of gradient-based learning.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [9]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="8">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Position vector: r(t) = [t, t²]
+# Velocity should be: v(t) = [1, 2t]
+
+dr_dt = jax.jacrev(lambda t: jnp.array([t, jnp.square(t)]))
+
+# Test at t = 0, 1, 2
+for t in [0.0, 1.0, 2.0]:
+    velocity = dr_dt(t)
+    print(f"t = {t}: velocity = {velocity}")
+    print(f"   Expected: [1, {2*t}]")
+    print()</pre>
+                </div>
+                <div class="code-output" id="output-8"></div>
+            </div>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [10]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="9">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python"># Combine vmap + autodiff: compute velocity for many time points
+dr_dt_vec = jax.vmap(dr_dt)
+
+t_vals = jnp.linspace(0, 2, 5)
+velocities = dr_dt_vec(t_vals)
+
+print("Time points:", t_vals)
+print("\nVelocities:")
+print(velocities)</pre>
+                </div>
+                <div class="code-output" id="output-9"></div>
+            </div>
+
+            <div class="explanation">
+                <h4>The Power Combo</h4>
+                <ul>
+                    <li><code>jacrev</code>: Reverse-mode autodiff for vector-valued functions</li>
+                    <li><code>grad</code>: For scalar-valued functions (loss functions)</li>
+                    <li><code>vmap</code>: Apply derivatives across batches</li>
+                    <li>This combination is what makes JAX ideal for physics simulations and PINNs</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- OOP -->
+        <section class="section" id="oop">
+            <h2>OOP for Physics Simulations</h2>
+            <p>Structure your code with classes for reusable, modular physics.</p>
+
+            <div class="code-cell">
+                <div class="code-cell-header">
+                    <span class="code-cell-label">In [11]</span>
+                    <button class="run-btn" onclick="runCell(this)" data-cell="10">
+                        <span>▶</span> Run
+                    </button>
+                </div>
+                <div class="code-input">
+                    <pre data-executable="true" data-language="python">class TimeStep:
+    def __init__(self, position, velocity):
+        self.position = position
+        self.velocity = velocity
+        self.dt = 0.01
+
+    def move(self):
+        new_x = self.position[0] + self.velocity[0] * self.dt
+        new_y = self.position[1] + self.velocity[1] * self.dt
+        self.position = (new_x, new_y)
+
+class Motion(TimeStep):
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity)
+
+    def compute_trajectory(self, tf):
+        vx = 1.0
+        t = 0.0
+        while t < tf:
+            self.move()
+            t += self.dt
+            vy = 2 * t  # Velocity increases with time
+            self.velocity = (vx, vy)
+
+    def __call__(self, tf):
+        self.compute_trajectory(tf)
+        return self.position
+
+# Simulate projectile motion
+projectile = Motion(position=(0.0, 0.0), velocity=(1.0, 0.0))
+final_pos = projectile(tf=2.0)
+print(f"Position after 2 seconds: ({final_pos[0]:.2f}, {final_pos[1]:.2f})")</pre>
+                </div>
+                <div class="code-output" id="output-10"></div>
+            </div>
+
+            <div class="explanation">
+                <h4>OOP Concepts Used</h4>
+                <ul>
+                    <li><strong>Classes:</strong> Blueprints for creating objects (TimeStep, Motion)</li>
+                    <li><strong>Inheritance:</strong> Motion extends TimeStep, getting its methods</li>
+                    <li><strong>__init__:</strong> Constructor that initializes object attributes</li>
+                    <li><strong>__call__:</strong> Makes objects callable like functions</li>
+                    <li><strong>super():</strong> Accesses parent class methods</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                Part of <a href="/">Physics St & AI Ave</a> ·
+                Built by Vivek Karmarkar
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Kernel status management
+        const kernelStatus = document.getElementById('kernelStatus');
+        let thebeReady = false;
+        let kernel = null;
+
+        function updateKernelStatus(status, text) {
+            kernelStatus.className = 'kernel-status ' + status;
+            kernelStatus.querySelector('.text').textContent = text;
+        }
+
+        // Initialize Thebe
+        async function initThebe() {
+            updateKernelStatus('connecting', 'Connecting to Binder...');
+
+            try {
+                thebelab.bootstrap({
+                    bootstrap: true,
+                    requestKernel: true,
+                    binderOptions: {
+                        repo: "google/jax",
+                        ref: "main",
+                        binderUrl: "https://mybinder.org",
+                    },
+                    kernelOptions: {
+                        name: "python3",
+                    },
+                    codeMirrorConfig: {
+                        theme: "material-darker",
+                    },
+                });
+
+                // Wait for kernel to be ready
+                document.addEventListener("thebelab:status", (event) => {
+                    if (event.detail.status === "ready") {
+                        thebeReady = true;
+                        kernel = thebelab.kernel;
+                        updateKernelStatus('ready', 'Ready');
+                    } else if (event.detail.status === "building") {
+                        updateKernelStatus('connecting', 'Building environment...');
+                    } else if (event.detail.status === "launching") {
+                        updateKernelStatus('connecting', 'Launching kernel...');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Thebe initialization failed:", error);
+                updateKernelStatus('error', 'Connection failed');
+            }
+        }
+
+        // Run a cell manually (fallback when Thebe not available)
+        async function runCell(button) {
+            const cell = button.closest('.code-cell');
+            const cellId = button.dataset.cell;
+            const code = cell.querySelector('pre').textContent;
+            const output = document.getElementById('output-' + cellId);
+
+            // Update button state
+            button.classList.add('running');
+            button.innerHTML = '<span>⟳</span> Running...';
+            button.disabled = true;
+
+            if (!thebeReady) {
+                output.textContent = "⚠️ Kernel not ready. Please wait for Binder to connect, or refresh the page.";
+                output.classList.add('has-output');
+                button.classList.remove('running');
+                button.innerHTML = '<span>▶</span> Run';
+                button.disabled = false;
+                return;
+            }
+
+            try {
+                // Execute using Thebe's kernel
+                const result = await thebelab.kernel.requestExecute({ code }).done;
+
+                output.textContent = result.content?.text || "✓ Executed successfully";
+                output.classList.add('has-output');
+                output.classList.remove('error');
+            } catch (error) {
+                output.textContent = "Error: " + error.message;
+                output.classList.add('has-output', 'error');
+            }
+
+            button.classList.remove('running');
+            button.innerHTML = '<span>▶</span> Run';
+            button.disabled = false;
+        }
+
+        // Start Thebe when page loads
+        window.addEventListener('load', () => {
+            // Small delay to let the page render first
+            setTimeout(initThebe, 500);
+        });
+    </script>
+</body>
+</html>

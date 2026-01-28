@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under the Hood | PAT Scan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-code: #1e293b;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #667eea;
+            --accent-light: #818cf8;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --border: #e2e8f0;
+            --gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-code: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #818cf8;
+            --accent-light: #a5b4fc;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle .sun { display: none; }
+        .theme-toggle .moon { display: block; }
+        [data-theme="dark"] .theme-toggle .sun { display: block; }
+        [data-theme="dark"] .theme-toggle .moon { display: none; }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            background: var(--gradient);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Reading Progress */
+        .reading-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .reading-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2 .section-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            background: var(--accent);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin: 2rem 0 1rem;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            background: linear-gradient(180deg, transparent 60%, rgba(102, 126, 234, 0.2) 60%);
+        }
+
+        /* Analogy Cards */
+        .analogy-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .analogy-card .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .analogy-card h4 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .analogy-card p {
+            margin-bottom: 0;
+        }
+
+        /* Concept Cards */
+        .concept-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card.highlight {
+            border-left: 4px solid var(--accent);
+        }
+
+        .concept-card h4 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Quote */
+        blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item h4 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item p {
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* Equation Box */
+        .equation-box {
+            background: var(--bg-code);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        .equation-box .label {
+            font-size: 0.75rem;
+            color: var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .equation-box .equation {
+            font-size: 1.2rem;
+        }
+
+        .equation-box .explanation {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .comparison-item.easy {
+            border-top: 3px solid var(--accent-green);
+        }
+
+        .comparison-item.hard {
+            border-top: 3px solid var(--accent-red);
+        }
+
+        .comparison-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-item p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Pipeline Diagram */
+        .pipeline {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .pipeline-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .pipeline-step.highlight {
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .pipeline-step .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-step .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-arrow {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Visual Breaks */
+        .visual-break {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .visual-break img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .visual-break figcaption {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Key Insight / Takeaway */
+        .key-insight, .key-takeaway {
+            background: var(--gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 3rem 0;
+        }
+
+        .key-insight h4, .key-takeaway h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .key-insight p, .key-takeaway p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0;
+        }
+
+        /* Code-like styling */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* List styling */
+        ul, ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .toc li {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        /* Navigation */
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .nav-btn.next {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .nav-btn.next:hover {
+            background: var(--accent-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+            .pipeline-row { flex-direction: column; }
+            .pipeline-arrow { transform: rotate(90deg); }
+            .nav-footer { flex-direction: column; gap: 1rem; }
+            .nav-btn { width: 100%; justify-content: center; }
+            .reading-info { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Home</a>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="sun">☀</span>
+        <span class="moon">🌙</span>
+    </button>
+
+    <header class="hero">
+        <div class="hero-content">
+            <span class="badge">🔧 Intermediate</span>
+            <h1>Under the Hood</h1>
+            <p>From intuition to equations: the full story of how PAT Scan works.</p>
+            <div class="reading-info">
+                <span>📖 ~20 min read</span>
+                <span>📐 Light equations</span>
+                <span>🎓 Some physics background helpful</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h4>In This Article</h4>
+            <ol>
+                <li><a href="#ancient-art">The Doctor's Hands</a></li>
+                <li><a href="#ct-inspiration">Learning from CT Scans</a></li>
+                <li><a href="#ai-student">The AI That Checks Its Work</a></li>
+                <li><a href="#forward-inverse">Forward vs. Inverse Problems</a></li>
+                <li><a href="#fem">The FEM Equation</a></li>
+                <li><a href="#architecture">The Training Architecture</a></li>
+                <li><a href="#loss">Loss Functions & Regularization</a></li>
+                <li><a href="#innovations">Key Innovations</a></li>
+            </ol>
+        </nav>
+
+        <!-- ========== PART I: THE BIG PICTURE ========== -->
+
+        <!-- Section 1: The Ancient Art -->
+        <section class="section" id="ancient-art">
+            <h2><span class="section-number">1</span>The Doctor's Hands</h2>
+
+            <p>
+                Close your eyes and imagine a doctor examining a patient. They press gently on the abdomen,
+                feeling for something that shouldn't be there. <span class="highlight">This is palpation</span>—one
+                of the oldest diagnostic techniques in medicine, practiced for over 3,000 years.
+            </p>
+
+            <p>
+                What are they feeling for? <strong>Stiffness.</strong> A tumor is like a hidden pebble in a
+                bowl of jelly—when you press on the surface, the stiff spot reveals itself through how the
+                surrounding tissue deforms.
+            </p>
+
+            <div class="analogy-card">
+                <div class="emoji">🍮</div>
+                <h4>The Jello Analogy</h4>
+                <p>
+                    Imagine a bowl of Jello with a marble hidden inside. When you poke the surface, the
+                    Jello near the marble doesn't jiggle the same way as the rest. An experienced chef
+                    (or doctor) can feel where the marble is just by how the surface responds to touch.
+                    <strong>That's exactly what our AI learns to do.</strong>
+                </p>
+            </div>
+
+            <p>
+                But here's the challenge: what if you could only feel the edges of the bowl, not poke
+                anywhere you want? What if you had to figure out where the marble is using only
+                <em>boundary measurements</em>?
+            </p>
+
+            <p>
+                That's the puzzle we're solving.
+            </p>
+        </section>
+
+        <!-- Section 2: The CT Inspiration -->
+        <section class="section" id="ct-inspiration">
+            <h2><span class="section-number">2</span>Learning from CT Scans</h2>
+
+            <p>
+                In 1971, Godfrey Hounsfield did something remarkable. He took X-ray images from many
+                different angles around a patient and used mathematics to reconstruct what was inside.
+                This became the CT scan, and it won him a Nobel Prize.
+            </p>
+
+            <blockquote>
+                "What if we could do for touch what CT did for X-rays?"
+            </blockquote>
+
+            <p>
+                We borrowed this insight. Instead of taking one measurement, we press on the tissue
+                from <strong>many different angles</strong>, like a CT scanner rotating around a patient.
+                Each press gives us a piece of the puzzle. Combine them all, and suddenly the hidden
+                structure becomes visible.
+            </p>
+
+            <figure class="visual-break">
+                <img src="angular_scanning_irregular.gif" alt="Multi-angle scanning animation">
+                <figcaption>
+                    Just like CT scans use multiple X-ray angles, we use multiple pressing angles
+                </figcaption>
+            </figure>
+        </section>
+
+        <!-- Section 3: The AI Student -->
+        <section class="section" id="ai-student">
+            <h2><span class="section-number">3</span>The AI That Checks Its Work</h2>
+
+            <p>
+                Here's where the AI magic comes in. We train a neural network—think of it as a very
+                eager student—to guess what the stiffness map looks like inside the tissue.
+            </p>
+
+            <p>
+                But here's the clever part: <strong>we don't just accept the guess.</strong> We check it.
+            </p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Step 1: The Student Guesses</h4>
+                    <p>The AI looks at how the surface deformed and guesses: "I think there's a stiff blob right here."</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 2: Physics Checks the Homework</h4>
+                    <p>We use physics simulation to ask: "If that guess were true, how would the surface actually deform?"</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 3: Compare & Learn</h4>
+                    <p>If the simulated deformation doesn't match reality, the AI learns from its mistake and tries again.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Step 4: Repeat Until Perfect</h4>
+                    <p>After thousands of iterations, the AI becomes remarkably good at guessing correctly.</p>
+                </div>
+            </div>
+
+            <div class="analogy-card">
+                <div class="emoji">📝</div>
+                <h4>The Math Test Analogy</h4>
+                <p>
+                    Imagine a student learning to solve word problems. They don't just memorize answers—they
+                    guess a solution, plug it back into the original problem to check if it works, and adjust
+                    if it doesn't. Our AI does exactly this, using physics as its "answer key."
+                    <strong>It's learning physics by doing physics.</strong>
+                </p>
+            </div>
+
+            <h3>Why Should You Care?</h3>
+
+            <p>
+                Current medical imaging for tissue stiffness requires expensive equipment:
+            </p>
+
+            <ul>
+                <li><strong>MRI-based elastography:</strong> $1-3 million machines</li>
+                <li><strong>Ultrasound elastography:</strong> $50,000-200,000 systems</li>
+                <li><strong>PAT Scan vision:</strong> Potentially just sensors on a flexible band</li>
+            </ul>
+
+            <p>
+                Imagine a world where early tumor detection doesn't require a hospital visit. Where a
+                wearable device could monitor tissue changes over time. Where healthcare reaches places
+                that have never had access to advanced imaging.
+            </p>
+
+            <div class="key-takeaway">
+                <h3>💡 The Big Idea</h3>
+                <p>
+                    We're teaching AI the ancient skill of palpation—the doctor's intuition encoded into
+                    algorithms. By combining the wisdom of physics with the pattern-recognition power of
+                    neural networks, we can make the invisible visible using nothing but touch.
+                </p>
+            </div>
+        </section>
+
+        <!-- ========== PART II: THE TECHNICAL FOUNDATION ========== -->
+
+        <!-- Section 4: Forward vs Inverse -->
+        <section class="section" id="forward-inverse">
+            <h2><span class="section-number">4</span>Forward vs. Inverse Problems</h2>
+
+            <p>
+                Now let's get more precise about what we just described. At the heart of PAT Scan lies a
+                fundamental distinction in physics: the difference between <strong>forward problems</strong>
+                (easy) and <strong>inverse problems</strong> (hard).
+            </p>
+
+            <div class="comparison">
+                <div class="comparison-item easy">
+                    <h4>✅ Forward Problem</h4>
+                    <p>
+                        <strong>Given:</strong> Material properties + Applied forces<br>
+                        <strong>Find:</strong> Resulting deformation<br><br>
+                        <em>"If I know what the tissue is made of and how hard I push, what shape does it become?"</em>
+                    </p>
+                </div>
+                <div class="comparison-item hard">
+                    <h4>❌ Inverse Problem</h4>
+                    <p>
+                        <strong>Given:</strong> Observed deformation + Applied forces<br>
+                        <strong>Find:</strong> Material properties<br><br>
+                        <em>"Given how the tissue deformed when I pushed, what must it be made of?"</em>
+                    </p>
+                </div>
+            </div>
+
+            <p>
+                The forward problem has a <strong>unique, stable solution</strong>—you can solve it with
+                standard numerical methods. The inverse problem is <strong>ill-posed</strong>: multiple
+                different material distributions could produce similar boundary measurements.
+            </p>
+
+            <div class="concept-card highlight">
+                <h4>🎯 The Core Insight</h4>
+                <p>
+                    This is precisely what we described in the "student checking homework" analogy! Instead
+                    of trying to directly solve the ill-posed inverse problem, we train a neural network to
+                    <em>propose</em> material distributions (the guess), then use the well-posed forward
+                    problem to <em>check</em> if the proposal matches observations (physics checking homework).
+                    The network learns to make better proposals through gradient descent.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: FEM Basics -->
+        <section class="section" id="fem">
+            <h2><span class="section-number">5</span>The FEM Equation</h2>
+
+            <p>
+                To simulate how tissue deforms (the "physics checking homework" step), we discretize the
+                continuous material into a mesh of triangular elements. Each element has its own material
+                properties (Young's modulus E, Poisson's ratio ν).
+            </p>
+
+            <figure class="visual-break">
+                <img src="irregular_inclusion_plot.png" alt="FEM mesh with irregular inclusion">
+                <figcaption>
+                    A triangular mesh with an irregular inclusion (stiffer region shown in darker color)
+                </figcaption>
+            </figure>
+
+            <h3>The Fundamental Equation</h3>
+
+            <p>
+                All of linear elasticity boils down to one elegant equation:
+            </p>
+
+            <div class="equation-box">
+                <span class="label">Linear Elasticity (FEM Form)</span>
+                <div class="equation">F = K · U</div>
+                <div class="explanation">
+                    Force vector = Stiffness matrix × Displacement vector
+                </div>
+            </div>
+
+            <p>
+                Let's unpack this:
+            </p>
+
+            <ul>
+                <li><strong>F</strong> — Applied forces at each node (what we control)</li>
+                <li><strong>K</strong> — Global stiffness matrix (encodes ALL material properties and geometry)</li>
+                <li><strong>U</strong> — Resulting displacements at each node (what we measure at boundaries)</li>
+            </ul>
+
+            <div class="concept-card">
+                <h4>🧱 What's in the Stiffness Matrix K?</h4>
+                <p>
+                    The stiffness matrix K is assembled from individual element stiffness matrices, each
+                    computed from the element's shape, material properties, and geometric configuration.
+                    It's like a giant spring network—K tells you how much each node "resists" when you
+                    push on any other node.
+                </p>
+                <p>
+                    <strong>Critical insight:</strong> K depends on the material properties E(x,y).
+                    Change the materials → change K → change how forces produce displacements.
+                </p>
+            </div>
+
+            <h3>Forward Problem = Linear System Solve</h3>
+
+            <p>
+                Given K and F, finding U requires solving the linear system <code>K · U = F</code>.
+                We use <code>torch.linalg.solve</code> to find U—this is computationally tractable
+                and well-posed. Modern sparse linear algebra makes this fast even for large meshes.
+            </p>
+        </section>
+
+        <!-- Section 6: Architecture -->
+        <section class="section" id="architecture">
+            <h2><span class="section-number">6</span>The Training Architecture</h2>
+
+            <p>
+                Here's the technical version of our "student checking homework" concept. We combine a
+                neural network (U-Net) with a differentiable physics simulator in a
+                <strong>forward-model-in-the-loop</strong> training setup.
+            </p>
+
+            <div class="pipeline">
+                <div class="pipeline-row">
+                    <div class="pipeline-step highlight">
+                        <div class="icon">🧠</div>
+                        <div class="label">U-Net Predicts</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">📍</div>
+                        <div class="label">Sample at Mesh</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">🔧</div>
+                        <div class="label">Build K</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">⚡</div>
+                        <div class="label">FEM Forward</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step">
+                        <div class="icon">📏</div>
+                        <div class="label">Extract Boundary</div>
+                    </div>
+                    <span class="pipeline-arrow">→</span>
+                    <div class="pipeline-step highlight">
+                        <div class="icon">🎯</div>
+                        <div class="label">Compare & Learn</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Step by Step</h3>
+
+            <ol>
+                <li>
+                    <strong>U-Net Predicts Material Field:</strong> Given boundary displacement measurements,
+                    the U-Net outputs a 64×64 image representing the predicted Young's modulus E(x,y)
+                    across the domain.
+                </li>
+                <li>
+                    <strong>Sample at Mesh Nodes:</strong> The continuous prediction is sampled at each
+                    element centroid to get discrete material values for the FEM mesh.
+                </li>
+                <li>
+                    <strong>Build Stiffness Matrix K:</strong> Using the predicted materials, we assemble
+                    the global stiffness matrix K from individual element contributions.
+                </li>
+                <li>
+                    <strong>FEM Forward Solve:</strong> Solve F = KU to get predicted displacements U_pred
+                    everywhere in the mesh.
+                </li>
+                <li>
+                    <strong>Extract Boundary Displacements:</strong> Pull out just the boundary node
+                    displacements from U_pred—these are what we can actually measure experimentally.
+                </li>
+                <li>
+                    <strong>Compare & Backpropagate:</strong> Compare predicted boundary displacements to
+                    actual measurements. Compute loss and backpropagate through the ENTIRE pipeline
+                    (including the FEM solve!) to update U-Net weights.
+                </li>
+            </ol>
+
+            <div class="key-insight">
+                <h4>💡 Why This Works</h4>
+                <p>
+                    The network doesn't just learn pattern matching—it learns physics. Every gradient
+                    update incorporates information about how material changes affect deformation. The
+                    physics simulator acts as an "answer checker" that enforces physical consistency.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 7: Loss Functions -->
+        <section class="section" id="loss">
+            <h2><span class="section-number">7</span>Loss Functions & Regularization</h2>
+
+            <p>
+                The loss function guides the network toward good solutions. We use a combination of
+                data fidelity and regularization terms.
+            </p>
+
+            <div class="equation-box">
+                <span class="label">Total Loss</span>
+                <div class="equation">L = L_data + λ_TV · L_TV</div>
+                <div class="explanation">
+                    Data fidelity term + Total Variation regularization
+                </div>
+            </div>
+
+            <h3>Data Fidelity: MSE on Boundary Displacements</h3>
+
+            <div class="equation-box">
+                <span class="label">Data Loss</span>
+                <div class="equation">L_data = ||U_boundary^pred - U_boundary^meas||²</div>
+                <div class="explanation">
+                    Squared difference between predicted and measured boundary displacements
+                </div>
+            </div>
+
+            <p>
+                This term ensures our predictions match experimental observations. Note that we only
+                compare at the <em>boundary</em>—this reflects real experimental constraints where
+                internal measurements are unavailable.
+            </p>
+
+            <h3>Regularization: Total Variation (TV)</h3>
+
+            <div class="equation-box">
+                <span class="label">TV Regularization</span>
+                <div class="equation">L_TV = Σ |∇E(x,y)|</div>
+                <div class="explanation">
+                    Sum of gradient magnitudes encourages piecewise-constant solutions
+                </div>
+            </div>
+
+            <p>
+                Total Variation regularization is borrowed from image processing. It penalizes
+                unnecessary variation in the material field, encouraging <strong>piecewise-constant</strong>
+                solutions with sharp boundaries—exactly what we expect for tissue with distinct
+                inclusions.
+            </p>
+
+            <figure class="visual-break">
+                <img src="tv_regularization_and_smoothing_and_level_set_post_processing.png"
+                     alt="Effect of TV regularization">
+                <figcaption>
+                    Algorithm results with TV regularization
+                </figcaption>
+            </figure>
+
+            <div class="concept-card">
+                <h4>⚖️ The Regularization Trade-off</h4>
+                <p>
+                    Too little TV (λ_TV small): Noisy predictions, overfitting to measurement noise<br>
+                    Too much TV (λ_TV large): Over-smoothed predictions, loss of fine details<br><br>
+                    We use hyperparameter search to find the sweet spot (typically λ_TV ≈ 0.001-0.01).
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 8: Key Innovations -->
+        <section class="section" id="innovations">
+            <h2><span class="section-number">8</span>Key Innovations</h2>
+
+            <h3>CT-Inspired Multi-Angle Acquisition</h3>
+
+            <p>
+                Just as CT scans acquire X-ray projections from many angles (remember the Hounsfield
+                insight?), we apply forces from multiple angles around the boundary. This dramatically
+                improves reconstruction quality by providing more independent measurements.
+            </p>
+
+            <div class="concept-card">
+                <h4>📐 Boussinesq-Inspired Angular Spacing</h4>
+                <p>
+                    The optimal angular spacing isn't uniform! We derive it from the Boussinesq
+                    solution for a point load on an elastic half-space. The stress field decays
+                    as cos²θ from the loading point, which suggests spacing forces according to
+                    inverse-cosine intervals for uniform information density.
+                </p>
+            </div>
+
+            <figure class="visual-break">
+                <img src="angular_scanning_irregular.gif" alt="Multi-angle scanning">
+                <figcaption>
+                    Sequential force application from different angles, like a CT scanner rotating
+                </figcaption>
+            </figure>
+
+            <h3>Watch the AI Learn</h3>
+
+            <p>
+                The most beautiful part? You can actually watch the learning happen. Below, see the AI
+                start with random noise and gradually converge on the correct answer over 2,000 training
+                steps.
+            </p>
+
+            <figure class="visual-break">
+                <img src="training_animation_grid_search_optimized.gif" alt="Training animation">
+                <figcaption>
+                    From chaos to clarity: watch the AI discover the hidden structure
+                </figcaption>
+            </figure>
+
+            <p>
+                On the left is the "ground truth"—what we're trying to find. In the middle is the AI's
+                current guess, getting better and better. On the right is the final cleaned-up boundary.
+            </p>
+
+            <div class="key-insight">
+                <h4>🧪 Physics-Informed by Design</h4>
+                <p>
+                    PAT Scan is a <strong>mesh-based Physics-Informed Neural Network (PINN)</strong>.
+                    Unlike meshfree PINNs that embed PDEs directly in the loss function, we leverage
+                    established FEM solvers for the physics while using deep learning only for the
+                    challenging inverse mapping. This hybrid approach combines the reliability of
+                    traditional numerical methods with the flexibility of neural networks.
+                </p>
+            </div>
+        </section>
+
+        <!-- What's Next -->
+        <section class="section">
+            <h2>Ready to Go Deeper?</h2>
+
+            <p>
+                Now you understand both the intuition and the conceptual architecture. The
+                <strong>Full Blueprint</strong> page dives into complete implementation details:
+                exact code structure, hyperparameter choices, boundary condition handling, and
+                experimental validation results.
+            </p>
+        </section>
+
+        <!-- Navigation Footer -->
+        <nav class="nav-footer">
+            <a href="beginner.html" class="nav-btn">← The Big Picture</a>
+            <a href="advanced.html" class="nav-btn next">The Full Blueprint →</a>
+        </nav>
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    </script>
+</body>
+</html>
