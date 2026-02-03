@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How Your Website Works</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0a0e1a;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:999;
+    background:#0a0e1a;border-bottom:1px solid #1f2937;
+    padding:10px 16px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+  }
+  .topbar button{
+    padding:7px 12px;border:2px solid #333;border-radius:6px;
+    background:#1a1a2e;color:#777;font-size:11px;font-weight:700;
+    cursor:pointer;transition:0.2s;
+  }
+  .topbar button:hover{border-color:#666;color:#ccc;}
+  .topbar button.on{color:var(--c);border-color:var(--c);}
+  .topbar .sp{flex:1;}
+  .topbar .ap{border-color:#FF6319;color:#FF6319;}
+  .topbar .ap:hover{background:#FF6319;color:#fff;}
+
+  .view{display:none;padding:70px 20px 40px;flex-direction:column;align-items:center;min-height:100vh;}
+  .view.on{display:flex;}
+  .view h1{font-size:26px;margin-bottom:4px;}
+  .view .sub{font-size:14px;color:#9ca3af;margin-bottom:20px;text-align:center;max-width:600px;}
+
+  .board{position:relative;width:1060px;}
+
+  /* Nodes */
+  .n{
+    position:absolute;border-radius:12px;padding:14px 16px;text-align:center;
+    background:linear-gradient(135deg,#1c2636,#131c2a);border:2px solid #444;
+    width:200px;transition:0.3s;
+  }
+  .n .ic{font-size:22px;}
+  .n .nm{font-size:14px;font-weight:700;color:#fff;margin-top:2px;}
+  .n .dt{font-size:11px;color:#9ca3af;margin-top:4px;line-height:1.4;}
+  .n.glow{box-shadow:0 0 18px var(--gc);}
+
+  /* Internet pill on arrows */
+  .inet{
+    position:absolute;background:#111827;border:1.5px dashed #374151;
+    border-radius:10px;padding:2px 8px;font-size:9px;font-weight:700;
+    color:#4b5563;letter-spacing:1px;
+  }
+  .same{
+    position:absolute;background:#FF631922;border:1.5px solid #FF631944;
+    border-radius:10px;padding:2px 8px;font-size:9px;font-weight:700;
+    color:#FF6319;letter-spacing:0.5px;
+  }
+  .local{
+    position:absolute;background:#00ADD822;border:1.5px solid #00ADD844;
+    border-radius:10px;padding:2px 8px;font-size:9px;font-weight:700;
+    color:#00ADD8;letter-spacing:0.5px;
+  }
+
+  /* Arrow label */
+  .al{position:absolute;font-size:10px;font-weight:600;white-space:nowrap;}
+
+  /* Stress */
+  .stress{animation:strs 0.4s ease infinite alternate;}
+  @keyframes strs{from{box-shadow:0 0 6px #EE352E55;}to{box-shadow:0 0 22px #EE352Eaa;}}
+
+  /* Dots */
+  .dots{position:absolute;display:flex;flex-wrap:wrap;gap:4px;}
+  .dot{width:12px;height:12px;border-radius:50%;animation:dp 1.5s ease infinite;}
+  @keyframes dp{0%,100%{opacity:0.3;transform:scale(0.8);}50%{opacity:0.9;transform:scale(1.1);}}
+  .dot.x{background:#EE352E;animation:dx 0.25s ease infinite alternate;}
+  @keyframes dx{from{opacity:0.5;}to{opacity:1;}}
+
+  /* Narration */
+  .nar{
+    max-width:740px;text-align:center;padding:18px 24px;border-radius:10px;
+    background:#13132a;border:1px solid #2a2a4a;font-size:14px;line-height:1.7;color:#bbb;
+  }
+  .nar b{color:#fff;}
+  .o{color:#FF6319;font-weight:600;}
+  .bl{color:#0039A6;font-weight:600;}
+  .g{color:#6CBE45;font-weight:600;}
+  .r{color:#EE352E;font-weight:600;}
+  .p{color:#7C3AED;font-weight:600;}
+  .cy{color:#00ADD8;font-weight:600;}
+  .y{color:#FCCC0A;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="topbar" id="tb"></div>
+
+<!-- ======================================================== -->
+<!--  STAGE 0: WEB LANGUAGES                                  -->
+<!-- ======================================================== -->
+<div class="view" id="v0">
+<h1 style="color:#FCCC0A">The Web Languages</h1>
+<p class="sub">Every website is built with three foundational languages. Browsers understand nothing else.</p>
+<div class="board" style="height:460px;">
+
+  <div style="position:absolute;left:10px;top:0;width:300px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#FCCC0A11;border:1px solid #FCCC0A33;color:#FCCC0A;font-size:12px;font-weight:700;letter-spacing:2px;">YOU WRITE</div>
+
+  <div class="n" style="left:10px;top:48px;width:300px;border-color:#FF6319;">
+    <div class="nm" style="color:#FF6319;">JSX — convenience syntax</div>
+    <div class="dt">Looks like HTML, lives inside JavaScript.<br>Browsers can't read it.</div>
+  </div>
+  <div class="n" style="left:10px;top:140px;width:300px;border-color:#FF6319;">
+    <div class="nm" style="color:#FF6319;">React — JavaScript library</div>
+    <div class="dt">Reusable UI components. Uses JSX.<br>Like NumPy is to Python.</div>
+  </div>
+  <div class="n" style="left:10px;top:232px;width:300px;border-color:#6CBE45;">
+    <div class="nm" style="color:#6CBE45;">TypeScript — JS + type enforcement</div>
+    <div class="dt">Like Python type hints, but blocks you<br>if the types are wrong.</div>
+  </div>
+  <div class="n" style="left:10px;top:324px;width:300px;border-color:#0039A6;">
+    <div class="nm" style="color:#0039A6;">Tailwind — CSS library</div>
+    <div class="dt">Shorthand classes like bg-dark-bg.<br>Like NumPy is to Python.</div>
+  </div>
+
+  <!-- VITE -->
+  <div class="n" style="left:415px;top:130px;width:190px;height:200px;border-color:#FCCC0A;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="font-size:36px;">⚡</div>
+    <div class="nm" style="color:#FCCC0A;font-size:18px;">VITE</div>
+    <div class="dt" style="color:#FCCC0A;">The Translator</div>
+    <div class="dt">JSX → JavaScript</div>
+    <div class="dt">Tailwind → CSS</div>
+    <div class="dt">TypeScript → JavaScript</div>
+  </div>
+
+  <div style="position:absolute;left:700px;top:0;width:330px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#7C3AED11;border:1px solid #7C3AED33;color:#7C3AED;font-size:12px;font-weight:700;letter-spacing:2px;">BROWSER UNDERSTANDS</div>
+
+  <div class="n" style="left:700px;top:48px;width:330px;border-color:#7C3AED;">
+    <div class="ic">🦴</div>
+    <div class="nm">HTML — Skeleton</div>
+    <div class="dt">What's on the page. The entry point.<br>References the CSS and JS files.</div>
+  </div>
+  <div class="n" style="left:700px;top:170px;width:330px;border-color:#7C3AED;">
+    <div class="ic">🎨</div>
+    <div class="nm">CSS — Skin</div>
+    <div class="dt">How it looks: colors, fonts, layout.<br>Why your site is dark with orange accents.</div>
+  </div>
+  <div class="n" style="left:700px;top:292px;width:330px;border-color:#7C3AED;">
+    <div class="ic">🧠</div>
+    <div class="nm">JavaScript — Brain</div>
+    <div class="dt">What it does: clicks, animations, sims.<br>All 7 sims run as JS in the browser.</div>
+  </div>
+
+  <!-- Arrows -->
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+      <marker id="ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+      <marker id="ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+      <marker id="ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+      <marker id="ay" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FCCC0A"/></marker>
+    </defs>
+    <line x1="310" y1="82" x2="415" y2="200" stroke="#FF6319" stroke-width="2" marker-end="url(#ao)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="310" y1="174" x2="415" y2="220" stroke="#FF6319" stroke-width="2" marker-end="url(#ao)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="310" y1="266" x2="415" y2="240" stroke="#6CBE45" stroke-width="2" marker-end="url(#ag)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="310" y1="358" x2="415" y2="260" stroke="#0039A6" stroke-width="2" marker-end="url(#ab)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="605" y1="190" x2="700" y2="90" stroke="#FCCC0A" stroke-width="2" marker-end="url(#ay)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="605" y1="230" x2="700" y2="220" stroke="#FCCC0A" stroke-width="2" marker-end="url(#ay)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="605" y1="270" x2="700" y2="340" stroke="#FCCC0A" stroke-width="2" marker-end="url(#ay)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <div style="position:absolute;left:10px;top:418px;width:300px;padding:10px;border-radius:8px;background:#13132a;border:1px solid #2a2a4a;text-align:center;font-size:12px;color:#9ca3af;">
+    <span style="color:#FCCC0A;font-weight:600;">Analogy:</span> NumPy is to Python as React is to JavaScript as Tailwind is to CSS.
+  </div>
+  <div style="position:absolute;left:700px;top:418px;width:330px;padding:10px;border-radius:8px;background:#13132a;border:1px solid #2a2a4a;text-align:center;font-size:12px;color:#9ca3af;">
+    These three are <b style="color:#fff;">foundational</b>. Not built on anything. Every framework compiles down to them.
+  </div>
+</div>
+<div class="nar">Browsers speak exactly three languages: <b>HTML</b>, <b>CSS</b>, and <b>JavaScript</b>. You write in convenience tools — <span class="o">React/JSX</span>, <span class="bl">Tailwind</span>, <span class="g">TypeScript</span> — and <span class="y">Vite</span> translates everything back to the three languages browsers actually speak.</div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 1: LOCALHOST                                       -->
+<!-- ======================================================== -->
+<div class="view" id="v1">
+<h1 style="color:#FF6319">Stage 1: Localhost (Current State)</h1>
+<p class="sub">Your website runs on your laptop. Your browser talks to Vite. But two things already cross the internet.</p>
+<div class="board" style="height:340px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs><marker id="a1o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a1p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    <marker id="a1g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a1r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    </defs>
+    <!-- Vite → Browser -->
+    <line x1="490" y1="90" x2="490" y2="170" stroke="#FF6319" stroke-width="2" marker-end="url(#a1o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Browser → Vite -->
+    <line x1="530" y1="170" x2="530" y2="90" stroke="#7C3AED" stroke-width="2" marker-end="url(#a1p)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Browser → MyBinder -->
+    <line x1="400" y1="210" x2="220" y2="210" stroke="#6CBE45" stroke-width="2" marker-end="url(#a1g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- MyBinder → Browser -->
+    <line x1="220" y1="230" x2="400" y2="230" stroke="#6CBE45" stroke-width="2" marker-end="url(#a1g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Browser → YouTube -->
+    <line x1="620" y1="210" x2="800" y2="210" stroke="#EE352E" stroke-width="2" marker-end="url(#a1r)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- YouTube → Browser -->
+    <line x1="800" y1="230" x2="620" y2="230" stroke="#EE352E" stroke-width="2" marker-end="url(#a1r)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <!-- Vite Server -->
+  <div class="n" style="left:410px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div>
+    <div class="nm">Your Laptop — Vite</div>
+    <div class="dt">Dev server at localhost:5173<br>Translates JSX on-the-fly</div>
+  </div>
+
+  <div class="same" style="left:460px;top:107px;">SAME MACHINE</div>
+
+  <!-- Browser -->
+  <div class="n" style="left:400px;top:170px;width:230px;border-color:#7C3AED;">
+    <div class="ic">🌐</div>
+    <div class="nm">Your Browser</div>
+    <div class="dt">Downloads files from Vite<br>Runs all 7 sims on your CPU</div>
+  </div>
+
+  <div class="inet" style="left:290px;top:195px;">INTERNET</div>
+  <div class="inet" style="left:700px;top:195px;">INTERNET</div>
+
+  <!-- MyBinder -->
+  <div class="n" style="left:10px;top:170px;width:210px;border-color:#6CBE45;">
+    <div class="ic">🔬</div>
+    <div class="nm">MyBinder</div>
+    <div class="dt">Temporary cloud server<br>Runs JAX code (your browser can't)</div>
+  </div>
+
+  <!-- YouTube -->
+  <div class="n" style="left:810px;top:170px;width:210px;border-color:#EE352E;">
+    <div class="ic">📺</div>
+    <div class="nm">YouTube (Google)</div>
+    <div class="dt">Streams embedded video<br>Google's servers + bandwidth</div>
+  </div>
+
+  <div class="al" style="left:470px;top:130px;color:#FF6319;">↓ HTML, CSS, JS</div>
+  <div class="al" style="left:540px;top:130px;color:#7C3AED;">↑ request</div>
+  <div class="al" style="left:280px;top:250px;color:#6CBE45;">← JAX code / results →</div>
+  <div class="al" style="left:700px;top:250px;color:#EE352E;">← embed request / video stream →</div>
+</div>
+<div class="nar">Your laptop is <b>both server and client</b>. Vite serves files, your browser runs them — <span class="o">same machine, no internet</span>. But two things already cross the internet: <span class="g">MyBinder</span> runs JAX code on a temporary cloud server (your browser can't do XLA compilation), and <span class="r">YouTube</span> streams embedded video from Google's servers.</div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 2: DEPLOYED                                        -->
+<!-- ======================================================== -->
+<div class="view" id="v2">
+<h1 style="color:#0039A6">Stage 2: Deployed Static Site</h1>
+<p class="sub">Your site is live. Anyone in the world can access it.</p>
+<div class="board" style="height:580px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a2o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a2b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a2g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a2p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    <marker id="a2r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    </defs>
+    <!-- Laptop → GitHub -->
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a2o)"/>
+    <!-- GitHub → Vercel -->
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a2b)"/>
+    <!-- Vercel → CDNs -->
+    <line x1="480" y1="330" x2="180" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a2g)"/>
+    <line x1="530" y1="330" x2="530" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a2g)"/>
+    <line x1="580" y1="330" x2="880" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a2g)"/>
+    <!-- CDN → Users -->
+    <line x1="150" y1="450" x2="150" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a2p)"/>
+    <line x1="530" y1="450" x2="530" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a2p)"/>
+    <line x1="900" y1="450" x2="900" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a2p)"/>
+    <!-- MyBinder ↔ Users[0] -->
+    <line x1="55" y1="480" x2="55" y2="450" stroke="#6CBE45" stroke-width="1.5" marker-end="url(#a2g)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- YouTube ↔ Users[2] -->
+    <line x1="1000" y1="480" x2="1000" y2="450" stroke="#EE352E" stroke-width="1.5" marker-end="url(#a2r)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <!-- Laptop -->
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div>
+    <div class="nm">Your Laptop</div>
+    <div class="dt">git push</div>
+  </div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+  <div class="al" style="left:545px;top:87px;color:#FF6319;">git push ↓</div>
+
+  <!-- GitHub -->
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;">
+    <div class="ic">🐙</div>
+    <div class="nm">GitHub (Microsoft)</div>
+    <div class="dt">Source code stored on<br>Microsoft's hard drives</div>
+  </div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+  <div class="al" style="left:545px;top:210px;color:#0039A6;">fetch source ↓</div>
+
+  <!-- Vercel -->
+  <div class="n" style="left:420px;top:250px;width:230px;border-color:#0039A6;">
+    <div class="ic">▲</div>
+    <div class="nm">Vercel Build Server</div>
+    <div class="dt">npm run build → Vite translates<br>Produces dist/ folder</div>
+  </div>
+  <div class="al" style="left:420px;top:345px;color:#6CBE45;">↓ copies dist/ to CDN servers worldwide</div>
+
+  <!-- CDNs -->
+  <div class="n" style="left:50px;top:390px;width:200px;border-color:#6CBE45;">
+    <div class="nm">🌐 CDN — Mumbai</div>
+  </div>
+  <div class="n" style="left:430px;top:390px;width:200px;border-color:#6CBE45;">
+    <div class="nm">🌐 CDN — London</div>
+  </div>
+  <div class="n" style="left:800px;top:390px;width:200px;border-color:#6CBE45;">
+    <div class="nm">🌐 CDN — Virginia</div>
+  </div>
+  <div class="inet" style="left:480px;top:460px;">INTERNET</div>
+
+  <!-- Users -->
+  <div class="n" style="left:30px;top:490px;width:230px;border-color:#7C3AED;">
+    <div class="nm">👤 User in India</div>
+    <div class="dt">Browser downloads from Mumbai<br>Runs sims on their CPU</div>
+  </div>
+  <div class="n" style="left:410px;top:490px;width:230px;border-color:#7C3AED;">
+    <div class="nm">👤 User in UK</div>
+    <div class="dt">Browser downloads from London<br>Runs sims on their CPU</div>
+  </div>
+  <div class="n" style="left:790px;top:490px;width:230px;border-color:#7C3AED;">
+    <div class="nm">👤 User in USA</div>
+    <div class="dt">Browser downloads from Virginia<br>Runs sims on their CPU</div>
+  </div>
+
+  <!-- MyBinder + YouTube still connected to users -->
+  <div style="position:absolute;left:30px;top:440px;width:60px;text-align:center;font-size:9px;color:#6CBE45;font-weight:600;">🔬<br>MyBinder<br>(still works)</div>
+  <div style="position:absolute;left:970px;top:440px;width:60px;text-align:center;font-size:9px;color:#EE352E;font-weight:600;">📺<br>YouTube<br>(still works)</div>
+</div>
+<div class="nar">You <span class="o">git push</span> to GitHub (Microsoft's hard drives) across the internet. Vercel fetches it across the internet, runs <b>npm run build</b>, copies <b>dist/</b> to <span class="g">CDN servers worldwide</span>. Users download from the nearest CDN across the internet. <b>Every arrow = a computer talking to another computer. Every box = a hard drive somewhere.</b> MyBinder and YouTube still work — users' browsers connect to them directly.</div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 3: + CHATBOT                                       -->
+<!-- ======================================================== -->
+<div class="view" id="v3">
+<h1 style="color:#FF6319">Stage 3: + AI Chatbot</h1>
+<p class="sub">Everything from Stage 2, plus Anthropic for AI chat.</p>
+<div class="board" style="height:580px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a3o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a3b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a3g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a3p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    <marker id="a3r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    </defs>
+    <!-- Laptop → GitHub -->
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a3o)"/>
+    <!-- GitHub → Vercel -->
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a3b)"/>
+    <!-- Vercel → Anthropic -->
+    <line x1="650" y1="275" x2="780" y2="275" stroke="#FF6319" stroke-width="2" marker-end="url(#a3o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="780" y1="295" x2="650" y2="295" stroke="#FF6319" stroke-width="2" marker-end="url(#a3o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Vercel → CDNs -->
+    <line x1="480" y1="330" x2="180" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a3g)"/>
+    <line x1="530" y1="330" x2="530" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a3g)"/>
+    <line x1="580" y1="330" x2="880" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a3g)"/>
+    <!-- CDN → Users -->
+    <line x1="150" y1="440" x2="150" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a3p)"/>
+    <line x1="530" y1="440" x2="530" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a3p)"/>
+    <line x1="900" y1="440" x2="900" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a3p)"/>
+    <!-- User chats → Vercel (via CDN area, conceptual) -->
+    <line x1="530" y1="475" x2="530" y2="330" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <!-- Laptop -->
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div><div class="nm">Your Laptop</div><div class="dt">git push</div>
+  </div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+
+  <!-- GitHub -->
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;">
+    <div class="ic">🐙</div><div class="nm">GitHub (Microsoft)</div><div class="dt">Source code on hard drives</div>
+  </div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+
+  <!-- Vercel -->
+  <div class="n" style="left:420px;top:250px;width:230px;border-color:#0039A6;">
+    <div class="ic">▲</div>
+    <div class="nm">Vercel (Gatekeeper)</div>
+    <div class="dt">Builds site + serves it<br><b style="color:#FF6319;">Holds Anthropic API key</b></div>
+  </div>
+
+  <!-- Anthropic (NEW) -->
+  <div class="n glow" style="left:800px;top:250px;width:220px;border-color:#FF6319;--gc:#FF631944;">
+    <div class="ic">🧠</div>
+    <div class="nm">Anthropic — <span style="color:#6CBE45;">NEW</span></div>
+    <div class="dt">LLM inference on GPUs<br>Anthropic's data center</div>
+  </div>
+  <div class="inet" style="left:710px;top:273px;">INTERNET</div>
+  <div class="al" style="left:670px;top:262px;color:#FF6319;">question →</div>
+  <div class="al" style="left:670px;top:302px;color:#FF6319;">← answer</div>
+
+  <!-- CDNs -->
+  <div class="n" style="left:50px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — Mumbai</div></div>
+  <div class="n" style="left:430px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — London</div></div>
+  <div class="n" style="left:800px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — Virginia</div></div>
+  <div class="inet" style="left:480px;top:450px;">INTERNET</div>
+
+  <!-- Users -->
+  <div class="n" style="left:30px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in India</div><div class="dt">Sims run locally + chats via Vercel</div></div>
+  <div class="n" style="left:410px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in UK</div><div class="dt">Sims run locally + chats via Vercel</div></div>
+  <div class="n" style="left:790px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in USA</div><div class="dt">Sims run locally + chats via Vercel</div></div>
+
+  <div style="position:absolute;left:30px;top:435px;font-size:9px;color:#6CBE45;font-weight:600;">🔬 MyBinder (still works)</div>
+  <div style="position:absolute;left:920px;top:435px;font-size:9px;color:#EE352E;font-weight:600;">📺 YouTube (still works)</div>
+</div>
+<div class="nar">Everything from Stage 2, plus: students can chat with an AI tutor. Browser sends questions across the internet to <span class="bl">Vercel</span> (holds the <span class="o">API key</span>). Vercel forwards across the internet to <span class="o">Anthropic</span>. Answer flows back. <b>Browser never talks to Anthropic directly — the API key would be exposed.</b></div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 4: + DATABASE                                      -->
+<!-- ======================================================== -->
+<div class="view" id="v4">
+<h1 style="color:#6CBE45">Stage 4: + Memory (Database)</h1>
+<p class="sub">Everything from Stage 3, plus Supabase to remember users.</p>
+<div class="board" style="height:580px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a4o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a4b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a4g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a4p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    </defs>
+    <!-- Laptop → GitHub -->
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a4o)"/>
+    <!-- GitHub → Vercel -->
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a4b)"/>
+    <!-- Vercel → Anthropic -->
+    <line x1="650" y1="275" x2="780" y2="275" stroke="#FF6319" stroke-width="2" marker-end="url(#a4o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="780" y1="295" x2="650" y2="295" stroke="#FF6319" stroke-width="2" marker-end="url(#a4o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Vercel → Supabase -->
+    <line x1="420" y1="275" x2="280" y2="275" stroke="#6CBE45" stroke-width="2" marker-end="url(#a4g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="280" y1="295" x2="420" y2="295" stroke="#6CBE45" stroke-width="2" marker-end="url(#a4b)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Vercel → CDNs -->
+    <line x1="480" y1="330" x2="180" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a4g)"/>
+    <line x1="530" y1="330" x2="530" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a4g)"/>
+    <line x1="580" y1="330" x2="880" y2="380" stroke="#6CBE45" stroke-width="2" marker-end="url(#a4g)"/>
+    <!-- CDN → Users -->
+    <line x1="150" y1="440" x2="150" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a4p)"/>
+    <line x1="530" y1="440" x2="530" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a4p)"/>
+    <line x1="900" y1="440" x2="900" y2="475" stroke="#7C3AED" stroke-width="2" marker-end="url(#a4p)"/>
+  </svg>
+
+  <!-- Laptop -->
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div><div class="nm">Your Laptop</div><div class="dt">git push</div>
+  </div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+
+  <!-- GitHub -->
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;">
+    <div class="ic">🐙</div><div class="nm">GitHub (Microsoft)</div><div class="dt">Source code on hard drives</div>
+  </div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+
+  <!-- Supabase (NEW) -->
+  <div class="n glow" style="left:40px;top:250px;width:240px;border-color:#6CBE45;--gc:#6CBE4544;">
+    <div class="ic">🗄️</div>
+    <div class="nm">Supabase — <span style="color:#6CBE45;">NEW</span></div>
+    <div class="dt">Database on its own servers<br>Stores user progress on hard drives</div>
+  </div>
+  <div class="inet" style="left:310px;top:273px;">NET</div>
+  <div class="al" style="left:300px;top:262px;color:#6CBE45;">write →</div>
+  <div class="al" style="left:300px;top:302px;color:#6CBE45;">← read</div>
+
+  <!-- Vercel -->
+  <div class="n" style="left:420px;top:250px;width:230px;border-color:#0039A6;">
+    <div class="ic">▲</div>
+    <div class="nm">Vercel (Gatekeeper)</div>
+    <div class="dt">Holds API key + DB credentials<br>Relays ALL requests</div>
+  </div>
+
+  <!-- Anthropic -->
+  <div class="n" style="left:800px;top:250px;width:220px;border-color:#FF6319;">
+    <div class="ic">🧠</div><div class="nm">Anthropic</div><div class="dt">LLM inference on GPUs</div>
+  </div>
+  <div class="inet" style="left:710px;top:273px;">NET</div>
+
+  <!-- CDNs -->
+  <div class="n" style="left:50px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — Mumbai</div></div>
+  <div class="n" style="left:430px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — London</div></div>
+  <div class="n" style="left:800px;top:385px;width:200px;border-color:#6CBE45;"><div class="nm">🌐 CDN — Virginia</div></div>
+  <div class="inet" style="left:480px;top:450px;">INTERNET</div>
+
+  <!-- Users -->
+  <div class="n" style="left:30px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in India</div></div>
+  <div class="n" style="left:410px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in UK</div></div>
+  <div class="n" style="left:790px;top:480px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in USA</div></div>
+
+  <div style="position:absolute;left:30px;top:440px;font-size:9px;color:#6CBE45;">🔬 MyBinder (still works)</div>
+  <div style="position:absolute;left:920px;top:440px;font-size:9px;color:#EE352E;">📺 YouTube (still works)</div>
+</div>
+<div class="nar">Everything from Stage 3, plus: <span class="g">Supabase</span> stores user progress on its own servers (physical hard drives). Browser → <span class="bl">Vercel</span> (holds DB credentials) → <span class="g">Supabase</span>. Same pattern: <b>Vercel is the gatekeeper. Browser never talks directly to any service that needs credentials.</b></div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 5: TRAFFIC SURGE                                   -->
+<!-- ======================================================== -->
+<div class="view" id="v5">
+<h1 style="color:#EE352E">Stage 5: Traffic Surge</h1>
+<p class="sub">Same architecture as Stage 4. Carl Wieman tweets your site. 5,000 students arrive.</p>
+<div class="board" style="height:540px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a5o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a5b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a5r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    <marker id="a5g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a5p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    </defs>
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a5o)"/>
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a5b)"/>
+    <!-- OVERWHELMED arrows Vercel → Supabase -->
+    <line x1="420" y1="265" x2="280" y2="265" stroke="#EE352E" stroke-width="3" marker-end="url(#a5r)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.2s" repeatCount="indefinite"/></line>
+    <line x1="420" y1="280" x2="280" y2="280" stroke="#EE352E" stroke-width="3" marker-end="url(#a5r)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.25s" repeatCount="indefinite"/></line>
+    <line x1="420" y1="295" x2="280" y2="295" stroke="#EE352E" stroke-width="3" marker-end="url(#a5r)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.3s" repeatCount="indefinite"/></line>
+    <!-- Vercel → Anthropic (fine) -->
+    <line x1="650" y1="280" x2="780" y2="280" stroke="#6CBE45" stroke-width="2" marker-end="url(#a5g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- CDN stuff -->
+    <line x1="480" y1="330" x2="180" y2="370" stroke="#6CBE45" stroke-width="2" marker-end="url(#a5g)"/>
+    <line x1="530" y1="330" x2="530" y2="370" stroke="#6CBE45" stroke-width="2" marker-end="url(#a5g)"/>
+    <line x1="580" y1="330" x2="880" y2="370" stroke="#6CBE45" stroke-width="2" marker-end="url(#a5g)"/>
+  </svg>
+
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;"><div class="ic">💻</div><div class="nm">Your Laptop</div></div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;"><div class="ic">🐙</div><div class="nm">GitHub (Microsoft)</div></div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+
+  <!-- Supabase STRESSED -->
+  <div class="n stress" style="left:40px;top:250px;width:240px;border-color:#EE352E;">
+    <div class="ic">🗄️</div>
+    <div class="nm" style="color:#EE352E;">Supabase — OVERWHELMED</div>
+    <div class="dt">Connection limit: ~100-500<br><b style="color:#EE352E;">REJECTING 5,000 connections</b></div>
+  </div>
+  <div class="al" style="left:310px;top:255px;color:#EE352E;font-size:11px;">5,000 connections!</div>
+
+  <!-- Vercel -->
+  <div class="n" style="left:420px;top:250px;width:230px;border-color:#0039A6;">
+    <div class="ic">▲</div><div class="nm">Vercel</div>
+    <div class="dt">Spins up 5,000 separate functions<br>Each opens its own DB connection</div>
+  </div>
+
+  <!-- Anthropic (fine) -->
+  <div class="n" style="left:800px;top:250px;width:220px;border-color:#6CBE45;">
+    <div class="ic">🧠</div><div class="nm" style="color:#6CBE45;">Anthropic — ✓ Fine</div><div class="dt">Handles its own scale</div>
+  </div>
+
+  <!-- CDNs + Users (compressed) -->
+  <div class="n" style="left:50px;top:375px;width:170px;border-color:#6CBE45;"><div class="nm" style="font-size:12px;">🌐 CDN Mumbai</div></div>
+  <div class="n" style="left:440px;top:375px;width:170px;border-color:#6CBE45;"><div class="nm" style="font-size:12px;">🌐 CDN London</div></div>
+  <div class="n" style="left:830px;top:375px;width:170px;border-color:#6CBE45;"><div class="nm" style="font-size:12px;">🌐 CDN Virginia</div></div>
+
+  <!-- Flood -->
+  <div style="position:absolute;left:50px;top:425px;color:#EE352E;font-weight:700;font-size:13px;">5,000 users flooding in:</div>
+  <div class="dots" style="left:50px;top:448px;width:950px;"></div>
+
+  <div style="position:absolute;left:920px;top:432px;font-size:9px;color:#6CBE45;">🔬 MyBinder</div>
+  <div style="position:absolute;left:920px;top:446px;font-size:9px;color:#EE352E;">📺 YouTube</div>
+</div>
+<div class="nar"><b>Same architecture as Stage 4.</b> Each request spins up a separate serverless function. Each opens its own database connection. Supabase has a <span class="r">connection limit</span>. 5,000 users → thousands of connections → <span class="r">Supabase rejects them</span>. <b>The waiter (Vercel) is fine. The kitchen (Supabase) is overwhelmed.</b></div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 6: + VIDEO                                         -->
+<!-- ======================================================== -->
+<div class="view" id="v6">
+<h1 style="color:#7C3AED">Stage 6: + Video Content</h1>
+<p class="sub">Everything from Stage 4, plus video hosting via YouTube and file storage via S3.</p>
+<div class="board" style="height:580px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a6o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a6b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a6g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a6p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    <marker id="a6r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    </defs>
+    <!-- Laptop → GitHub -->
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a6o)"/>
+    <!-- Laptop → YouTube (upload) -->
+    <line x1="430" y1="45" x2="110" y2="45" stroke="#EE352E" stroke-width="2" marker-end="url(#a6r)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- GitHub → Vercel -->
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a6b)"/>
+    <!-- Vercel ↔ Supabase -->
+    <line x1="420" y1="275" x2="280" y2="275" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="280" y1="295" x2="420" y2="295" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6b)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Vercel ↔ Anthropic -->
+    <line x1="650" y1="275" x2="780" y2="275" stroke="#FF6319" stroke-width="2" marker-end="url(#a6o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="780" y1="295" x2="650" y2="295" stroke="#FF6319" stroke-width="2" marker-end="url(#a6o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Vercel → CDNs -->
+    <line x1="480" y1="330" x2="280" y2="385" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6g)"/>
+    <line x1="530" y1="330" x2="530" y2="385" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6g)"/>
+    <line x1="580" y1="330" x2="780" y2="385" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6g)"/>
+    <!-- CDN → Users -->
+    <line x1="250" y1="445" x2="250" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a6p)"/>
+    <line x1="530" y1="445" x2="530" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a6p)"/>
+    <line x1="800" y1="445" x2="800" y2="480" stroke="#7C3AED" stroke-width="2" marker-end="url(#a6p)"/>
+    <!-- YouTube → Users -->
+    <line x1="80" y1="95" x2="200" y2="480" stroke="#EE352E" stroke-width="2" marker-end="url(#a6r)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- S3 → Users -->
+    <line x1="960" y1="300" x2="850" y2="480" stroke="#6CBE45" stroke-width="2" marker-end="url(#a6g)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <!-- YouTube (NEW) -->
+  <div class="n glow" style="left:10px;top:10px;width:210px;border-color:#EE352E;--gc:#EE352E44;">
+    <div class="ic">📺</div>
+    <div class="nm">YouTube — <span style="color:#6CBE45;">NEW</span></div>
+    <div class="dt">You upload video here<br>Google streams to users — free</div>
+  </div>
+  <div class="al" style="left:240px;top:28px;color:#EE352E;">← upload from laptop</div>
+
+  <!-- Laptop -->
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div><div class="nm">Your Laptop</div><div class="dt">git push + upload videos</div>
+  </div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+
+  <!-- GitHub -->
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;">
+    <div class="ic">🐙</div><div class="nm">GitHub (Microsoft)</div><div class="dt">Source + small audio (24 MB)</div>
+  </div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+
+  <!-- Supabase -->
+  <div class="n" style="left:40px;top:250px;width:240px;border-color:#6CBE45;">
+    <div class="ic">🗄️</div><div class="nm">Supabase</div><div class="dt">User progress</div>
+  </div>
+  <div class="inet" style="left:310px;top:273px;">NET</div>
+
+  <!-- Vercel -->
+  <div class="n" style="left:420px;top:250px;width:230px;border-color:#0039A6;">
+    <div class="ic">▲</div><div class="nm">Vercel (Gatekeeper)</div><div class="dt">Builds + serves + relays</div>
+  </div>
+
+  <!-- Anthropic -->
+  <div class="n" style="left:800px;top:250px;width:220px;border-color:#FF6319;">
+    <div class="ic">🧠</div><div class="nm">Anthropic</div><div class="dt">AI chatbot</div>
+  </div>
+  <div class="inet" style="left:710px;top:273px;">NET</div>
+
+  <!-- S3 (NEW) -->
+  <div class="n glow" style="left:880px;top:250px;width:160px;border-color:#6CBE45;--gc:#6CBE4544;">
+    <div class="ic">📦</div>
+    <div class="nm" style="font-size:12px;">S3 — <span style="color:#6CBE45;">NEW</span></div>
+    <div class="dt">Large audio, PDFs</div>
+  </div>
+
+  <!-- CDNs -->
+  <div class="n" style="left:150px;top:390px;width:190px;border-color:#6CBE45;"><div class="nm">🌐 CDN Mumbai</div></div>
+  <div class="n" style="left:430px;top:390px;width:190px;border-color:#6CBE45;"><div class="nm">🌐 CDN London</div></div>
+  <div class="n" style="left:700px;top:390px;width:190px;border-color:#6CBE45;"><div class="nm">🌐 CDN Virginia</div></div>
+  <div class="inet" style="left:480px;top:455px;">INTERNET</div>
+
+  <!-- Users -->
+  <div class="n" style="left:130px;top:485px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in India</div><div class="dt">Site + video + files</div></div>
+  <div class="n" style="left:420px;top:485px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in UK</div><div class="dt">Site + video + files</div></div>
+  <div class="n" style="left:700px;top:485px;width:230px;border-color:#7C3AED;"><div class="nm">👤 User in USA</div><div class="dt">Site + video + files</div></div>
+
+  <div class="al" style="left:30px;top:200px;color:#EE352E;">Google streams video ↓ to users</div>
+  <div style="position:absolute;left:150px;top:460px;font-size:9px;color:#6CBE45;">🔬 MyBinder (still works)</div>
+</div>
+<div class="nar">Everything from Stage 4, plus: you <span class="o">upload videos</span> from your laptop to <span class="r">YouTube</span> — Google streams them to users, you pay nothing. Large audio/PDFs go to <span class="g">AWS S3</span>. Small audio (24 MB Suno songs) stays in Git repo, served via CDN. <b>Videos are the expensive part — let Google eat the bandwidth cost.</b></div>
+</div>
+
+<!-- ======================================================== -->
+<!--  STAGE 7: OWN SERVER                                      -->
+<!-- ======================================================== -->
+<div class="view" id="v7">
+<h1 style="color:#00ADD8">Stage 7: Your Own Server</h1>
+<p class="sub">Replace Vercel + Supabase with your own AWS infrastructure. Everything else stays.</p>
+<div class="board" style="height:580px;">
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+    <defs>
+    <marker id="a7o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FF6319"/></marker>
+    <marker id="a7b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0039A6"/></marker>
+    <marker id="a7g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6CBE45"/></marker>
+    <marker id="a7p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7C3AED"/></marker>
+    <marker id="a7c" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#00ADD8"/></marker>
+    <marker id="a7r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#EE352E"/></marker>
+    </defs>
+    <line x1="530" y1="70" x2="530" y2="120" stroke="#FF6319" stroke-width="2" marker-end="url(#a7o)"/>
+    <!-- Laptop → YouTube -->
+    <line x1="430" y1="45" x2="110" y2="45" stroke="#EE352E" stroke-width="2" marker-end="url(#a7r)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- GitHub → Server -->
+    <line x1="530" y1="195" x2="530" y2="240" stroke="#0039A6" stroke-width="2" marker-end="url(#a7b)"/>
+    <!-- Server ↔ DB (local) -->
+    <line x1="480" y1="330" x2="380" y2="330" stroke="#00ADD8" stroke-width="2" marker-end="url(#a7c)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="380" y1="350" x2="480" y2="350" stroke="#00ADD8" stroke-width="2" marker-end="url(#a7c)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Server → Anthropic -->
+    <line x1="700" y1="280" x2="820" y2="280" stroke="#FF6319" stroke-width="2" marker-end="url(#a7o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <line x1="820" y1="300" x2="700" y2="300" stroke="#FF6319" stroke-width="2" marker-end="url(#a7o)" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    <!-- Server → CDNs -->
+    <line x1="540" y1="370" x2="280" y2="420" stroke="#6CBE45" stroke-width="2" marker-end="url(#a7g)"/>
+    <line x1="590" y1="370" x2="590" y2="420" stroke="#6CBE45" stroke-width="2" marker-end="url(#a7g)"/>
+    <line x1="640" y1="370" x2="870" y2="420" stroke="#6CBE45" stroke-width="2" marker-end="url(#a7g)"/>
+    <!-- CDN → Users -->
+    <line x1="250" y1="475" x2="250" y2="500" stroke="#7C3AED" stroke-width="2" marker-end="url(#a7p)"/>
+    <line x1="570" y1="475" x2="570" y2="500" stroke="#7C3AED" stroke-width="2" marker-end="url(#a7p)"/>
+    <line x1="870" y1="475" x2="870" y2="500" stroke="#7C3AED" stroke-width="2" marker-end="url(#a7p)"/>
+    <!-- YouTube → Users -->
+    <line x1="80" y1="95" x2="200" y2="500" stroke="#EE352E" stroke-width="1.5" marker-end="url(#a7r)" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.8s" repeatCount="indefinite"/></line>
+  </svg>
+
+  <!-- YouTube -->
+  <div class="n" style="left:10px;top:10px;width:210px;border-color:#EE352E;">
+    <div class="ic">📺</div><div class="nm">YouTube</div><div class="dt">Video streaming (free)</div>
+  </div>
+
+  <!-- Laptop -->
+  <div class="n" style="left:430px;top:10px;width:210px;border-color:#FF6319;">
+    <div class="ic">💻</div><div class="nm">Your Laptop</div><div class="dt">git push + upload videos</div>
+  </div>
+  <div class="inet" style="left:500px;top:80px;">INTERNET</div>
+
+  <!-- GitHub -->
+  <div class="n" style="left:430px;top:120px;width:210px;border-color:#e5e7eb;">
+    <div class="ic">🐙</div><div class="nm">GitHub (Microsoft)</div><div class="dt">Source code</div>
+  </div>
+  <div class="inet" style="left:500px;top:203px;">INTERNET</div>
+
+  <!-- AWS boundary -->
+  <div style="position:absolute;left:260px;top:235px;width:440px;height:150px;border:2px solid #00ADD8;border-radius:16px;background:#00ADD808;">
+    <div style="position:absolute;top:-12px;left:16px;background:#0a0e1a;padding:0 10px;color:#00ADD8;font-size:11px;font-weight:700;">AWS DATA CENTER — same building, local network</div>
+  </div>
+
+  <!-- Your Server (NEW, replaces Vercel) -->
+  <div class="n glow" style="left:480px;top:260px;width:220px;border-color:#00ADD8;--gc:#00ADD844;">
+    <div class="ic">🖥️</div>
+    <div class="nm">Your Server — <span style="color:#00ADD8;">NEW</span></div>
+    <div class="dt">Always running. Serves files.<br>Persistent DB connection pool.</div>
+  </div>
+
+  <!-- Your DB (NEW, replaces Supabase) -->
+  <div class="n glow" style="left:270px;top:300px;width:200px;border-color:#00ADD8;--gc:#00ADD844;">
+    <div class="ic">🗄️</div>
+    <div class="nm">Your Database — <span style="color:#00ADD8;">NEW</span></div>
+    <div class="dt">Same building — < 1ms</div>
+  </div>
+  <div class="local" style="left:400px;top:315px;">LOCAL</div>
+
+  <!-- Anthropic -->
+  <div class="n" style="left:830px;top:260px;width:200px;border-color:#FF6319;">
+    <div class="ic">🧠</div><div class="nm">Anthropic</div><div class="dt">AI chatbot</div>
+  </div>
+  <div class="inet" style="left:745px;top:278px;">NET</div>
+
+  <!-- CDNs -->
+  <div class="n" style="left:150px;top:420px;width:180px;border-color:#6CBE45;"><div class="nm">🌐 CDN Mumbai</div></div>
+  <div class="n" style="left:470px;top:420px;width:180px;border-color:#6CBE45;"><div class="nm">🌐 CDN London</div></div>
+  <div class="n" style="left:780px;top:420px;width:180px;border-color:#6CBE45;"><div class="nm">🌐 CDN Virginia</div></div>
+  <div class="inet" style="left:510px;top:484px;">INTERNET</div>
+
+  <!-- Users -->
+  <div class="n" style="left:130px;top:505px;width:220px;border-color:#7C3AED;"><div class="nm">👤 User in India</div></div>
+  <div class="n" style="left:440px;top:505px;width:220px;border-color:#7C3AED;"><div class="nm">👤 User in UK</div></div>
+  <div class="n" style="left:750px;top:505px;width:220px;border-color:#7C3AED;"><div class="nm">👤 User in USA</div></div>
+
+  <div style="position:absolute;left:160px;top:490px;font-size:9px;color:#6CBE45;">🔬 MyBinder</div>
+</div>
+<div class="nar">Replace Vercel + Supabase with <span class="cy">your own AWS server and database</span> — in the <b>same building, meters apart</b>, connected by a local network (< 1ms). Persistent connection pool — no spin-up/tear-down per request. Everything else (YouTube, Anthropic, CDN, MyBinder) stays the same. <b>More control, more responsibility — you're now on call at 3am.</b></div>
+</div>
+
+<!-- ===== NAVIGATION ===== -->
+<script>
+const S=[
+  {id:'v0',label:'0. Web Languages',color:'#FCCC0A'},
+  {id:'v1',label:'1. Localhost',color:'#FF6319'},
+  {id:'v2',label:'2. Deployed',color:'#0039A6'},
+  {id:'v3',label:'3. + Chatbot',color:'#FF6319'},
+  {id:'v4',label:'4. + Database',color:'#6CBE45'},
+  {id:'v5',label:'5. Traffic Surge',color:'#EE352E'},
+  {id:'v6',label:'6. + Video',color:'#7C3AED'},
+  {id:'v7',label:'7. Own Server',color:'#00ADD8'},
+];
+let cur=0,at=null;
+const tb=document.getElementById('tb');
+S.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.textContent=s.label;b.id='b'+i;
+  b.style.setProperty('--c',s.color);
+  b.onclick=()=>go(i);tb.appendChild(b);
+});
+const sp=document.createElement('div');sp.className='sp';tb.appendChild(sp);
+const ab=document.createElement('button');ab.className='ap';ab.textContent='▶ Auto-Play';
+ab.onclick=()=>{
+  if(at){clearInterval(at);at=null;ab.textContent='▶ Auto-Play';ab.style.borderColor='#FF6319';ab.style.color='#FF6319';return;}
+  ab.textContent='■ Stop';ab.style.borderColor='#EE352E';ab.style.color='#EE352E';
+  let x=0;go(x);
+  at=setInterval(()=>{x++;if(x>=S.length){clearInterval(at);at=null;ab.textContent='▶ Auto-Play';ab.style.borderColor='#FF6319';ab.style.color='#FF6319';return;}go(x);},6000);
+};
+tb.appendChild(ab);
+
+function go(n){
+  cur=n;
+  S.forEach((s,i)=>{
+    document.getElementById(s.id).classList.toggle('on',i===n);
+    document.getElementById('b'+i).classList.toggle('on',i===n);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Inject dots for stage 5
+const dotsEl=document.querySelector('#v5 .dots');
+for(let i=0;i<60;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i%3===0?' x':'');
+  d.style.background=i%3===0?'#EE352E':'#7C3AED';
+  d.style.animationDelay=(Math.random()*2).toFixed(1)+'s';
+  dotsEl.appendChild(d);
+}
+
+go(0);
+</script>
+</body>
+</html>

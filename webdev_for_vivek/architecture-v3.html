@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How Your Website Works — From Code to the World</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e1a;
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    background: #0a0e1a;
+    border-bottom: 1px solid #1f2937;
+    padding: 12px 20px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .topbar button {
+    padding: 7px 13px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #1a1a2e;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .topbar button:hover { border-color: #666; color: #ccc; }
+  .topbar button.on { border-color: var(--c); color: var(--c); background: #111; }
+  .topbar .spacer { flex: 1; }
+  .topbar .auto {
+    border-color: #FF6319;
+    color: #FF6319;
+  }
+  .topbar .auto:hover { background: #FF6319; color: #fff; }
+
+  /* ===== STAGE ===== */
+  .stage {
+    display: none;
+    padding: 80px 30px 50px;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+  }
+  .stage.active { display: flex; }
+
+  .stage h1 {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+  .stage .sub {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 24px;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  /* ===== DIAGRAM ===== */
+  .diagram {
+    position: relative;
+    width: 1100px;
+    margin-bottom: 24px;
+  }
+
+  /* ===== NODE ===== */
+  .node {
+    position: absolute;
+    background: linear-gradient(135deg, #1e2a3a, #151d2b);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    transition: 0.3s;
+  }
+  .node .icon { font-size: 24px; margin-bottom: 4px; }
+  .node .name { font-size: 13px; font-weight: 700; color: #fff; }
+  .node .detail { font-size: 11px; color: #9ca3af; margin-top: 3px; line-height: 1.4; }
+
+  /* ===== INTERNET CLOUD ===== */
+  .internet {
+    position: absolute;
+    background: #111827;
+    border: 2px dashed #374151;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #4b5563;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ===== ARROW (CSS) ===== */
+  .arrow {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .arrow .line {
+    height: 2px;
+    flex: 1;
+  }
+  .arrow .head {
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+  .arrow .lbl {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #0a0e1a;
+  }
+
+  /* animated dashes */
+  .flow-line {
+    background: repeating-linear-gradient(
+      90deg,
+      var(--c) 0px, var(--c) 8px,
+      transparent 8px, transparent 14px
+    );
+    background-size: 14px 2px;
+    animation: flowmove 0.8s linear infinite;
+  }
+  @keyframes flowmove {
+    to { background-position: 14px 0; }
+  }
+
+  /* stress pulse */
+  .stress { animation: stresspulse 0.4s ease infinite alternate; }
+  @keyframes stresspulse {
+    from { box-shadow: 0 0 8px rgba(238,53,46,0.3); }
+    to { box-shadow: 0 0 20px rgba(238,53,46,0.7); }
+  }
+
+  /* user dots */
+  .dots {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    animation: dotpulse 1.5s ease infinite;
+  }
+  @keyframes dotpulse {
+    0%,100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 0.9; transform: scale(1.1); }
+  }
+  .dot.angry { background: #EE352E; animation: angrydot 0.25s ease infinite alternate; }
+  @keyframes angrydot { from { opacity: 0.5; } to { opacity: 1; } }
+
+  /* ===== NARRATION ===== */
+  .narration {
+    max-width: 750px;
+    text-align: center;
+    padding: 18px 24px;
+    border-radius: 10px;
+    background: #13132a;
+    border: 1px solid #2a2a4a;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #bbb;
+  }
+  .narration b { color: #fff; }
+  .o { color: #FF6319; font-weight: 600; }
+  .b { color: #0039A6; font-weight: 600; }
+  .g { color: #6CBE45; font-weight: 600; }
+  .r { color: #EE352E; font-weight: 600; }
+  .p { color: #7C3AED; font-weight: 600; }
+  .c { color: #00ADD8; font-weight: 600; }
+  .y { color: #FCCC0A; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar"></div>
+
+<!-- ============================================================ -->
+<!-- STAGE 0: WEB LANGUAGES                                       -->
+<!-- ============================================================ -->
+<div class="stage" id="s0">
+  <h1 style="color:#FCCC0A">The Web Languages</h1>
+  <p class="sub">Every website in the world is built with three foundational languages. Browsers understand nothing else.</p>
+
+  <div class="diagram" style="height:480px;">
+    <!-- YOU WRITE -->
+    <div style="position:absolute;left:20px;top:0;width:280px;padding:8px 0;text-align:center;border:1px solid #FCCC0A44;border-radius:8px;background:#FCCC0A11;color:#FCCC0A;font-size:12px;font-weight:700;letter-spacing:2px;">YOU WRITE</div>
+
+    <div class="node" style="left:20px;top:50px;width:280px;border-color:#FF6319;">
+      <div class="name" style="color:#FF6319;">JSX</div>
+      <div class="detail">HTML-like syntax inside JavaScript<br>Convenient — but browsers can't read it</div>
+    </div>
+    <div class="node" style="left:20px;top:130px;width:280px;border-color:#FF6319;">
+      <div class="name" style="color:#FF6319;">React (JavaScript library)</div>
+      <div class="detail">Reusable UI components. Uses JSX.<br>Like NumPy for Python — don't reinvent the wheel</div>
+    </div>
+    <div class="node" style="left:20px;top:220px;width:280px;border-color:#6CBE45;">
+      <div class="name" style="color:#6CBE45;">TypeScript (.tsx files)</div>
+      <div class="detail">JavaScript with enforced type checking<br>Like Python type hints, but blocks you if wrong</div>
+    </div>
+    <div class="node" style="left:20px;top:310px;width:280px;border-color:#0039A6;">
+      <div class="name" style="color:#0039A6;">Tailwind (CSS library)</div>
+      <div class="detail">CSS shorthand classes: bg-dark-bg, text-white<br>Like NumPy for CSS — don't reinvent the wheel</div>
+    </div>
+
+    <!-- VITE -->
+    <div class="node" style="left:420px;top:120px;width:200px;height:200px;border-color:#FCCC0A;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div style="font-size:40px;">⚡</div>
+      <div class="name" style="color:#FCCC0A;font-size:18px;">VITE</div>
+      <div class="detail" style="color:#FCCC0A;">The Translator</div>
+      <div class="detail" style="margin-top:8px;">npm run build</div>
+      <div class="detail">JSX → JavaScript</div>
+      <div class="detail">Tailwind → CSS</div>
+      <div class="detail">TypeScript → JavaScript</div>
+    </div>
+
+    <!-- Arrows: write → vite -->
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <line x1="300" y1="75" x2="420" y2="200" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="300" y1="155" x2="420" y2="210" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="300" y1="248" x2="420" y2="220" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="300" y1="335" x2="420" y2="235" stroke="#0039A6" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+
+      <!-- Vite → outputs -->
+      <line x1="620" y1="180" x2="730" y2="80" stroke="#FCCC0A" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="620" y1="220" x2="730" y2="200" stroke="#FCCC0A" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="620" y1="260" x2="730" y2="320" stroke="#FCCC0A" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+    </svg>
+
+    <!-- BROWSER UNDERSTANDS -->
+    <div style="position:absolute;left:730px;top:0;width:330px;padding:8px 0;text-align:center;border:1px solid #7C3AED44;border-radius:8px;background:#7C3AED11;color:#7C3AED;font-size:12px;font-weight:700;letter-spacing:2px;">BROWSER UNDERSTANDS</div>
+
+    <div class="node" style="left:730px;top:50px;width:330px;border-color:#7C3AED;">
+      <div class="icon">🦴</div>
+      <div class="name">HTML — Skeleton</div>
+      <div class="detail">Structure: headings, paragraphs, buttons<br>The entry point. References CSS and JS files.</div>
+    </div>
+    <div class="node" style="left:730px;top:170px;width:330px;border-color:#7C3AED;">
+      <div class="icon">🎨</div>
+      <div class="name">CSS — Skin</div>
+      <div class="detail">Appearance: colors, fonts, spacing, layout<br>Why your site is dark with orange accents.</div>
+    </div>
+    <div class="node" style="left:730px;top:290px;width:330px;border-color:#7C3AED;">
+      <div class="icon">🧠</div>
+      <div class="name">JavaScript — Brain</div>
+      <div class="detail">Behavior: clicks, animations, simulations<br>All 7 sims run as JavaScript in the browser.</div>
+    </div>
+
+    <!-- Bottom -->
+    <div style="position:absolute;left:730px;top:410px;width:330px;padding:12px;border-radius:10px;background:#13132a;border:1px solid #2a2a4a;text-align:center;">
+      <div style="color:#9ca3af;font-size:12px;">These three are <b style="color:#fff;">foundational</b>.</div>
+      <div style="color:#9ca3af;font-size:12px;">Not built on top of anything else.</div>
+      <div style="color:#e5e7eb;font-size:12px;font-weight:600;margin-top:4px;">Every framework compiles down to them.</div>
+    </div>
+
+    <div style="position:absolute;left:20px;top:410px;width:280px;padding:12px;border-radius:10px;background:#13132a;border:1px solid #2a2a4a;text-align:center;">
+      <div style="color:#FCCC0A;font-size:12px;font-weight:600;">The analogy:</div>
+      <div style="color:#9ca3af;font-size:12px;margin-top:4px;">NumPy is to Python</div>
+      <div style="color:#9ca3af;font-size:12px;">as React is to JavaScript</div>
+      <div style="color:#9ca3af;font-size:12px;">as Tailwind is to CSS</div>
+    </div>
+  </div>
+
+  <div class="narration">
+    Browsers speak exactly three languages: <b>HTML</b> (skeleton), <b>CSS</b> (skin), and <b>JavaScript</b> (brain). That's it. But writing raw HTML/CSS/JS is tedious, so you use convenience tools: <span class="o">React</span> uses <span class="o">JSX</span> for JS, <span class="b">Tailwind</span> for CSS, <span class="g">TypeScript</span> for type-safe JS. None are understood by browsers — <span class="y">Vite</span> translates everything back to the three foundational languages.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 1: LOCALHOST (CURRENT)                                  -->
+<!-- ============================================================ -->
+<div class="stage" id="s1">
+  <h1 style="color:#FF6319">Stage 1: Localhost (Current State)</h1>
+  <p class="sub">Your website runs only on your laptop. Vite is the server. Your browser is the client. But you already connect to the outside world.</p>
+
+  <div class="diagram" style="height:420px;">
+    <!-- Your laptop -->
+    <div class="node" style="left:370px;top:0;width:260px;border-color:#FF6319;">
+      <div class="icon">💻</div>
+      <div class="name">Your Laptop</div>
+      <div class="detail">Vite dev server runs here<br>localhost:5173<br>Translates JSX on-the-fly</div>
+    </div>
+
+    <!-- Browser -->
+    <div class="node" style="left:370px;top:170px;width:260px;border-color:#7C3AED;">
+      <div class="icon">🌐</div>
+      <div class="name">Your Browser</div>
+      <div class="detail">Downloads HTML, CSS, JS from Vite<br>Runs all sims locally on your CPU<br>Also loads YouTube embeds</div>
+    </div>
+
+    <!-- Arrow: laptop ↔ browser -->
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- Laptop → Browser -->
+      <line x1="480" y1="95" x2="480" y2="170" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="475,168 485,168 480,175" fill="#FF6319"/>
+      <text x="490" y="130" fill="#FF6319" font-size="10" font-weight="600">HTML, CSS, JS</text>
+
+      <line x1="520" y1="170" x2="520" y2="95" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="515,97 525,97 520,90" fill="#7C3AED"/>
+      <text x="530" y="140" fill="#7C3AED" font-size="10" font-weight="600">requests page</text>
+
+      <!-- Same machine callout -->
+      <rect x="395" y="105" width="210" height="24" rx="6" fill="#FF631922" stroke="#FF631944" stroke-width="1"/>
+      <text x="500" y="121" text-anchor="middle" fill="#FF6319" font-size="10" font-weight="700">SAME MACHINE — no internet</text>
+
+      <!-- Browser → YouTube -->
+      <line x1="630" y1="210" x2="780" y2="130" stroke="#EE352E" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="778,125 782,135 772,133" fill="#EE352E"/>
+
+      <line x1="780" y1="145" x2="630" y2="225" stroke="#EE352E" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="625,223 635,228 628,218" fill="#EE352E"/>
+
+      <!-- Browser → MyBinder -->
+      <line x1="370" y1="220" x2="220" y2="140" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="222,135 218,145 228,140" fill="#6CBE45"/>
+
+      <line x1="220" y1="155" x2="370" y2="235" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="368,233 372,240 363,237" fill="#6CBE45"/>
+    </svg>
+
+    <!-- Internet clouds -->
+    <div class="internet" style="left:240px;top:150px;width:80px;height:50px;font-size:9px;">INTERNET</div>
+    <div class="internet" style="left:680px;top:150px;width:80px;height:50px;font-size:9px;">INTERNET</div>
+
+    <!-- MyBinder -->
+    <div class="node" style="left:30px;top:80px;width:210px;border-color:#6CBE45;">
+      <div class="icon">🔬</div>
+      <div class="name">MyBinder</div>
+      <div class="detail">Temporary cloud server with Python + JAX<br>Spins up → runs your code → sends results<br>Your browser can't run JAX locally</div>
+    </div>
+
+    <!-- YouTube -->
+    <div class="node" style="left:800px;top:80px;width:210px;border-color:#EE352E;">
+      <div class="icon">📺</div>
+      <div class="name">YouTube (Google)</div>
+      <div class="detail">Streams embedded video<br>Google's servers + bandwidth<br>You pay nothing</div>
+    </div>
+
+    <!-- Bottom labels -->
+    <div style="position:absolute;left:50px;top:230px;font-size:10px;color:#6CBE45;font-weight:600;">sends JAX code →</div>
+    <div style="position:absolute;left:50px;top:245px;font-size:10px;color:#6CBE45;font-weight:600;">← returns results</div>
+
+    <div style="position:absolute;left:870px;top:230px;font-size:10px;color:#EE352E;font-weight:600;text-align:right;">← streams video</div>
+
+    <!-- Explanatory boxes -->
+    <div style="position:absolute;left:50px;top:290px;width:450px;padding:14px;border-radius:10px;background:#13132a;border:1px solid #2a2a4a;">
+      <div style="color:#FF6319;font-size:12px;font-weight:700;margin-bottom:6px;">WHAT RUNS WHERE — RIGHT NOW</div>
+      <div style="color:#fff;font-size:11px;">🟠 Your 7 interactive sims → <span style="color:#FF6319;">Your browser (your CPU)</span></div>
+      <div style="color:#fff;font-size:11px;">🟢 JAX code execution → <span style="color:#6CBE45;">MyBinder (cloud server)</span></div>
+      <div style="color:#fff;font-size:11px;">🔴 Video playback → <span style="color:#EE352E;">YouTube (Google's servers)</span></div>
+      <div style="color:#fff;font-size:11px;">🟠 Vite dev server → <span style="color:#FF6319;">Your laptop (localhost:5173)</span></div>
+    </div>
+
+    <div style="position:absolute;left:550px;top:290px;width:450px;padding:14px;border-radius:10px;background:#13132a;border:1px solid #2a2a4a;">
+      <div style="color:#7C3AED;font-size:12px;font-weight:700;margin-bottom:6px;">WHY CAN'T THE BROWSER RUN JAX?</div>
+      <div style="color:#9ca3af;font-size:11px;line-height:1.5;">
+        JAX needs <b style="color:#fff;">XLA compilation</b> — a real server with Python, NumPy, and JAX installed. Your browser only runs JavaScript. So MyBinder spins up a <b style="color:#fff;">temporary virtual machine</b> in the cloud (a real computer in a data center) with JAX installed. Your browser connects to it via WebSocket. Code runs there. Results stream back.
+      </div>
+    </div>
+  </div>
+
+  <div class="narration">
+    Right now, your laptop is <b>both the server and the client</b>. Vite serves files at localhost:5173, your browser downloads and runs them — all on the same machine, no internet needed. But two things already cross the internet: <span class="g">MyBinder</span> runs JAX code on a temporary cloud server (your browser can't do XLA compilation), and <span class="r">YouTube</span> streams embedded video from Google's servers. <b>The sims run locally. The heavy compute and video happen elsewhere.</b>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 2: DEPLOYED STATIC SITE                                 -->
+<!-- ============================================================ -->
+<div class="stage" id="s2">
+  <h1 style="color:#0039A6">Stage 2: Deployed Static Site</h1>
+  <p class="sub">Your site is live on the internet. Anyone in the world can access it.</p>
+
+  <div class="diagram" style="height:520px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- Laptop → GitHub -->
+      <line x1="220" y1="50" x2="310" y2="50" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="308,45 308,55 316,50" fill="#FF6319"/>
+
+      <!-- GitHub → Vercel -->
+      <line x1="580" y1="50" x2="680" y2="50" stroke="#0039A6" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="678,45 678,55 686,50" fill="#0039A6"/>
+
+      <!-- Vercel → CDNs -->
+      <line x1="820" y1="95" x2="220" y2="215" stroke="#6CBE45" stroke-width="2"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="820" y1="95" x2="550" y2="215" stroke="#6CBE45" stroke-width="2"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <line x1="820" y1="95" x2="880" y2="215" stroke="#6CBE45" stroke-width="2"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+
+      <!-- CDNs → Users -->
+      <line x1="180" y1="285" x2="180" y2="340" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="175,338 185,338 180,346" fill="#7C3AED"/>
+      <line x1="510" y1="285" x2="510" y2="340" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="505,338 515,338 510,346" fill="#7C3AED"/>
+      <line x1="850" y1="285" x2="850" y2="340" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="845,338 855,338 850,346" fill="#7C3AED"/>
+    </svg>
+
+    <!-- Row 1 -->
+    <div class="node" style="left:30px;top:15px;width:190px;border-color:#FF6319;">
+      <div class="icon">💻</div>
+      <div class="name">Your Laptop</div>
+      <div class="detail">git push</div>
+    </div>
+
+    <div class="internet" style="left:245px;top:30px;width:65px;height:42px;">NET</div>
+
+    <div class="node" style="left:330px;top:15px;width:250px;border-color:#e5e7eb;">
+      <div class="icon">🐙</div>
+      <div class="name">GitHub (Microsoft)</div>
+      <div class="detail">Source code stored on<br>Microsoft's hard drives</div>
+    </div>
+
+    <div class="internet" style="left:608px;top:30px;width:65px;height:42px;">NET</div>
+
+    <div class="node" style="left:695px;top:15px;width:260px;border-color:#0039A6;">
+      <div class="icon">▲</div>
+      <div class="name">Vercel Build Server</div>
+      <div class="detail">Fetches source → npm run build<br>Vite translates → dist/ folder</div>
+    </div>
+
+    <!-- Label -->
+    <div style="position:absolute;left:250px;top:5px;font-size:10px;color:#FF6319;font-weight:600;">git push</div>
+    <div style="position:absolute;left:615px;top:5px;font-size:10px;color:#0039A6;font-weight:600;">fetch source</div>
+    <div style="position:absolute;left:470px;top:130px;font-size:11px;color:#6CBE45;font-weight:600;">copies dist/ to CDN servers worldwide</div>
+
+    <!-- Internet bar -->
+    <div style="position:absolute;left:30px;top:155px;right:30px;height:30px;border:2px dashed #374151;border-radius:15px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;font-weight:700;letter-spacing:2px;">THE INTERNET — requests travel through undersea cables, routers, switches</div>
+
+    <!-- Row 2: CDN -->
+    <div class="node" style="left:80px;top:215px;width:200px;border-color:#6CBE45;">
+      <div class="icon">🌐</div>
+      <div class="name">CDN — Mumbai</div>
+      <div class="detail">Copy of dist/ files</div>
+    </div>
+    <div class="node" style="left:410px;top:215px;width:200px;border-color:#6CBE45;">
+      <div class="icon">🌐</div>
+      <div class="name">CDN — London</div>
+      <div class="detail">Copy of dist/ files</div>
+    </div>
+    <div class="node" style="left:750px;top:215px;width:200px;border-color:#6CBE45;">
+      <div class="icon">🌐</div>
+      <div class="name">CDN — Virginia</div>
+      <div class="detail">Copy of dist/ files</div>
+    </div>
+
+    <!-- Internet bar 2 -->
+    <div style="position:absolute;left:30px;top:305px;right:30px;height:30px;border:2px dashed #374151;border-radius:15px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;font-weight:700;letter-spacing:2px;">THE INTERNET</div>
+
+    <!-- Row 3: Users -->
+    <div class="node" style="left:60px;top:345px;width:230px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">User in India</div>
+      <div class="detail">Browser downloads from Mumbai CDN<br>Runs sims on their own CPU</div>
+    </div>
+    <div class="node" style="left:390px;top:345px;width:230px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">User in UK</div>
+      <div class="detail">Browser downloads from London CDN<br>Runs sims on their own CPU</div>
+    </div>
+    <div class="node" style="left:730px;top:345px;width:230px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">User in USA</div>
+      <div class="detail">Browser downloads from Virginia CDN<br>Runs sims on their own CPU</div>
+    </div>
+
+    <!-- Note -->
+    <div style="position:absolute;left:200px;top:460px;width:650px;text-align:center;padding:10px;border-radius:8px;background:#13132a;border:1px solid #2a2a4a;">
+      <span style="color:#6b7280;font-size:12px;">MyBinder (JAX) and YouTube (video) still work exactly as in Stage 1 — they're separate services, not part of your hosting.</span>
+    </div>
+  </div>
+
+  <div class="narration">
+    You <span class="o">git push</span> to GitHub (Microsoft's hard drives). Vercel's build server fetches the source across the internet, runs <b>npm run build</b> (Vite translates everything), and copies the <b>dist/</b> folder to <span class="g">CDN servers worldwide</span>. A user in India opens your URL — their browser downloads from the <b>nearest CDN server</b> (Mumbai) across the internet. <b>Every arrow crosses the internet. Every box is a hard drive.</b>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 3: + CHATBOT                                            -->
+<!-- ============================================================ -->
+<div class="stage" id="s3">
+  <h1 style="color:#FF6319">Stage 3: + AI Chatbot</h1>
+  <p class="sub">A student asks a question while working through the JAX tutorial.</p>
+
+  <div class="diagram" style="height:390px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- User → Vercel -->
+      <line x1="550" y1="250" x2="550" y2="95" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="545,97 555,97 550,88" fill="#7C3AED"/>
+      <!-- Vercel → Anthropic -->
+      <line x1="680" y1="55" x2="810" y2="55" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="808,50 808,60 816,55" fill="#FF6319"/>
+      <!-- Anthropic → Vercel -->
+      <line x1="810" y1="72" x2="680" y2="72" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="682,67 682,77 674,72" fill="#FF6319"/>
+      <!-- Vercel → User -->
+      <line x1="520" y1="95" x2="520" y2="250" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="515,248 525,248 520,256" fill="#6CBE45"/>
+    </svg>
+
+    <!-- Static delivery (dimmed) -->
+    <div class="node" style="left:30px;top:15px;width:160px;border-color:#555;opacity:0.35;">
+      <div class="name" style="color:#888;">💻 Laptop → GitHub</div>
+      <div class="detail">Still works as before</div>
+    </div>
+
+    <!-- Vercel -->
+    <div class="node" style="left:420px;top:15px;width:260px;border-color:#0039A6;">
+      <div class="icon">▲</div>
+      <div class="name">Vercel (The Gatekeeper)</div>
+      <div class="detail">Serverless function holds your<br><b style="color:#FF6319;">Anthropic API key</b> (secret!)<br>Relays requests, enforces limits</div>
+    </div>
+
+    <div class="internet" style="left:720px;top:40px;width:65px;height:42px;">NET</div>
+
+    <!-- Anthropic -->
+    <div class="node" style="left:820px;top:15px;width:240px;border-color:#FF6319;">
+      <div class="icon">🧠</div>
+      <div class="name">Anthropic</div>
+      <div class="detail">LLM inference on Anthropic's GPUs<br>Data center with physical hardware</div>
+    </div>
+
+    <!-- Internet bar -->
+    <div style="position:absolute;left:30px;top:130px;right:30px;height:26px;border:2px dashed #374151;border-radius:13px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;font-weight:700;letter-spacing:2px;">THE INTERNET</div>
+
+    <!-- Labels -->
+    <div style="position:absolute;left:555px;top:160px;font-size:10px;color:#7C3AED;font-weight:600;">↑ "What does vmap do?"</div>
+    <div style="position:absolute;left:440px;top:180px;font-size:10px;color:#6CBE45;font-weight:600;">↓ "vmap batches a function..."</div>
+    <div style="position:absolute;left:700px;top:22px;font-size:10px;color:#FF6319;font-weight:600;">question →</div>
+    <div style="position:absolute;left:700px;top:82px;font-size:10px;color:#FF6319;font-weight:600;">← answer</div>
+
+    <!-- CDN still serves static files (dimmed) -->
+    <div class="node" style="left:30px;top:165px;width:190px;border-color:#6CBE45;opacity:0.35;">
+      <div class="name" style="color:#6CBE45;">🌐 CDN servers</div>
+      <div class="detail">Still serve static files (unchanged)</div>
+    </div>
+
+    <!-- User -->
+    <div class="node" style="left:400px;top:260px;width:300px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">Student</div>
+      <div class="detail">Types a question in the chatbot<br>Browser sends it to Vercel, NOT directly to Anthropic</div>
+    </div>
+
+    <!-- Why not direct? -->
+    <div style="position:absolute;left:100px;top:290px;width:250px;padding:14px;border-radius:10px;background:#1a0000;border:1px solid #EE352E44;">
+      <div style="color:#EE352E;font-size:12px;font-weight:700;">⚠️ WHY NOT DIRECTLY?</div>
+      <div style="color:#ccc;font-size:11px;margin-top:6px;line-height:1.5;">
+        Browser JavaScript is <b style="color:#fff;">visible to everyone</b>. Open dev tools → Sources tab → read all code. API key in browser = anyone copies it = unlimited calls on your bill.
+      </div>
+    </div>
+  </div>
+
+  <div class="narration">
+    The student's browser sends the question across the internet to <span class="b">Vercel's serverless function</span> — a tiny program on Vercel's servers that holds your <span class="o">Anthropic API key</span>. That function forwards it across the internet to <span class="o">Anthropic's GPUs</span>. The answer flows back: Anthropic → internet → Vercel → internet → browser. <b>The browser never talks to Anthropic directly because the API key would be exposed.</b>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 4: + DATABASE                                           -->
+<!-- ============================================================ -->
+<div class="stage" id="s4">
+  <h1 style="color:#6CBE45">Stage 4: + Memory (Database)</h1>
+  <p class="sub">Students log in. Their progress is saved between sessions.</p>
+
+  <div class="diagram" style="height:370px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- Vercel ↔ Supabase -->
+      <line x1="420" y1="50" x2="280" y2="50" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="282,45 282,55 274,50" fill="#6CBE45"/>
+      <line x1="280" y1="68" x2="420" y2="68" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="418,63 418,73 426,68" fill="#6CBE45"/>
+      <!-- Vercel ↔ Anthropic -->
+      <line x1="680" y1="50" x2="820" y2="50" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="818,45 818,55 826,50" fill="#FF6319"/>
+      <line x1="820" y1="68" x2="680" y2="68" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="682,63 682,73 674,68" fill="#FF6319"/>
+      <!-- User → Vercel -->
+      <line x1="550" y1="230" x2="550" y2="100" stroke="#7C3AED" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="545,102 555,102 550,94" fill="#7C3AED"/>
+    </svg>
+
+    <!-- Supabase -->
+    <div class="node" style="left:30px;top:15px;width:250px;border-color:#6CBE45;">
+      <div class="icon">🗄️</div>
+      <div class="name">Supabase (Database)</div>
+      <div class="detail">Stores user progress on hard drives<br>Runs on its own servers</div>
+    </div>
+
+    <div class="internet" style="left:300px;top:38px;width:50px;height:38px;font-size:8px;">NET</div>
+
+    <!-- Vercel -->
+    <div class="node" style="left:420px;top:15px;width:260px;border-color:#0039A6;">
+      <div class="icon">▲</div>
+      <div class="name">Vercel (Gatekeeper)</div>
+      <div class="detail">Holds API key + DB credentials<br>Relays ALL requests</div>
+    </div>
+
+    <div class="internet" style="left:725px;top:38px;width:50px;height:38px;font-size:8px;">NET</div>
+
+    <!-- Anthropic -->
+    <div class="node" style="left:830px;top:15px;width:220px;border-color:#FF6319;">
+      <div class="icon">🧠</div>
+      <div class="name">Anthropic</div>
+      <div class="detail">LLM inference on GPUs</div>
+    </div>
+
+    <!-- Labels -->
+    <div style="position:absolute;left:295px;top:18px;font-size:10px;color:#6CBE45;font-weight:600;">write →</div>
+    <div style="position:absolute;left:295px;top:80px;font-size:10px;color:#6CBE45;font-weight:600;">← read</div>
+    <div style="position:absolute;left:705px;top:18px;font-size:10px;color:#FF6319;font-weight:600;">question →</div>
+    <div style="position:absolute;left:705px;top:80px;font-size:10px;color:#FF6319;font-weight:600;">← answer</div>
+
+    <!-- Internet bar -->
+    <div style="position:absolute;left:30px;top:120px;right:30px;height:26px;border:2px dashed #374151;border-radius:13px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;font-weight:700;letter-spacing:2px;">THE INTERNET</div>
+
+    <!-- User -->
+    <div class="node" style="left:370px;top:230px;width:360px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">Student beats ε = 0.12 challenge</div>
+      <div class="detail">Browser → Vercel → Supabase: "save score"<br>Next visit: Vercel → Supabase → Browser: "3/5 complete"</div>
+    </div>
+
+    <!-- Pattern box -->
+    <div style="position:absolute;left:120px;top:170px;width:180px;padding:10px;border-radius:8px;background:#13132a;border:1px solid #2a2a4a;font-size:11px;color:#9ca3af;text-align:center;">
+      <div style="color:#FCCC0A;font-weight:700;margin-bottom:4px;">THE PATTERN</div>
+      Browser → <span style="color:#0039A6">Vercel</span> → Service<br>
+      <b style="color:#fff;">Browser NEVER talks</b><br>
+      <b style="color:#fff;">directly to any service</b>
+    </div>
+  </div>
+
+  <div class="narration">
+    A database is just <b>persistent memory</b> — data that survives after closing the browser. Browser → <span class="b">Vercel</span> (holds DB credentials) → <span class="g">Supabase</span> (database on its own servers with hard drives). Same pattern as the chatbot: <b>Vercel is the gatekeeper for everything.</b> Browser never talks directly to the database — credentials would be exposed.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 5: TRAFFIC SURGE                                        -->
+<!-- ============================================================ -->
+<div class="stage" id="s5">
+  <h1 style="color:#EE352E">Stage 5: Traffic Surge</h1>
+  <p class="sub">Carl Wieman tweets your site. 5,000 students arrive at once.</p>
+
+  <div class="diagram" style="height:450px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- Many red arrows Vercel → Supabase -->
+      <line x1="420" y1="40" x2="280" y2="40" stroke="#EE352E" stroke-width="3" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.25s" repeatCount="indefinite"/></line>
+      <line x1="420" y1="55" x2="280" y2="55" stroke="#EE352E" stroke-width="3" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.3s" repeatCount="indefinite"/></line>
+      <line x1="420" y1="70" x2="280" y2="70" stroke="#EE352E" stroke-width="3" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.2s" repeatCount="indefinite"/></line>
+      <line x1="420" y1="85" x2="280" y2="85" stroke="#EE352E" stroke-width="3" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="0" to="-7" dur="0.35s" repeatCount="indefinite"/></line>
+    </svg>
+
+    <!-- Supabase (stressed) -->
+    <div class="node stress" style="left:30px;top:15px;width:250px;border-color:#EE352E;">
+      <div class="icon">🗄️</div>
+      <div class="name" style="color:#EE352E;">Supabase — OVERWHELMED</div>
+      <div class="detail">Connection limit: ~100-500<br>Getting 5,000 simultaneous requests<br><b style="color:#EE352E;">REJECTING CONNECTIONS</b></div>
+    </div>
+
+    <!-- Vercel (stressed) -->
+    <div class="node stress" style="left:420px;top:15px;width:260px;border-color:#EE352E;">
+      <div class="icon">▲</div>
+      <div class="name">Vercel — 5,000 functions</div>
+      <div class="detail">Each request spins up its own function<br>Each function opens its own DB connection<br>Vercel itself is fine — Supabase isn't</div>
+    </div>
+
+    <!-- Anthropic (fine) -->
+    <div class="node" style="left:780px;top:15px;width:240px;border-color:#6CBE45;">
+      <div class="icon">🧠</div>
+      <div class="name" style="color:#6CBE45;">Anthropic — ✓ Fine</div>
+      <div class="detail">Handles its own scaling<br>Not your problem</div>
+    </div>
+
+    <div style="position:absolute;left:310px;top:22px;font-size:10px;color:#EE352E;font-weight:700;">5,000 connections!</div>
+
+    <!-- User flood -->
+    <div style="position:absolute;left:30px;top:130px;right:30px;text-align:center;font-size:14px;color:#EE352E;font-weight:700;">5,000 concurrent users</div>
+    <div class="dots" style="left:80px;top:155px;width:900px;">
+      <script>
+        // Inject dots via document.write during parse
+        for(let i=0;i<70;i++){
+          const angry = i % 3 === 0;
+          document.write(`<div class="dot${angry?' angry':''}" style="background:${angry?'#EE352E':'#7C3AED'};animation-delay:${(Math.random()*2).toFixed(1)}s;"></div>`);
+        }
+      </script>
+    </div>
+
+    <!-- Error messages -->
+    <div style="position:absolute;left:100px;top:230px;padding:8px 16px;border-radius:8px;background:#2a0000;border:1px solid #EE352E44;">
+      <span style="color:#EE352E;font-size:13px;font-weight:600;">⚠️ "Error: too many connections"</span>
+    </div>
+    <div style="position:absolute;left:550px;top:230px;padding:8px 16px;border-radius:8px;background:#2a0000;border:1px solid #EE352E44;">
+      <span style="color:#EE352E;font-size:13px;font-weight:600;">⚠️ "Error: could not save progress"</span>
+    </div>
+
+    <!-- Restaurant analogy -->
+    <div style="position:absolute;left:50px;top:285px;right:50px;padding:20px;border-radius:12px;background:#13132a;border:1px solid #2a2a4a;">
+      <div style="text-align:center;color:#FCCC0A;font-size:14px;font-weight:700;margin-bottom:14px;">THE RESTAURANT ANALOGY</div>
+      <div style="display:flex;gap:20px;justify-content:center;">
+        <div style="text-align:center;flex:1;">
+          <div style="color:#0039A6;font-weight:700;font-size:14px;">Vercel = Waiter</div>
+          <div style="color:#9ca3af;font-size:12px;margin-top:4px;">Takes orders from everyone</div>
+          <div style="color:#6CBE45;font-size:12px;">✓ Handles the rush fine</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div style="color:#EE352E;font-weight:700;font-size:14px;">Supabase = Kitchen</div>
+          <div style="color:#9ca3af;font-size:12px;margin-top:4px;">Has limited stove burners</div>
+          <div style="color:#EE352E;font-size:12px;">✗ Can't cook 5,000 meals</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div style="color:#7C3AED;font-weight:700;font-size:14px;">Users = Customers</div>
+          <div style="color:#9ca3af;font-size:12px;margin-top:4px;">Ordered food, got errors</div>
+          <div style="color:#EE352E;font-size:12px;">✗ "Where's my progress?!"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="narration">
+    Each request spins up a <b>separate</b> serverless function. Each opens its <b>own</b> database connection. Supabase has a <span class="r">connection limit</span> (~100-500). With 5,000 users, thousands of functions try to connect simultaneously. <span class="r">Supabase starts rejecting.</span> The waiter (Vercel) is fine — the kitchen (Supabase) is overwhelmed.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 6: + VIDEO                                              -->
+<!-- ============================================================ -->
+<div class="stage" id="s6">
+  <h1 style="color:#7C3AED">Stage 6: + Video Content</h1>
+  <p class="sub">Veritas^(Blue·Pi) takes off. You produce educational videos.</p>
+
+  <div class="diagram" style="height:400px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- Laptop → YouTube -->
+      <line x1="230" y1="50" x2="390" y2="50" stroke="#EE352E" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="388,45 388,55 396,50" fill="#EE352E"/>
+      <!-- YouTube → Users -->
+      <line x1="550" y1="85" x2="550" y2="220" stroke="#EE352E" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="545,218 555,218 550,226" fill="#EE352E"/>
+      <!-- CDN → Users -->
+      <line x1="200" y1="175" x2="350" y2="230" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="348,226 352,234 344,232" fill="#6CBE45"/>
+      <!-- S3 → Users -->
+      <line x1="870" y1="85" x2="700" y2="230" stroke="#6CBE45" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="698,226 706,232 696,234" fill="#6CBE45"/>
+    </svg>
+
+    <!-- Laptop -->
+    <div class="node" style="left:30px;top:15px;width:200px;border-color:#FF6319;">
+      <div class="icon">💻</div>
+      <div class="name">Your Laptop</div>
+      <div class="detail">Uploads videos to YouTube<br>Pushes code to GitHub</div>
+    </div>
+
+    <div class="internet" style="left:275px;top:30px;width:60px;height:38px;font-size:8px;">NET</div>
+
+    <div style="position:absolute;left:285px;top:15px;font-size:10px;color:#EE352E;font-weight:600;">upload video →</div>
+
+    <!-- YouTube -->
+    <div class="node" style="left:400px;top:15px;width:270px;border-color:#EE352E;">
+      <div class="icon">📺</div>
+      <div class="name">YouTube (Google)</div>
+      <div class="detail">Stores video on Google's hard drives<br>Google pays bandwidth cost<br><b style="color:#6CBE45;">FREE for you</b></div>
+    </div>
+
+    <!-- S3 -->
+    <div class="node" style="left:770px;top:15px;width:240px;border-color:#6CBE45;">
+      <div class="icon">📦</div>
+      <div class="name">AWS S3</div>
+      <div class="detail">Large audio files, PDFs<br>Pay per GB stored + served</div>
+    </div>
+
+    <!-- CDN (small, still serves site) -->
+    <div class="node" style="left:30px;top:130px;width:200px;border-color:#6CBE45;opacity:0.5;">
+      <div class="name" style="color:#6CBE45;">🌐 CDN</div>
+      <div class="detail">Still serves site code + small audio</div>
+    </div>
+
+    <!-- Internet bar -->
+    <div style="position:absolute;left:30px;top:200px;right:30px;height:26px;border:2px dashed #374151;border-radius:13px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;font-weight:700;letter-spacing:2px;">THE INTERNET</div>
+
+    <!-- User -->
+    <div class="node" style="left:350px;top:230px;width:350px;border-color:#7C3AED;">
+      <div class="icon">👤</div>
+      <div class="name">Student</div>
+      <div class="detail">Site code from CDN + videos from YouTube + PDFs from S3<br>All downloaded to browser, assembled into one experience</div>
+    </div>
+
+    <!-- Size guide -->
+    <div style="position:absolute;left:100px;top:320px;width:800px;padding:16px;border-radius:12px;background:#13132a;border:1px solid #2a2a4a;">
+      <div style="text-align:center;color:#FCCC0A;font-size:13px;font-weight:700;margin-bottom:12px;">MATCH STORAGE TO FILE SIZE</div>
+      <div style="display:flex;gap:20px;justify-content:center;">
+        <div style="text-align:center;flex:1;">
+          <div style="color:#6CBE45;font-weight:700;">Small</div>
+          <div style="color:#9ca3af;font-size:12px;">Code, Suno songs (24 MB)</div>
+          <div style="color:#fff;font-size:12px;">Git repo → CDN</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div style="color:#6CBE45;font-weight:700;">Medium</div>
+          <div style="color:#9ca3af;font-size:12px;">Audio, PDFs (100s of MB)</div>
+          <div style="color:#fff;font-size:12px;">AWS S3</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div style="color:#EE352E;font-weight:700;">Large</div>
+          <div style="color:#9ca3af;font-size:12px;">Videos (GBs each)</div>
+          <div style="color:#fff;font-size:12px;">YouTube (free!)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="narration">
+    You <span class="o">upload videos</span> from your laptop across the internet to YouTube. When a student watches, <span class="r">Google streams it</span> from their servers — you pay nothing. For large files that aren't video, <span class="g">AWS S3</span> stores and serves them (pay per GB). Your Suno songs (24 MB total) stay in the Git repo and get served via CDN. <b>Videos are the expensive part — let Google eat that cost.</b>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STAGE 7: OWN SERVER                                           -->
+<!-- ============================================================ -->
+<div class="stage" id="s7">
+  <h1 style="color:#00ADD8">Stage 7: Your Own Server</h1>
+  <p class="sub">Thousands of daily users. You need control. You rent from AWS.</p>
+
+  <div class="diagram" style="height:420px;">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+      <!-- GitHub → Server -->
+      <line x1="330" y1="48" x2="410" y2="48" stroke="#0039A6" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="408,43 408,53 416,48" fill="#0039A6"/>
+      <!-- Server ↔ DB -->
+      <line x1="530" y1="170" x2="530" y2="120" stroke="#00ADD8" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="525,122 535,122 530,114" fill="#00ADD8"/>
+      <line x1="560" y1="120" x2="560" y2="170" stroke="#00ADD8" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="555,168 565,168 560,176" fill="#00ADD8"/>
+      <!-- Server → Anthropic -->
+      <line x1="700" y1="105" x2="800" y2="60" stroke="#FF6319" stroke-width="2" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>
+      <polygon points="798,55 802,65 793,61" fill="#FF6319"/>
+      <!-- Server → CDNs -->
+      <line x1="540" y1="210" x2="200" y2="285" stroke="#6CBE45" stroke-width="2"/>
+      <line x1="560" y1="210" x2="560" y2="285" stroke="#6CBE45" stroke-width="2"/>
+      <line x1="580" y1="210" x2="910" y2="285" stroke="#6CBE45" stroke-width="2"/>
+      <!-- CDN → Users -->
+      <line x1="180" y1="345" x2="180" y2="370" stroke="#7C3AED" stroke-width="2"/>
+      <line x1="540" y1="345" x2="540" y2="370" stroke="#7C3AED" stroke-width="2"/>
+      <line x1="900" y1="345" x2="900" y2="370" stroke="#7C3AED" stroke-width="2"/>
+    </svg>
+
+    <!-- GitHub (dimmed) -->
+    <div class="node" style="left:160px;top:15px;width:170px;border-color:#555;opacity:0.5;">
+      <div class="name" style="color:#888;">🐙 GitHub</div>
+      <div class="detail">Source code</div>
+    </div>
+
+    <div class="internet" style="left:355px;top:28px;width:50px;height:35px;font-size:8px;">NET</div>
+
+    <!-- AWS Data Center boundary -->
+    <div style="position:absolute;left:410px;top:12px;width:290px;height:210px;border:2px solid #00ADD8;border-radius:16px;background:#00ADD808;">
+      <div style="position:absolute;top:-12px;left:20px;background:#0a0e1a;padding:0 10px;color:#00ADD8;font-size:11px;font-weight:700;letter-spacing:1px;">AWS DATA CENTER — same building</div>
+    </div>
+
+    <!-- Your server -->
+    <div class="node" style="left:420px;top:60px;width:270px;border-color:#00ADD8;">
+      <div class="icon">🖥️</div>
+      <div class="name">Your AWS Server</div>
+      <div class="detail">Always running. Serves files.<br>Backend logic. Persistent DB pool.</div>
+    </div>
+
+    <!-- Your DB -->
+    <div class="node" style="left:440px;top:170px;width:220px;border-color:#00ADD8;">
+      <div class="icon">🗄️</div>
+      <div class="name">Your Database</div>
+      <div class="detail">Same local network<br>Persistent connections — no spin-up</div>
+    </div>
+
+    <div style="position:absolute;left:500px;top:135px;font-size:10px;color:#00ADD8;font-weight:600;">← local network →</div>
+    <div style="position:absolute;left:573px;top:135px;font-size:10px;color:#00ADD8;font-weight:600;">< 1ms</div>
+
+    <!-- Anthropic -->
+    <div class="node" style="left:810px;top:15px;width:210px;border-color:#FF6319;">
+      <div class="icon">🧠</div>
+      <div class="name">Anthropic</div>
+      <div class="detail">LLM inference</div>
+    </div>
+
+    <div class="internet" style="left:740px;top:68px;width:50px;height:35px;font-size:8px;">NET</div>
+
+    <!-- CDN row -->
+    <div class="node" style="left:80px;top:285px;width:180px;border-color:#6CBE45;opacity:0.5;">
+      <div class="name" style="color:#6CBE45;">🌐 CDN</div>
+    </div>
+    <div class="node" style="left:440px;top:285px;width:180px;border-color:#6CBE45;opacity:0.5;">
+      <div class="name" style="color:#6CBE45;">🌐 CDN</div>
+    </div>
+    <div class="node" style="left:810px;top:285px;width:180px;border-color:#6CBE45;opacity:0.5;">
+      <div class="name" style="color:#6CBE45;">🌐 CDN</div>
+    </div>
+
+    <!-- Users -->
+    <div class="node" style="left:80px;top:370px;width:180px;border-color:#7C3AED;opacity:0.5;">
+      <div class="name">👤 User</div>
+    </div>
+    <div class="node" style="left:440px;top:370px;width:180px;border-color:#7C3AED;opacity:0.5;">
+      <div class="name">👤 User</div>
+    </div>
+    <div class="node" style="left:810px;top:370px;width:180px;border-color:#7C3AED;opacity:0.5;">
+      <div class="name">👤 User</div>
+    </div>
+
+    <!-- What changed box -->
+    <div style="position:absolute;left:20px;top:100px;width:200px;padding:12px;border-radius:10px;background:#13132a;border:1px solid #2a2a4a;">
+      <div style="color:#00ADD8;font-size:12px;font-weight:700;">WHAT CHANGED</div>
+      <div style="color:#9ca3af;font-size:11px;margin-top:6px;line-height:1.6;">
+        <span style="color:#EE352E;">✗ Vercel</span> → <span style="color:#00ADD8;">Your server</span><br>
+        <span style="color:#EE352E;">✗ Supabase</span> → <span style="color:#00ADD8;">Your database</span><br>
+        <span style="color:#6CBE45;">✓ Same building</span><br>
+        <span style="color:#6CBE45;">✓ Persistent connections</span><br>
+        <span style="color:#EE352E;">✗ You manage everything</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="narration">
+    You replace Vercel + Supabase with <span class="c">your own AWS server and database</span> — in the <b>same data center, meters apart</b>, on a local network (< 1ms). Your server keeps <b>persistent connections</b> to the database (20 connections shared by all requests). No spin-up/tear-down per request. <b>More control, more responsibility — you're now on call at 3am when the server crashes.</b>
+  </div>
+</div>
+
+<!-- ===== STAGE MANAGEMENT ===== -->
+<script>
+const stageData = [
+  { id: 's0', label: '0. Web Languages', color: '#FCCC0A' },
+  { id: 's1', label: '1. Localhost', color: '#FF6319' },
+  { id: 's2', label: '2. Deployed', color: '#0039A6' },
+  { id: 's3', label: '3. + Chatbot', color: '#FF6319' },
+  { id: 's4', label: '4. + Database', color: '#6CBE45' },
+  { id: 's5', label: '5. Traffic Surge', color: '#EE352E' },
+  { id: 's6', label: '6. + Video', color: '#7C3AED' },
+  { id: 's7', label: '7. Own Server', color: '#00ADD8' },
+];
+
+let current = 0;
+let autoTimer = null;
+
+// Build buttons
+const topbar = document.getElementById('topbar');
+stageData.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = s.label;
+  btn.style.setProperty('--c', s.color);
+  btn.onclick = () => go(i);
+  btn.id = 'btn' + i;
+  topbar.appendChild(btn);
+});
+
+const spacer = document.createElement('div');
+spacer.className = 'spacer';
+topbar.appendChild(spacer);
+
+const autoBtn = document.createElement('button');
+autoBtn.className = 'auto';
+autoBtn.textContent = '▶ Auto-Play';
+autoBtn.onclick = toggleAuto;
+topbar.appendChild(autoBtn);
+
+function go(n) {
+  current = n;
+  stageData.forEach((s, i) => {
+    document.getElementById(s.id).classList.toggle('active', i === n);
+    document.getElementById('btn' + i).classList.toggle('on', i === n);
+  });
+}
+
+function toggleAuto() {
+  if (autoTimer) {
+    clearInterval(autoTimer);
+    autoTimer = null;
+    autoBtn.textContent = '▶ Auto-Play';
+    autoBtn.style.borderColor = '#FF6319';
+    autoBtn.style.color = '#FF6319';
+    return;
+  }
+  autoBtn.textContent = '■ Stop';
+  autoBtn.style.borderColor = '#EE352E';
+  autoBtn.style.color = '#EE352E';
+  let idx = 0;
+  go(idx);
+  autoTimer = setInterval(() => {
+    idx++;
+    if (idx >= stageData.length) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+      autoBtn.textContent = '▶ Auto-Play';
+      autoBtn.style.borderColor = '#FF6319';
+      autoBtn.style.color = '#FF6319';
+      return;
+    }
+    go(idx);
+  }, 6000);
+}
+
+go(0);
+</script>
+
+</body>
+</html>

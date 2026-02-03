@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Website Architecture — Animated Evolution</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e1a;
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ===== CONTROLS ===== */
+  .controls {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, #0a0e1a 60%, transparent);
+    padding: 20px 40px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .stage-btn {
+    padding: 10px 20px;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #9ca3af;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  .stage-btn:hover { border-color: #6b7280; color: white; }
+  .stage-btn.active { border-color: #FF6319; color: #FF6319; background: #1a1000; }
+  .stage-btn.s2.active { border-color: #0039A6; color: #0039A6; background: #000a1a; }
+  .stage-btn.s3.active { border-color: #6CBE45; color: #6CBE45; background: #0a1a00; }
+  .stage-btn.s4.active { border-color: #EE352E; color: #EE352E; background: #1a0500; }
+  .stage-btn.s5.active { border-color: #7C3AED; color: #7C3AED; background: #0f0020; }
+  .stage-btn.s6.active { border-color: #00ADD8; color: #00ADD8; background: #001a20; }
+
+  .auto-btn {
+    margin-left: auto;
+    padding: 10px 24px;
+    border: 2px solid #FF6319;
+    border-radius: 8px;
+    background: transparent;
+    color: #FF6319;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .auto-btn:hover { background: #FF6319; color: white; }
+  .auto-btn.playing { border-color: #EE352E; color: #EE352E; }
+  .auto-btn.playing:hover { background: #EE352E; color: white; }
+
+  /* ===== CANVAS ===== */
+  .canvas {
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ===== STAGE TITLE ===== */
+  .stage-title {
+    text-align: center;
+    margin-bottom: 32px;
+    transition: opacity 0.5s;
+  }
+  .stage-title h1 {
+    font-size: 32px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .stage-title p {
+    font-size: 16px;
+    color: #9ca3af;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  .stage-title .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* ===== DIAGRAM ===== */
+  .diagram {
+    position: relative;
+    width: 1100px;
+    min-height: 600px;
+  }
+
+  /* ===== NODES ===== */
+  .node {
+    position: absolute;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #1f2937, #111827);
+    border: 1.5px solid #374151;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  .node.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .node.highlight {
+    border-color: #FF6319;
+    box-shadow: 0 0 20px rgba(255,99,25,0.3);
+  }
+  .node.stress {
+    animation: stress 0.5s ease infinite alternate;
+    border-color: #EE352E;
+    box-shadow: 0 0 20px rgba(238,53,46,0.4);
+  }
+  @keyframes stress {
+    from { transform: scale(1); }
+    to { transform: scale(1.03); }
+  }
+  .node.dead {
+    border-color: #EE352E;
+    opacity: 0.4;
+  }
+  .node .icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  .node .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+  }
+  .node .sub {
+    font-size: 11px;
+    color: #9ca3af;
+    line-height: 1.4;
+  }
+  .node .sub.new {
+    color: #6CBE45;
+    font-weight: 600;
+  }
+
+  /* ===== ARROWS (SVG overlay) ===== */
+  .arrows-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .arrow-path {
+    fill: none;
+    stroke-width: 2;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .arrow-path.visible { opacity: 1; }
+  .arrow-path.data-flow {
+    stroke-dasharray: 8 4;
+    animation: flow 1s linear infinite;
+  }
+  @keyframes flow {
+    to { stroke-dashoffset: -12; }
+  }
+  .arrow-path.heavy-flow {
+    stroke-width: 4;
+    stroke-dasharray: 12 4;
+    animation: flow 0.5s linear infinite;
+  }
+  .arrow-path.overwhelmed {
+    stroke: #EE352E;
+    stroke-width: 6;
+    stroke-dasharray: 4 4;
+    animation: flow 0.2s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(238,53,46,0.6));
+  }
+
+  .arrow-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #0a0e1a;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .arrow-label.visible { opacity: 1; }
+
+  /* ===== USERS ===== */
+  .users-cluster {
+    position: absolute;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    transition: all 0.8s ease;
+    opacity: 0;
+  }
+  .users-cluster.visible { opacity: 1; }
+  .user-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #7C3AED;
+    opacity: 0.6;
+    animation: pulse 2s ease infinite;
+  }
+  .user-dot:nth-child(odd) { animation-delay: 0.5s; }
+  .user-dot:nth-child(3n) { animation-delay: 1s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+  .user-dot.angry {
+    background: #EE352E;
+    animation: angry-pulse 0.3s ease infinite alternate;
+  }
+  @keyframes angry-pulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+  }
+
+  /* ===== NARRATION BOX ===== */
+  .narration {
+    margin-top: 32px;
+    max-width: 700px;
+    text-align: center;
+    padding: 20px 28px;
+    border-radius: 12px;
+    background: #1a1a2e;
+    border: 1px solid #2d2d4a;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #d1d5db;
+    transition: opacity 0.5s;
+    min-height: 80px;
+  }
+  .narration strong { color: white; }
+  .narration .accent { color: #FF6319; font-weight: 600; }
+  .narration .red { color: #EE352E; font-weight: 600; }
+  .narration .green { color: #6CBE45; font-weight: 600; }
+  .narration .blue { color: #0039A6; font-weight: 600; }
+  .narration .cyan { color: #00ADD8; font-weight: 600; }
+
+  /* ===== TRAFFIC COUNTER ===== */
+  .traffic-counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #1a1a2e;
+    border: 1px solid #374151;
+    font-size: 12px;
+    color: #9ca3af;
+    opacity: 0;
+    transition: all 0.5s;
+  }
+  .traffic-counter.visible { opacity: 1; }
+  .traffic-counter .count {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    display: block;
+  }
+  .traffic-counter.danger .count { color: #EE352E; }
+  .traffic-counter.danger { border-color: #EE352E; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button class="stage-btn s1 active" onclick="goStage(1)">1. Static Site</button>
+  <button class="stage-btn s2" onclick="goStage(2)">2. + Chatbot</button>
+  <button class="stage-btn s3" onclick="goStage(3)">3. + Database</button>
+  <button class="stage-btn s4" onclick="goStage(4)">4. Traffic Surge</button>
+  <button class="stage-btn s5" onclick="goStage(5)">5. + Video Content</button>
+  <button class="stage-btn s6" onclick="goStage(6)">6. Own Server</button>
+  <button class="auto-btn" onclick="toggleAutoPlay()" id="autoBtn">Auto-Play</button>
+</div>
+
+<div class="canvas">
+  <div class="stage-title" id="stageTitle"></div>
+
+  <div class="diagram" id="diagram">
+    <div class="traffic-counter" id="trafficCounter">
+      <span>Concurrent Users</span>
+      <span class="count" id="trafficCount">3</span>
+    </div>
+
+    <!-- SVG arrows layer -->
+    <svg class="arrows-svg" id="arrowsSvg" viewBox="0 0 1100 650" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="ah-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#FF6319"/></marker>
+        <marker id="ah-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0039A6"/></marker>
+        <marker id="ah-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6CBE45"/></marker>
+        <marker id="ah-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7C3AED"/></marker>
+        <marker id="ah-cyan" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00ADD8"/></marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#EE352E"/></marker>
+        <marker id="ah-yellow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#FCCC0A"/></marker>
+      </defs>
+
+      <!-- Stage 1 arrows -->
+      <path id="arr-laptop-github" class="arrow-path" d="M225 85 L370 85" stroke="#FF6319" marker-end="url(#ah-orange)"/>
+      <path id="arr-github-vercel" class="arrow-path" d="M480 125 L480 185" stroke="#0039A6" marker-end="url(#ah-blue)"/>
+      <path id="arr-vercel-cdn1" class="arrow-path" d="M420 260 Q300 310 180 360" stroke="#6CBE45" marker-end="url(#ah-green)"/>
+      <path id="arr-vercel-cdn2" class="arrow-path" d="M480 280 L480 360" stroke="#6CBE45" marker-end="url(#ah-green)"/>
+      <path id="arr-vercel-cdn3" class="arrow-path" d="M540 260 Q660 310 780 360" stroke="#6CBE45" marker-end="url(#ah-green)"/>
+      <path id="arr-cdn1-user" class="arrow-path" d="M150 430 L150 490" stroke="#7C3AED" marker-end="url(#ah-purple)"/>
+      <path id="arr-cdn2-user" class="arrow-path" d="M480 430 L480 490" stroke="#7C3AED" marker-end="url(#ah-purple)"/>
+      <path id="arr-cdn3-user" class="arrow-path" d="M810 430 L810 490" stroke="#7C3AED" marker-end="url(#ah-purple)"/>
+
+      <!-- Stage 2 arrows: Vercel → Anthropic -->
+      <path id="arr-vercel-anthropic" class="arrow-path data-flow" d="M560 230 Q700 230 830 170" stroke="#FF6319" marker-end="url(#ah-orange)"/>
+      <path id="arr-anthropic-vercel" class="arrow-path data-flow" d="M830 150 Q700 200 560 215" stroke="#FF6319" marker-end="url(#ah-orange)" style="animation-delay:0.5s"/>
+
+      <!-- Stage 3 arrows: Vercel → Supabase -->
+      <path id="arr-vercel-supabase" class="arrow-path data-flow" d="M400 230 Q280 230 180 170" stroke="#6CBE45" marker-end="url(#ah-green)"/>
+      <path id="arr-supabase-vercel" class="arrow-path data-flow" d="M180 150 Q280 200 400 215" stroke="#6CBE45" marker-end="url(#ah-green)" style="animation-delay:0.5s"/>
+
+      <!-- Stage 4 arrows: overwhelmed -->
+      <path id="arr-overwhelm1" class="arrow-path" d="M150 490 L150 430" stroke="#EE352E" marker-end="url(#ah-red)" style="display:none"/>
+      <path id="arr-overwhelm2" class="arrow-path" d="M480 490 L480 430" stroke="#EE352E" marker-end="url(#ah-red)" style="display:none"/>
+      <path id="arr-overwhelm3" class="arrow-path" d="M810 490 L810 430" stroke="#EE352E" marker-end="url(#ah-red)" style="display:none"/>
+      <path id="arr-supabase-overwhelm" class="arrow-path" d="M400 230 Q280 230 180 170" stroke="#EE352E" marker-end="url(#ah-red)" style="display:none"/>
+
+      <!-- Stage 5: YouTube arrows -->
+      <path id="arr-yt-user" class="arrow-path data-flow" d="M810 155 Q870 300 810 490" stroke="#EE352E" marker-end="url(#ah-red)"/>
+
+      <!-- Stage 6: Own server arrows -->
+      <path id="arr-server-db" class="arrow-path data-flow" d="M440 230 Q360 260 280 230" stroke="#00ADD8" marker-end="url(#ah-cyan)"/>
+      <path id="arr-db-server" class="arrow-path data-flow" d="M280 210 Q360 190 440 210" stroke="#00ADD8" marker-end="url(#ah-cyan)" style="animation-delay:0.4s"/>
+      <path id="arr-server-anthropic2" class="arrow-path data-flow" d="M560 210 Q680 180 790 160" stroke="#FF6319" marker-end="url(#ah-orange)"/>
+      <path id="arr-server-cdn-s6" class="arrow-path" d="M480 260 L480 360" stroke="#6CBE45" marker-end="url(#ah-green)"/>
+      <path id="arr-github-server" class="arrow-path" d="M480 125 L480 185" stroke="#0039A6" marker-end="url(#ah-blue)"/>
+    </svg>
+
+    <!-- ===== NODES ===== -->
+
+    <!-- Laptop -->
+    <div class="node" id="node-laptop" style="left:80px; top:40px; width:170px;">
+      <div class="icon">💻</div>
+      <div class="label">Your Laptop</div>
+      <div class="sub">.jsx .tsx .css MP3s</div>
+    </div>
+
+    <!-- GitHub -->
+    <div class="node" id="node-github" style="left:375px; top:40px; width:210px;">
+      <div class="icon">🐙</div>
+      <div class="label">GitHub</div>
+      <div class="sub">Microsoft's servers<br>Stores your source code</div>
+    </div>
+
+    <!-- Vercel -->
+    <div class="node" id="node-vercel" style="left:375px; top:190px; width:210px;">
+      <div class="icon">▲</div>
+      <div class="label">Vercel</div>
+      <div class="sub">Runs npm run build<br>Produces dist/ folder</div>
+    </div>
+
+    <!-- CDN 1 -->
+    <div class="node" id="node-cdn1" style="left:60px; top:370px; width:170px;">
+      <div class="icon">🌐</div>
+      <div class="label">CDN — Mumbai</div>
+      <div class="sub">Nearest to India</div>
+    </div>
+
+    <!-- CDN 2 -->
+    <div class="node" id="node-cdn2" style="left:390px; top:370px; width:170px;">
+      <div class="icon">🌐</div>
+      <div class="label">CDN — London</div>
+      <div class="sub">Nearest to Europe</div>
+    </div>
+
+    <!-- CDN 3 -->
+    <div class="node" id="node-cdn3" style="left:720px; top:370px; width:170px;">
+      <div class="icon">🌐</div>
+      <div class="label">CDN — Virginia</div>
+      <div class="sub">Nearest to US East</div>
+    </div>
+
+    <!-- Users -->
+    <div class="node" id="node-user1" style="left:60px; top:500px; width:170px;">
+      <div class="icon">👤</div>
+      <div class="label">User — India</div>
+      <div class="sub">Browser runs sims locally</div>
+    </div>
+    <div class="node" id="node-user2" style="left:390px; top:500px; width:170px;">
+      <div class="icon">👤</div>
+      <div class="label">User — UK</div>
+      <div class="sub">Browser runs sims locally</div>
+    </div>
+    <div class="node" id="node-user3" style="left:720px; top:500px; width:170px;">
+      <div class="icon">👤</div>
+      <div class="label">User — USA</div>
+      <div class="sub">Browser runs sims locally</div>
+    </div>
+
+    <!-- Anthropic (Stage 2+) -->
+    <div class="node" id="node-anthropic" style="left:780px; top:100px; width:210px;">
+      <div class="icon">🧠</div>
+      <div class="label">Anthropic API</div>
+      <div class="sub">LLM inference on<br>Anthropic's GPUs</div>
+    </div>
+
+    <!-- Supabase (Stage 3+) -->
+    <div class="node" id="node-supabase" style="left:60px; top:100px; width:210px;">
+      <div class="icon">🗄️</div>
+      <div class="label">Supabase</div>
+      <div class="sub">Database — stores user<br>progress on their hard drives</div>
+    </div>
+
+    <!-- YouTube (Stage 5) -->
+    <div class="node" id="node-youtube" style="left:750px; top:100px; width:210px;">
+      <div class="icon">📺</div>
+      <div class="label">YouTube</div>
+      <div class="sub">Google streams video<br>You pay nothing</div>
+    </div>
+
+    <!-- S3 (Stage 5) -->
+    <div class="node" id="node-s3" style="left:60px; top:180px; width:200px;">
+      <div class="icon">📦</div>
+      <div class="label">AWS S3</div>
+      <div class="sub">File storage for large<br>assets (audio, PDFs)</div>
+    </div>
+
+    <!-- Own Server (Stage 6) -->
+    <div class="node" id="node-own-server" style="left:375px; top:190px; width:210px;">
+      <div class="icon">🖥️</div>
+      <div class="label">Your AWS Server</div>
+      <div class="sub">Backend + file serving<br>Persistent DB connections<br>Same building as database</div>
+    </div>
+
+    <!-- Own DB (Stage 6) -->
+    <div class="node" id="node-own-db" style="left:100px; top:190px; width:200px;">
+      <div class="icon">🗄️</div>
+      <div class="label">Your AWS Database</div>
+      <div class="sub">Same data center<br>Local network — fast</div>
+    </div>
+
+    <!-- Many users cluster (Stage 4) -->
+    <div class="users-cluster" id="user-flood" style="left:30px; top:600px; width:1040px;"></div>
+  </div>
+
+  <div class="narration" id="narration"></div>
+</div>
+
+<script>
+let currentStage = 0;
+let autoInterval = null;
+
+const stages = [
+  null, // 0 index placeholder
+  // ===== STAGE 1: STATIC SITE =====
+  {
+    title: 'Stage 1: Static Site',
+    titleColor: '#FF6319',
+    subtitle: 'Where you are right now. No backend. Browser does all the work.',
+    narration: `You <span class="accent">git push</span> your code to GitHub. Vercel detects the push, runs <strong>npm run build</strong> (Vite translates JSX → JavaScript, Tailwind → CSS), and distributes the <strong>dist/</strong> folder across CDN servers worldwide. Users download the files from the nearest server. Their browser runs everything — all 7 interactive sims, all animations, all code generation. <strong>No server-side computation.</strong>`,
+    traffic: { count: 3, danger: false },
+    nodes: ['node-laptop', 'node-github', 'node-vercel', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3'],
+    arrows: ['arr-laptop-github', 'arr-github-vercel', 'arr-vercel-cdn1', 'arr-vercel-cdn2', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user'],
+    specialArrows: [],
+    stressNodes: [],
+    deadNodes: [],
+    highlightNodes: [],
+    userFlood: 0
+  },
+  // ===== STAGE 2: + CHATBOT =====
+  {
+    title: 'Stage 2: + AI Chatbot',
+    titleColor: '#0039A6',
+    subtitle: 'A student asks a question while working through a tutorial.',
+    narration: `A student types a question in the chatbot. The browser sends it to a <span class="accent">Vercel serverless function</span> — a tiny piece of code running on Vercel's servers that <strong>holds your Anthropic API key</strong> (the secret). That function forwards the question to <span class="accent">Anthropic's servers</span>, where GPUs run LLM inference. The response streams back through Vercel to the browser. The user never sees the API key. <strong>Vercel is the gatekeeper.</strong>`,
+    traffic: { count: 15, danger: false },
+    nodes: ['node-laptop', 'node-github', 'node-vercel', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3', 'node-anthropic'],
+    arrows: ['arr-laptop-github', 'arr-github-vercel', 'arr-vercel-cdn1', 'arr-vercel-cdn2', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user', 'arr-vercel-anthropic', 'arr-anthropic-vercel'],
+    specialArrows: [],
+    stressNodes: [],
+    deadNodes: [],
+    highlightNodes: ['node-anthropic'],
+    userFlood: 0
+  },
+  // ===== STAGE 3: + DATABASE =====
+  {
+    title: 'Stage 3: + Memory (Database)',
+    titleColor: '#6CBE45',
+    subtitle: 'Students log in. Their progress is saved between sessions.',
+    narration: `Now the site remembers users. When a student beats the ε = 0.12 challenge in Sequence Convergence, the browser tells Vercel's serverless function. That function <span class="green">holds the database credentials</span> (another secret) and writes to <span class="green">Supabase</span> — a database running on its own servers with physical hard drives. Next visit, the function reads from Supabase and tells the browser: "You've completed 3/5 challenges." <strong>Browser → Vercel → Supabase. Browser never talks to the database directly.</strong>`,
+    traffic: { count: 50, danger: false },
+    nodes: ['node-laptop', 'node-github', 'node-vercel', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3', 'node-anthropic', 'node-supabase'],
+    arrows: ['arr-laptop-github', 'arr-github-vercel', 'arr-vercel-cdn1', 'arr-vercel-cdn2', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user', 'arr-vercel-anthropic', 'arr-anthropic-vercel', 'arr-vercel-supabase', 'arr-supabase-vercel'],
+    specialArrows: [],
+    stressNodes: [],
+    deadNodes: [],
+    highlightNodes: ['node-supabase'],
+    userFlood: 0
+  },
+  // ===== STAGE 4: TRAFFIC SURGE =====
+  {
+    title: 'Stage 4: Traffic Surge',
+    titleColor: '#EE352E',
+    subtitle: 'Carl Wieman tweets your site. 5,000 students arrive at once.',
+    narration: `Every user request spins up a separate serverless function on Vercel. Each function opens its own connection to Supabase. The database has a <span class="red">connection limit — maybe 100-500</span>. With 5,000 users, thousands of functions try to connect simultaneously. Supabase starts <span class="red">rejecting connections</span>. Users see errors. The chatbot still works (Anthropic handles its own scale), but saving progress fails. <strong>The waiter is fine. The kitchen is overwhelmed.</strong>`,
+    traffic: { count: 5000, danger: true },
+    nodes: ['node-laptop', 'node-github', 'node-vercel', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3', 'node-anthropic', 'node-supabase'],
+    arrows: ['arr-laptop-github', 'arr-github-vercel', 'arr-vercel-cdn1', 'arr-vercel-cdn2', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user', 'arr-vercel-anthropic', 'arr-anthropic-vercel'],
+    specialArrows: ['arr-overwhelm1', 'arr-overwhelm2', 'arr-overwhelm3', 'arr-supabase-overwhelm'],
+    stressNodes: ['node-supabase', 'node-vercel'],
+    deadNodes: [],
+    highlightNodes: [],
+    userFlood: 80
+  },
+  // ===== STAGE 5: VIDEO CONTENT =====
+  {
+    title: 'Stage 5: + Video Content',
+    titleColor: '#7C3AED',
+    subtitle: 'Veritas^(Blue·Pi) takes off. You produce educational videos.',
+    narration: `Videos are huge — 1 GB each. Storing them is cheap. <strong>Streaming them to 10,000 users is expensive</strong> (10 TB of bandwidth). Solution: <span class="red">YouTube embeds for video</span> — Google pays the bandwidth cost. For large audio/PDF assets that don't belong on YouTube, you use <span class="green">AWS S3</span> — a dedicated file storage service. Your Git repo stays lean. <strong>YouTube = free video CDN. S3 = file storage you pay for by the GB.</strong>`,
+    traffic: { count: 500, danger: false },
+    nodes: ['node-laptop', 'node-github', 'node-vercel', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3', 'node-youtube', 'node-supabase', 'node-s3'],
+    arrows: ['arr-laptop-github', 'arr-github-vercel', 'arr-vercel-cdn1', 'arr-vercel-cdn2', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user', 'arr-vercel-supabase', 'arr-supabase-vercel', 'arr-yt-user'],
+    specialArrows: [],
+    stressNodes: [],
+    deadNodes: [],
+    highlightNodes: ['node-youtube', 'node-s3'],
+    userFlood: 0
+  },
+  // ===== STAGE 6: OWN SERVER =====
+  {
+    title: 'Stage 6: Your Own Server',
+    titleColor: '#00ADD8',
+    subtitle: 'Thousands of daily users. You need control. You rent from AWS.',
+    narration: `You replace Vercel + Supabase with <span class="cyan">your own AWS server and database</span> — in the <strong>same data center, meters apart</strong>, connected by a local network. Your server keeps a <strong>persistent connection pool</strong> to the database (20 connections, shared by all requests). No more spinning up and tearing down. The server handles builds, serves files, manages the chatbot relay, and talks to the database efficiently. <strong>More control. More responsibility. You're now on call at 3am.</strong>`,
+    traffic: { count: 2000, danger: false },
+    nodes: ['node-laptop', 'node-github', 'node-own-server', 'node-own-db', 'node-cdn1', 'node-cdn2', 'node-cdn3', 'node-user1', 'node-user2', 'node-user3', 'node-anthropic'],
+    arrows: ['arr-laptop-github', 'arr-github-server', 'arr-server-db', 'arr-db-server', 'arr-server-anthropic2', 'arr-server-cdn-s6', 'arr-vercel-cdn1', 'arr-vercel-cdn3', 'arr-cdn1-user', 'arr-cdn2-user', 'arr-cdn3-user'],
+    specialArrows: [],
+    stressNodes: [],
+    deadNodes: [],
+    highlightNodes: ['node-own-server', 'node-own-db'],
+    userFlood: 0
+  }
+];
+
+function goStage(n) {
+  if (n === currentStage) return;
+  currentStage = n;
+  const s = stages[n];
+
+  // Update buttons
+  document.querySelectorAll('.stage-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === n - 1);
+  });
+
+  // Title
+  const titleEl = document.getElementById('stageTitle');
+  titleEl.innerHTML = `
+    <div class="badge" style="background:${s.titleColor}22; color:${s.titleColor}; border:1px solid ${s.titleColor}44;">STAGE ${n}</div>
+    <h1 style="color:${s.titleColor}">${s.title}</h1>
+    <p>${s.subtitle}</p>
+  `;
+
+  // Narration
+  document.getElementById('narration').innerHTML = s.narration;
+
+  // Traffic counter
+  const tc = document.getElementById('trafficCounter');
+  tc.classList.toggle('visible', true);
+  tc.classList.toggle('danger', s.traffic.danger);
+  animateCount(s.traffic.count);
+
+  // Hide all nodes
+  document.querySelectorAll('.node').forEach(el => {
+    el.classList.remove('visible', 'highlight', 'stress', 'dead');
+  });
+
+  // Show stage nodes
+  setTimeout(() => {
+    s.nodes.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.add('visible');
+          if (s.highlightNodes.includes(id)) el.classList.add('highlight');
+          if (s.stressNodes.includes(id)) el.classList.add('stress');
+          if (s.deadNodes.includes(id)) el.classList.add('dead');
+        }
+      }, i * 80);
+    });
+  }, 100);
+
+  // Hide all arrows
+  document.querySelectorAll('.arrow-path').forEach(el => {
+    el.classList.remove('visible', 'overwhelmed', 'heavy-flow');
+    el.style.display = '';
+  });
+
+  // Show stage arrows
+  setTimeout(() => {
+    s.arrows.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('visible');
+      }, i * 100);
+    });
+
+    // Special overwhelmed arrows
+    s.specialArrows.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = '';
+          el.classList.add('visible', 'overwhelmed');
+        }
+      }, 500 + i * 100);
+    });
+  }, 300);
+
+  // User flood
+  const floodEl = document.getElementById('user-flood');
+  floodEl.innerHTML = '';
+  floodEl.classList.toggle('visible', s.userFlood > 0);
+  if (s.userFlood > 0) {
+    for (let i = 0; i < s.userFlood; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'user-dot' + (Math.random() > 0.5 ? ' angry' : '');
+      dot.style.animationDelay = (Math.random() * 2) + 's';
+      floodEl.appendChild(dot);
+    }
+  }
+}
+
+function animateCount(target) {
+  const el = document.getElementById('trafficCount');
+  const start = parseInt(el.textContent) || 0;
+  const diff = target - start;
+  const duration = 800;
+  const startTime = performance.now();
+
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + diff * eased);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function toggleAutoPlay() {
+  const btn = document.getElementById('autoBtn');
+  if (autoInterval) {
+    clearInterval(autoInterval);
+    autoInterval = null;
+    btn.textContent = 'Auto-Play';
+    btn.classList.remove('playing');
+  } else {
+    btn.textContent = 'Stop';
+    btn.classList.add('playing');
+    let stage = 1;
+    goStage(stage);
+    autoInterval = setInterval(() => {
+      stage++;
+      if (stage > 6) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        btn.textContent = 'Auto-Play';
+        btn.classList.remove('playing');
+        return;
+      }
+      goStage(stage);
+    }, 5000);
+  }
+}
+
+// Arrow labels
+const labels = [
+  { id: 'lbl-push', text: 'git push', x: 280, y: 72, color: '#FF6319' },
+  { id: 'lbl-fetch', text: 'fetch source', x: 490, y: 158, color: '#0039A6' },
+  { id: 'lbl-dist', text: 'distribute dist/', x: 490, y: 325, color: '#6CBE45' },
+];
+
+// Initialize
+goStage(1);
+</script>
+
+</body>
+</html>

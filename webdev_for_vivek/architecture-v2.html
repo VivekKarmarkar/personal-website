@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How Your Website Works — From Code to the World</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e1a;
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ===== CONTROLS ===== */
+  .controls {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, #0a0e1a 70%, transparent);
+    padding: 16px 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .stage-btn {
+    padding: 8px 14px;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  .stage-btn:hover { border-color: #6b7280; color: white; }
+  .stage-btn.active { border-color: var(--stage-color, #FF6319); color: var(--stage-color, #FF6319); background: #111; }
+  .auto-btn {
+    margin-left: auto;
+    padding: 8px 20px;
+    border: 2px solid #FF6319;
+    border-radius: 8px;
+    background: transparent;
+    color: #FF6319;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .auto-btn:hover { background: #FF6319; color: white; }
+  .auto-btn.playing { border-color: #EE352E; color: #EE352E; }
+  .auto-btn.playing:hover { background: #EE352E; color: white; }
+
+  /* ===== MAIN ===== */
+  .main {
+    padding: 90px 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .stage-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .stage-header .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .stage-header h1 { font-size: 28px; margin-bottom: 6px; }
+  .stage-header p { font-size: 15px; color: #9ca3af; max-width: 550px; margin: 0 auto; line-height: 1.5; }
+
+  /* ===== DIAGRAM AREA ===== */
+  .diagram-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  /* ===== NARRATION ===== */
+  .narration {
+    max-width: 720px;
+    text-align: center;
+    padding: 20px 28px;
+    border-radius: 12px;
+    background: #1a1a2e;
+    border: 1px solid #2d2d4a;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #d1d5db;
+    min-height: 60px;
+  }
+  .narration b { color: white; }
+  .hl-orange { color: #FF6319; font-weight: 600; }
+  .hl-blue { color: #0039A6; font-weight: 600; }
+  .hl-green { color: #6CBE45; font-weight: 600; }
+  .hl-red { color: #EE352E; font-weight: 600; }
+  .hl-purple { color: #7C3AED; font-weight: 600; }
+  .hl-cyan { color: #00ADD8; font-weight: 600; }
+  .hl-yellow { color: #FCCC0A; font-weight: 600; }
+
+  /* ===== SVG STYLES ===== */
+  .box {
+    transition: opacity 0.6s ease;
+  }
+  .flow-arrow {
+    stroke-dasharray: 8 5;
+    animation: dash 1.2s linear infinite;
+  }
+  @keyframes dash { to { stroke-dashoffset: -13; } }
+  .flow-arrow-fast {
+    stroke-dasharray: 6 4;
+    animation: dash 0.4s linear infinite;
+  }
+  .pulse-node {
+    animation: pnode 1s ease infinite alternate;
+  }
+  @keyframes pnode {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+  }
+  .shake-node {
+    animation: shake 0.15s ease infinite alternate;
+  }
+  @keyframes shake {
+    from { transform: translate(-1px, 0); }
+    to { transform: translate(1px, 0); }
+  }
+  .user-dot {
+    animation: udot 1.8s ease infinite;
+  }
+  @keyframes udot {
+    0%, 100% { opacity: 0.3; r: 5; }
+    50% { opacity: 0.8; r: 7; }
+  }
+  .angry-dot {
+    animation: adot 0.3s ease infinite alternate;
+  }
+  @keyframes adot {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls" id="controls"></div>
+<div class="main">
+  <div class="stage-header" id="header"></div>
+  <div class="diagram-container" id="diagramContainer"></div>
+  <div class="narration" id="narration"></div>
+</div>
+
+<script>
+const STAGES = [
+  // ============================================================
+  // STAGE 0: THE WEB LANGUAGES
+  // ============================================================
+  {
+    title: 'The Web Languages',
+    subtitle: 'Every website in the world is built with three languages. Browsers understand nothing else.',
+    color: '#FCCC0A',
+    label: '0. Web Languages',
+    narration: `Browsers speak exactly three languages: <b>HTML</b> (skeleton — what's on the page), <b>CSS</b> (skin — how it looks), and <b>JavaScript</b> (brain — what it does). That's it. Every website ever made compiles down to these three. But writing raw HTML/CSS/JS is tedious, so we use convenience tools: <span class="hl-orange">React</span> lets you write <span class="hl-orange">JSX</span> (HTML-like syntax inside JavaScript). <span class="hl-blue">Tailwind</span> gives shorthand for CSS. <span class="hl-green">TypeScript</span> adds type checking to JavaScript. None of these are understood by browsers — <span class="hl-yellow">Vite</span> translates everything back to the three languages browsers actually speak.`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 520;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // === YOU WRITE column ===
+      addBox(svg, 40, 30, 280, 44, 'YOU WRITE', '#FCCC0A', 12, true);
+
+      const writes = [
+        { y: 90, label: 'JSX', sub: 'HTML-like syntax in JS', color: '#FF6319', icon: '{ }' },
+        { y: 160, label: 'React Components', sub: 'Reusable UI building blocks', color: '#FF6319', icon: '⚛' },
+        { y: 230, label: 'TypeScript (.tsx)', sub: 'JS with enforced types', color: '#6CBE45', icon: 'TS' },
+        { y: 300, label: 'Tailwind Classes', sub: 'CSS shorthand (bg-dark-bg)', color: '#0039A6', icon: '🎨' },
+      ];
+      writes.forEach(item => {
+        addCard(svg, 40, item.y, 280, 55, item.label, item.sub, item.color);
+      });
+
+      // === VITE (middle) ===
+      addBox(svg, 410, 140, 180, 180, '', '#FCCC0A', 12, false);
+      addText(svg, 500, 185, '⚡', 40, '#FCCC0A', 'middle');
+      addText(svg, 500, 220, 'VITE', 20, '#FCCC0A', 'middle', 700);
+      addText(svg, 500, 245, 'The Translator', 13, '#9ca3af', 'middle');
+      addText(svg, 500, 268, 'npm run build', 11, '#FCCC0A', 'middle', 600);
+      addText(svg, 500, 290, 'JSX → JavaScript', 11, '#6b7280', 'middle');
+      addText(svg, 500, 305, 'Tailwind → CSS', 11, '#6b7280', 'middle');
+
+      // Arrows: writes → Vite
+      writes.forEach(item => {
+        addArrow(svg, 320, item.y + 28, 410, 230, item.color, true);
+      });
+
+      // === BROWSER UNDERSTANDS column ===
+      addBox(svg, 680, 30, 360, 44, 'BROWSER UNDERSTANDS', '#7C3AED', 12, true);
+
+      const outputs = [
+        { y: 100, label: 'HTML', sub: 'Skeleton — structure of the page', color: '#7C3AED', icon: '🦴', detail: 'index.html → entry point' },
+        { y: 200, label: 'CSS', sub: 'Skin — colors, layout, fonts, spacing', color: '#7C3AED', icon: '🎨', detail: 'One optimized .css file' },
+        { y: 300, label: 'JavaScript', sub: 'Brain — interactivity, sims, logic', color: '#7C3AED', icon: '🧠', detail: 'Bundled .js files' },
+      ];
+      outputs.forEach(item => {
+        addCard(svg, 680, item.y, 360, 75, item.label, item.sub + '\n' + item.detail, item.color);
+      });
+
+      // Arrows: Vite → outputs
+      outputs.forEach(item => {
+        addArrow(svg, 590, 230, 680, item.y + 38, '#FCCC0A', true);
+      });
+
+      // === Bottom: the three foundations ===
+      addBox(svg, 680, 410, 360, 80, '', '#374151', 12, false);
+      addText(svg, 860, 438, 'These three are foundational.', 13, '#9ca3af', 'middle');
+      addText(svg, 860, 458, 'Not built on top of anything.', 13, '#9ca3af', 'middle');
+      addText(svg, 860, 478, 'Every framework compiles down to them.', 13, '#e5e7eb', 'middle', 600);
+
+      // === Left side: analogy ===
+      addBox(svg, 40, 380, 280, 110, '', '#374151', 12, false);
+      addText(svg, 180, 405, 'Like in Python...', 13, '#FCCC0A', 'middle', 600);
+      addText(svg, 180, 428, 'NumPy is to Python', 12, '#9ca3af', 'middle');
+      addText(svg, 180, 446, 'as React is to JavaScript', 12, '#9ca3af', 'middle');
+      addText(svg, 180, 464, 'as Tailwind is to CSS', 12, '#9ca3af', 'middle');
+      addText(svg, 180, 482, 'Don\'t reinvent the wheel.', 12, '#e5e7eb', 'middle', 600);
+    }
+  },
+
+  // ============================================================
+  // STAGE 1: STATIC SITE
+  // ============================================================
+  {
+    title: 'Stage 1: Static Site',
+    subtitle: 'Where you are now. No backend. Browser does all the work.',
+    color: '#FF6319',
+    label: '1. Static Site',
+    narration: `You <span class="hl-orange">git push</span> source code to GitHub (stored on Microsoft's hard drives). Vercel's build server fetches it, runs <b>npm run build</b> (Vite translates JSX → JS, Tailwind → CSS), and produces the <b>dist/</b> folder. Vercel copies dist/ to <span class="hl-green">CDN servers worldwide</span>. A user opens your URL — their browser downloads HTML, CSS, and JavaScript from the <b>nearest CDN server</b> and runs everything locally. All 7 sims, all animations — <b>the user's CPU does the work, not a server.</b>`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 500;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Row 1: Laptop → GitHub → Vercel Build
+      addCard(svg, 30, 40, 200, 80, '💻  Your Laptop', 'Source: .jsx .tsx .css MP3s', '#FF6319');
+      addArrow(svg, 230, 80, 340, 80, '#FF6319', true);
+      addLabel(svg, 275, 68, 'git push', '#FF6319');
+
+      addCard(svg, 340, 40, 220, 80, '🐙  GitHub', 'Microsoft\'s servers\nStores source on hard drives', '#e5e7eb');
+      addArrow(svg, 560, 80, 680, 80, '#0039A6', true);
+      addLabel(svg, 608, 68, 'fetch source', '#0039A6');
+
+      addCard(svg, 680, 40, 240, 80, '▲  Vercel Build Server', 'Runs npm run build\nVite → dist/ folder', '#0039A6');
+
+      // Arrow: Vercel → distributes
+      addArrow(svg, 800, 120, 180, 230, '#6CBE45', true);
+      addArrow(svg, 800, 120, 530, 230, '#6CBE45', true);
+      addArrow(svg, 800, 120, 880, 230, '#6CBE45', true);
+      addLabel(svg, 660, 178, 'copies dist/ to CDN servers', '#6CBE45');
+
+      // Row 2: CDN servers
+      addCard(svg, 50, 230, 200, 65, '🌐  CDN — Mumbai', 'Nearest to India', '#6CBE45');
+      addCard(svg, 400, 230, 200, 65, '🌐  CDN — London', 'Nearest to Europe', '#6CBE45');
+      addCard(svg, 760, 230, 200, 65, '🌐  CDN — Virginia', 'Nearest to US East', '#6CBE45');
+
+      // Arrows: CDN → Users
+      addArrow(svg, 150, 295, 150, 340, '#7C3AED', true);
+      addArrow(svg, 500, 295, 500, 340, '#7C3AED', true);
+      addArrow(svg, 860, 295, 860, 340, '#7C3AED', true);
+      addLabel(svg, 490, 323, 'downloads files', '#7C3AED');
+
+      // Row 3: Users
+      addCard(svg, 50, 340, 200, 70, '👤  User in India', 'Browser runs sims locally\nUser\'s CPU does the work', '#7C3AED');
+      addCard(svg, 400, 340, 200, 70, '👤  User in UK', 'Browser runs sims locally\nUser\'s CPU does the work', '#7C3AED');
+      addCard(svg, 760, 340, 200, 70, '👤  User in USA', 'Browser runs sims locally\nUser\'s CPU does the work', '#7C3AED');
+
+      // Bottom note
+      addBox(svg, 250, 440, 600, 44, '', '#1a1a2e', 10, false);
+      addText(svg, 550, 460, 'Every arrow = one computer requesting something from another computer', 12, '#6b7280', 'middle');
+      addText(svg, 550, 476, 'Every box = a hard drive somewhere', 12, '#6b7280', 'middle');
+    }
+  },
+
+  // ============================================================
+  // STAGE 2: + CHATBOT
+  // ============================================================
+  {
+    title: 'Stage 2: + AI Chatbot',
+    subtitle: 'A student asks a question while working through a tutorial.',
+    color: '#0039A6',
+    label: '2. + Chatbot',
+    narration: `Everything from Stage 1 still works. Now we add a <span class="hl-orange">chatbot</span>. The browser sends the student's question to a <b>Vercel serverless function</b> — a tiny program on Vercel's servers that <b>holds your Anthropic API key</b> (the secret). That function forwards the question to <span class="hl-orange">Anthropic's GPUs</span> for LLM inference. The response flows back: Anthropic → Vercel → browser. The user never sees the key. <b>If the key were in the browser's JavaScript, anyone could open dev tools, copy it, and run up your bill.</b>`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 440;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Static delivery (dimmed to show it still works)
+      addCard(svg, 30, 20, 180, 55, '💻  Your Laptop', 'git push', '#FF6319', 0.4);
+      addArrow(svg, 210, 48, 270, 48, '#FF6319', false, 0.3);
+      addCard(svg, 270, 20, 180, 55, '🐙  GitHub', 'Source code', '#e5e7eb', 0.4);
+      addArrow(svg, 450, 48, 510, 48, '#0039A6', false, 0.3);
+
+      // Vercel (central, prominent)
+      addCard(svg, 510, 10, 230, 75, '▲  Vercel', 'Serverless functions\nHolds secrets (API key)', '#0039A6');
+
+      // Anthropic
+      addCard(svg, 830, 10, 230, 75, '🧠  Anthropic', 'LLM inference\nRuns on Anthropic\'s GPUs', '#FF6319');
+
+      // Arrows: Vercel ↔ Anthropic
+      addArrow(svg, 740, 35, 830, 35, '#FF6319', true, 1, true);
+      addLabel(svg, 770, 23, 'question', '#FF6319');
+      addArrow(svg, 830, 60, 740, 60, '#FF6319', true, 1, true);
+      addLabel(svg, 770, 72, 'answer', '#FF6319');
+
+      // CDN layer
+      addLabel(svg, 440, 118, 'dist/ still served via CDN (unchanged from Stage 1)', '#6b7280');
+      addCard(svg, 50, 130, 170, 50, '🌐  CDN Mumbai', '', '#6CBE45', 0.5);
+      addCard(svg, 290, 130, 170, 50, '🌐  CDN London', '', '#6CBE45', 0.5);
+      addCard(svg, 530, 130, 170, 50, '🌐  CDN Virginia', '', '#6CBE45', 0.5);
+
+      // Users
+      addCard(svg, 100, 230, 220, 55, '👤  Student in India', 'Asks: "What does vmap do?"', '#7C3AED');
+      addCard(svg, 440, 230, 220, 55, '👤  Student in UK', 'Browsing sims (no chatbot)', '#7C3AED', 0.5);
+      addCard(svg, 780, 230, 220, 55, '👤  Student in USA', 'Browsing sims (no chatbot)', '#7C3AED', 0.5);
+
+      // Flow: user → Vercel → Anthropic (the key flow)
+      addArrow(svg, 210, 230, 625, 85, '#FF6319', true, 1, true);
+      addLabel(svg, 330, 170, '1. question sent to Vercel', '#FF6319');
+
+      addArrow(svg, 625, 85, 210, 258, '#FF6319', true, 1, true);
+      addLabel(svg, 330, 195, '4. answer back to browser', '#FF6319');
+
+      // Gatekeeper callout
+      addBox(svg, 100, 320, 900, 90, '', '#1a1a2e', 10, false);
+      addText(svg, 550, 345, 'WHY NOT PUT THE API KEY IN THE BROWSER?', 14, '#EE352E', 'middle', 700);
+      addText(svg, 550, 368, 'Your browser downloads JavaScript → the user can read ALL of it (open dev tools → Sources tab)', 13, '#d1d5db', 'middle');
+      addText(svg, 550, 388, 'API key in browser = anyone copies it = unlimited calls on your account = you pay', 13, '#d1d5db', 'middle');
+      addText(svg, 550, 408, 'Vercel\'s serverless function runs on Vercel\'s servers. Users never see that code.', 13, '#6CBE45', 'middle', 600);
+    }
+  },
+
+  // ============================================================
+  // STAGE 3: + DATABASE
+  // ============================================================
+  {
+    title: 'Stage 3: + Memory (Database)',
+    subtitle: 'The website remembers users between sessions.',
+    color: '#6CBE45',
+    label: '3. + Database',
+    narration: `A database is just <b>persistent memory</b> — data that survives after closing the tab. The browser can't talk to the database directly (same reason: credentials would be exposed). So: browser → <b>Vercel serverless function</b> (holds DB credentials) → <span class="hl-green">Supabase</span> (database program running on servers with physical hard drives). The serverless function is the <b>gatekeeper for everything</b> — API keys, database credentials, all secrets live there.`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 480;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Top: Vercel (center hub)
+      addCard(svg, 380, 20, 260, 80, '▲  Vercel (Gatekeeper)', 'Serverless functions\nHolds ALL secrets', '#0039A6');
+
+      // Left: Supabase
+      addCard(svg, 30, 20, 250, 80, '🗄️  Supabase (Database)', 'Stores user progress\nPhysical hard drives', '#6CBE45');
+
+      // Right: Anthropic
+      addCard(svg, 770, 20, 250, 80, '🧠  Anthropic', 'LLM inference on GPUs', '#FF6319');
+
+      // Arrows: Vercel ↔ Supabase
+      addArrow(svg, 380, 45, 280, 45, '#6CBE45', true, 1, true);
+      addLabel(svg, 310, 33, 'write: save score', '#6CBE45');
+      addArrow(svg, 280, 70, 380, 70, '#6CBE45', true, 1, true);
+      addLabel(svg, 305, 83, 'read: load progress', '#6CBE45');
+
+      // Arrows: Vercel ↔ Anthropic
+      addArrow(svg, 640, 45, 770, 45, '#FF6319', true, 1, true);
+      addArrow(svg, 770, 70, 640, 70, '#FF6319', true, 1, true);
+
+      // CDN layer (dimmed, still there)
+      addCard(svg, 130, 145, 150, 40, '🌐 CDN', 'Serves static files', '#6CBE45', 0.4);
+      addCard(svg, 430, 145, 150, 40, '🌐 CDN', 'Serves static files', '#6CBE45', 0.4);
+      addCard(svg, 730, 145, 150, 40, '🌐 CDN', 'Serves static files', '#6CBE45', 0.4);
+
+      // User
+      addCard(svg, 330, 230, 340, 70, '👤  Student', 'Beats ε = 0.12 challenge in Sequence Convergence', '#7C3AED');
+
+      // Flow diagram
+      addArrow(svg, 500, 230, 510, 100, '#7C3AED', true, 1, true);
+      addLabel(svg, 520, 175, '1. "Save: beat ε = 0.12"', '#7C3AED');
+
+      addArrow(svg, 510, 100, 500, 300, '#7C3AED', true, 1, true);
+      addLabel(svg, 410, 175, '4. "Saved ✓"', '#6CBE45');
+
+      // The pattern box
+      addBox(svg, 80, 330, 850, 120, '', '#1a1a2e', 10, false);
+      addText(svg, 505, 355, 'THE PATTERN — Vercel is the gatekeeper for everything behind it', 14, '#FCCC0A', 'middle', 700);
+
+      addText(svg, 250, 385, 'Browser', 13, '#7C3AED', 'middle', 700);
+      addText(svg, 390, 385, '→', 16, '#6b7280', 'middle');
+      addText(svg, 505, 385, 'Vercel (holds secrets)', 13, '#0039A6', 'middle', 700);
+      addText(svg, 640, 385, '→', 16, '#6b7280', 'middle');
+      addText(svg, 770, 385, 'Anthropic (chatbot)', 13, '#FF6319', 'middle', 700);
+
+      addText(svg, 250, 410, 'Browser', 13, '#7C3AED', 'middle', 700);
+      addText(svg, 390, 410, '→', 16, '#6b7280', 'middle');
+      addText(svg, 505, 410, 'Vercel (holds secrets)', 13, '#0039A6', 'middle', 700);
+      addText(svg, 640, 410, '→', 16, '#6b7280', 'middle');
+      addText(svg, 770, 410, 'Supabase (database)', 13, '#6CBE45', 'middle', 700);
+
+      addText(svg, 505, 440, 'Browser NEVER talks directly to Anthropic or Supabase.', 13, '#e5e7eb', 'middle', 600);
+    }
+  },
+
+  // ============================================================
+  // STAGE 4: TRAFFIC SURGE
+  // ============================================================
+  {
+    title: 'Stage 4: Traffic Surge',
+    subtitle: 'Carl Wieman tweets your site. 5,000 students arrive at once.',
+    color: '#EE352E',
+    label: '4. Traffic Surge',
+    narration: `Each user request spins up a <b>separate serverless function</b> on Vercel. Each function opens its <b>own connection</b> to Supabase. But databases have a <span class="hl-red">connection limit</span> — maybe 100-500 simultaneous connections. With 5,000 users, thousands of functions all try to connect at once. Supabase starts <span class="hl-red">rejecting connections</span>. Users see errors. <b>The waiter (Vercel) is fine. The kitchen (Supabase) is overwhelmed.</b>`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 520;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Vercel (stressed)
+      addCard(svg, 380, 20, 260, 80, '▲  Vercel', 'Spins up 5,000 functions\nEach one is independent', '#EE352E');
+      // Add shake class
+      const vercelRect = svg.querySelector('rect:last-of-type');
+
+      // Supabase (dying)
+      addCard(svg, 30, 20, 260, 80, '🗄️  Supabase', 'Connection limit: ~100-500\nGetting 5,000 requests', '#EE352E');
+      // X marks
+      addText(svg, 160, 115, '❌ REJECTING CONNECTIONS', 12, '#EE352E', 'middle', 700);
+
+      // Anthropic (fine)
+      addCard(svg, 770, 20, 250, 80, '🧠  Anthropic', 'Handles its own scale\n✓ Still working fine', '#6CBE45');
+
+      // Arrows: Vercel → Supabase (overwhelmed)
+      for (let i = 0; i < 5; i++) {
+        const y = 35 + i * 12;
+        addArrow(svg, 380, y, 290, y, '#EE352E', false, 0.5 + i * 0.1, true);
+      }
+      addLabel(svg, 330, 100, '5,000 connections!', '#EE352E');
+
+      // Arrows: Vercel → Anthropic (fine)
+      addArrow(svg, 640, 50, 770, 50, '#6CBE45', true, 0.6, true);
+
+      // User flood
+      const floodY = 160;
+      addText(svg, 550, floodY, '5,000 concurrent users', 16, '#EE352E', 'middle', 700);
+      for (let i = 0; i < 60; i++) {
+        const x = 80 + (i % 20) * 50;
+        const y = floodY + 20 + Math.floor(i / 20) * 28;
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', x);
+        c.setAttribute('cy', y);
+        c.setAttribute('r', 6);
+        c.setAttribute('fill', i % 3 === 0 ? '#EE352E' : '#7C3AED');
+        c.setAttribute('class', i % 3 === 0 ? 'angry-dot' : 'user-dot');
+        c.style.animationDelay = (Math.random() * 2) + 's';
+        svg.appendChild(c);
+      }
+
+      // Error messages
+      addBox(svg, 150, 280, 340, 40, '', '#2a0000', 8, false);
+      addText(svg, 320, 304, '⚠️  "Error: too many connections"', 13, '#EE352E', 'middle', 600);
+
+      addBox(svg, 550, 280, 340, 40, '', '#2a0000', 8, false);
+      addText(svg, 720, 304, '⚠️  "Error: could not save progress"', 13, '#EE352E', 'middle', 600);
+
+      // Restaurant analogy
+      addBox(svg, 100, 350, 850, 140, '', '#1a1a2e', 10, false);
+      addText(svg, 525, 378, 'THE RESTAURANT ANALOGY', 14, '#FCCC0A', 'middle', 700);
+
+      addText(svg, 280, 410, 'Vercel = Waiter', 14, '#0039A6', 'middle', 700);
+      addText(svg, 280, 430, 'Takes orders from everyone', 12, '#9ca3af', 'middle');
+      addText(svg, 280, 448, '✓ Handles the rush fine', 12, '#6CBE45', 'middle');
+
+      addText(svg, 525, 410, 'Supabase = Kitchen', 14, '#EE352E', 'middle', 700);
+      addText(svg, 525, 430, 'Has limited stove burners', 12, '#9ca3af', 'middle');
+      addText(svg, 525, 448, '✗ Can\'t cook 5,000 meals at once', 12, '#EE352E', 'middle');
+
+      addText(svg, 770, 410, 'Users = Angry customers', 14, '#7C3AED', 'middle', 700);
+      addText(svg, 770, 430, 'Ordered food, got errors', 12, '#9ca3af', 'middle');
+      addText(svg, 770, 448, '✗ "Where\'s my saved progress?!"', 12, '#EE352E', 'middle');
+    }
+  },
+
+  // ============================================================
+  // STAGE 5: + VIDEO CONTENT
+  // ============================================================
+  {
+    title: 'Stage 5: + Video Content',
+    subtitle: 'Veritas^(Blue·Pi) takes off. Educational videos need hosting.',
+    color: '#7C3AED',
+    label: '5. + Video',
+    narration: `Videos are huge — 1 GB each. <b>Storing</b> them is cheap. <b>Streaming</b> them to 10,000 users is expensive (10 TB bandwidth). Solution: <span class="hl-red">YouTube embeds</span> — you upload from your laptop to YouTube, Google streams to users, you pay nothing. For large audio/PDFs, <span class="hl-green">AWS S3</span> — dedicated file storage. Small audio (your 4 Suno songs at 24 MB) stays in the Git repo, served via CDN. <b>Match the storage to the file size.</b>`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 500;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Your laptop (uploads)
+      addCard(svg, 30, 30, 200, 70, '💻  Your Laptop', 'Uploads videos to YouTube\nPushes code to GitHub', '#FF6319');
+
+      // YouTube
+      addCard(svg, 350, 30, 250, 70, '📺  YouTube (Google)', 'Stores video on Google\'s servers\nStreams to users — free for you', '#EE352E');
+
+      // Arrow: Laptop → YouTube
+      addArrow(svg, 230, 55, 350, 55, '#EE352E', true, 1, true);
+      addLabel(svg, 275, 42, 'upload video', '#EE352E');
+
+      // GitHub
+      addCard(svg, 30, 140, 200, 55, '🐙  GitHub', 'Source code + 24 MB audio', '#e5e7eb', 0.6);
+
+      // Arrow: Laptop → GitHub
+      addArrow(svg, 130, 100, 130, 140, '#FF6319', true, 0.5);
+
+      // S3
+      addCard(svg, 700, 30, 250, 70, '📦  AWS S3', 'Large files: audio, PDFs\nPay per GB stored + downloaded', '#6CBE45');
+
+      // Vercel + CDN (dimmed, still works)
+      addCard(svg, 30, 230, 200, 50, '▲  Vercel', 'Still builds & serves site', '#0039A6', 0.4);
+      addCard(svg, 30, 310, 200, 50, '🌐  CDN', 'HTML, CSS, JS, small audio', '#6CBE45', 0.4);
+
+      // Users
+      addCard(svg, 300, 250, 220, 80, '👤  Student watches video', 'Browser has embedded\nYouTube player', '#7C3AED');
+
+      // Arrow: YouTube → User (streaming)
+      addArrow(svg, 475, 100, 410, 250, '#EE352E', true, 1, true);
+      addLabel(svg, 460, 170, 'Google streams video', '#EE352E');
+
+      // Arrow: CDN → User
+      addArrow(svg, 130, 360, 300, 290, '#6CBE45', true, 0.5, true);
+      addLabel(svg, 170, 340, 'site files', '#6CBE45');
+
+      // Arrow: S3 → User
+      addCard(svg, 640, 250, 220, 80, '👤  Student downloads PDF', 'Browser fetches from\nS3 URL directly', '#7C3AED');
+      addArrow(svg, 825, 100, 750, 250, '#6CBE45', true, 1, true);
+      addLabel(svg, 810, 170, 'file download', '#6CBE45');
+
+      // Size comparison
+      addBox(svg, 150, 390, 750, 90, '', '#1a1a2e', 10, false);
+      addText(svg, 525, 415, 'MATCH STORAGE TO FILE SIZE', 14, '#FCCC0A', 'middle', 700);
+
+      addText(svg, 250, 442, 'Small (code, tiny audio)', 12, '#e5e7eb', 'middle', 600);
+      addText(svg, 250, 460, 'Git repo → CDN', 12, '#6CBE45', 'middle');
+
+      addText(svg, 525, 442, 'Medium (audio, PDFs)', 12, '#e5e7eb', 'middle', 600);
+      addText(svg, 525, 460, 'AWS S3', 12, '#6CBE45', 'middle');
+
+      addText(svg, 790, 442, 'Large (video)', 12, '#e5e7eb', 'middle', 600);
+      addText(svg, 790, 460, 'YouTube (free!)', 12, '#EE352E', 'middle');
+    }
+  },
+
+  // ============================================================
+  // STAGE 6: OWN SERVER
+  // ============================================================
+  {
+    title: 'Stage 6: Your Own Server',
+    subtitle: 'Thousands of daily users. You need control. You rent from AWS.',
+    color: '#00ADD8',
+    label: '6. Own Server',
+    narration: `You replace Vercel + Supabase with <span class="hl-cyan">your own AWS server and database</span> — in the <b>same data center, meters apart</b>, on a local network. Your server keeps a <b>persistent connection pool</b> (20 connections shared by all requests). No more spin-up/tear-down per request. It serves files, relays to Anthropic, manages the database — all from one place. <b>More control, more responsibility. You manage uptime, security, and 3am crashes.</b>`,
+    buildSVG: (svg) => {
+      const w = 1100, h = 520;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+      // Laptop + GitHub (top left, dimmed)
+      addCard(svg, 30, 20, 170, 50, '💻  Laptop', 'git push', '#FF6319', 0.5);
+      addArrow(svg, 200, 45, 270, 45, '#FF6319', false, 0.3);
+      addCard(svg, 270, 20, 170, 50, '🐙  GitHub', 'Source code', '#e5e7eb', 0.5);
+      addArrow(svg, 360, 70, 360, 120, '#0039A6', false, 0.5);
+
+      // AWS Data Center box
+      addBox(svg, 120, 110, 600, 200, '', '#00ADD8', 14, false);
+      addText(svg, 420, 135, 'AWS DATA CENTER  (same building)', 13, '#00ADD8', 'middle', 700);
+
+      // Your server
+      addCard(svg, 340, 155, 250, 80, '🖥️  Your AWS Server', 'Backend logic (always running)\nServes files, relays to Anthropic\nPersistent DB connection pool', '#00ADD8');
+
+      // Your database
+      addCard(svg, 140, 155, 180, 80, '🗄️  Your Database', 'Same local network\nMeters away — fast', '#00ADD8');
+
+      // Arrow: Server ↔ DB (local, fast)
+      addArrow(svg, 340, 185, 320, 185, '#00ADD8', true, 1, true);
+      addArrow(svg, 320, 210, 340, 210, '#00ADD8', true, 1, true);
+      addLabel(svg, 322, 170, 'local network', '#00ADD8');
+      addLabel(svg, 322, 228, '< 1ms', '#00ADD8');
+
+      // Anthropic
+      addCard(svg, 810, 120, 230, 75, '🧠  Anthropic', 'LLM inference', '#FF6319');
+      addArrow(svg, 590, 175, 810, 155, '#FF6319', true, 1, true);
+      addArrow(svg, 810, 175, 590, 195, '#FF6319', true, 1, true);
+
+      // CDN
+      addCard(svg, 200, 350, 170, 50, '🌐 CDN', '', '#6CBE45', 0.5);
+      addCard(svg, 470, 350, 170, 50, '🌐 CDN', '', '#6CBE45', 0.5);
+      addCard(svg, 740, 350, 170, 50, '🌐 CDN', '', '#6CBE45', 0.5);
+      addArrow(svg, 420, 310, 285, 350, '#6CBE45', true, 0.5);
+      addArrow(svg, 470, 310, 555, 350, '#6CBE45', true, 0.5);
+      addArrow(svg, 520, 310, 825, 350, '#6CBE45', true, 0.5);
+
+      // Users
+      addCard(svg, 200, 425, 170, 50, '👤  User', '', '#7C3AED', 0.5);
+      addCard(svg, 470, 425, 170, 50, '👤  User', '', '#7C3AED', 0.5);
+      addCard(svg, 740, 425, 170, 50, '👤  User', '', '#7C3AED', 0.5);
+      addArrow(svg, 285, 400, 285, 425, '#7C3AED', false, 0.4);
+      addArrow(svg, 555, 400, 555, 425, '#7C3AED', false, 0.4);
+      addArrow(svg, 825, 400, 825, 425, '#7C3AED', false, 0.4);
+
+      // Comparison table
+      addBox(svg, 120, 490, 860, 25, '', '#1a1a2e', 6, false);
+      addText(svg, 550, 507, 'Before: Vercel (spin up per request) + Supabase (separate servers, internet hops)  →  After: One server, persistent connections, same building', 11, '#9ca3af', 'middle');
+    }
+  }
+];
+
+// ===== SVG HELPERS =====
+function addCard(svg, x, y, w, h, title, sub, color, opacity = 1) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.style.opacity = opacity;
+
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', 10);
+  rect.setAttribute('fill', '#1f2937');
+  rect.setAttribute('stroke', color);
+  rect.setAttribute('stroke-width', 1.5);
+  g.appendChild(rect);
+
+  if (title) {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x + 14); t.setAttribute('y', y + 22);
+    t.setAttribute('fill', 'white'); t.setAttribute('font-size', 13);
+    t.setAttribute('font-weight', 600);
+    t.textContent = title;
+    g.appendChild(t);
+  }
+
+  if (sub) {
+    sub.split('\n').forEach((line, i) => {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', x + 14); t.setAttribute('y', y + 38 + i * 15);
+      t.setAttribute('fill', '#9ca3af'); t.setAttribute('font-size', 11);
+      t.textContent = line;
+      g.appendChild(t);
+    });
+  }
+
+  svg.appendChild(g);
+}
+
+function addBox(svg, x, y, w, h, text, color, r, isHeader) {
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', r);
+  if (isHeader) {
+    rect.setAttribute('fill', color + '22');
+    rect.setAttribute('stroke', color + '66');
+    rect.setAttribute('stroke-width', 1);
+  } else {
+    rect.setAttribute('fill', color === '#1a1a2e' ? color : 'transparent');
+    rect.setAttribute('stroke', color);
+    rect.setAttribute('stroke-width', 1.5);
+  }
+  svg.appendChild(rect);
+
+  if (text && isHeader) {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x + w/2); t.setAttribute('y', y + 28);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', color); t.setAttribute('font-size', 13);
+    t.setAttribute('font-weight', 700); t.setAttribute('letter-spacing', '1.5');
+    t.textContent = text;
+    svg.appendChild(t);
+  }
+}
+
+function addText(svg, x, y, text, size, color, anchor, weight) {
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('text-anchor', anchor || 'start');
+  t.setAttribute('fill', color); t.setAttribute('font-size', size);
+  if (weight) t.setAttribute('font-weight', weight);
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+function addArrow(svg, x1, y1, x2, y2, color, hasHead = true, opacity = 1, animated = false) {
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', color);
+  line.setAttribute('stroke-width', 2);
+  line.style.opacity = opacity;
+
+  if (animated) {
+    line.setAttribute('class', 'flow-arrow');
+  }
+
+  if (hasHead) {
+    // Simple arrowhead via marker
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const headLen = 8;
+    const ax = x2 - headLen * Math.cos(angle - 0.4);
+    const ay = y2 - headLen * Math.sin(angle - 0.4);
+    const bx = x2 - headLen * Math.cos(angle + 0.4);
+    const by = y2 - headLen * Math.sin(angle + 0.4);
+
+    const head = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    head.setAttribute('points', `${x2},${y2} ${ax},${ay} ${bx},${by}`);
+    head.setAttribute('fill', color);
+    head.style.opacity = opacity;
+    svg.appendChild(head);
+  }
+
+  svg.appendChild(line);
+}
+
+function addLabel(svg, x, y, text, color) {
+  // Background
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('fill', color); t.setAttribute('font-size', 11);
+  t.setAttribute('font-weight', 600);
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+// ===== STAGE MANAGEMENT =====
+let currentStage = -1;
+let autoInterval = null;
+
+function buildControls() {
+  const el = document.getElementById('controls');
+  STAGES.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'stage-btn';
+    btn.textContent = s.label;
+    btn.style.setProperty('--stage-color', s.color);
+    btn.onclick = () => goStage(i);
+    el.appendChild(btn);
+  });
+
+  const autoBtn = document.createElement('button');
+  autoBtn.className = 'auto-btn';
+  autoBtn.id = 'autoBtn';
+  autoBtn.textContent = 'Auto-Play';
+  autoBtn.onclick = toggleAutoPlay;
+  el.appendChild(autoBtn);
+}
+
+function goStage(n) {
+  if (n === currentStage) return;
+  currentStage = n;
+  const s = STAGES[n];
+
+  // Update buttons
+  document.querySelectorAll('.stage-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === n);
+    if (i === n) btn.style.setProperty('--stage-color', s.color);
+  });
+
+  // Header
+  document.getElementById('header').innerHTML = `
+    <div class="badge" style="background:${s.color}18; color:${s.color}; border:1px solid ${s.color}44;">${s.label.toUpperCase()}</div>
+    <h1 style="color:${s.color}">${s.title}</h1>
+    <p>${s.subtitle}</p>
+  `;
+
+  // Build SVG
+  const container = document.getElementById('diagramContainer');
+  container.innerHTML = '';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.width = '100%';
+  svg.style.maxWidth = '1100px';
+  container.appendChild(svg);
+  s.buildSVG(svg);
+
+  // Animate in: fade all children
+  const children = svg.children;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    child.style.opacity = '0';
+    child.style.transition = `opacity 0.5s ease ${i * 0.02}s`;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        child.style.opacity = child.dataset.opacity || child.style.opacity || '1';
+        // Restore intended opacity
+        const origOpacity = child.style.opacity;
+        child.style.opacity = '0';
+        requestAnimationFrame(() => {
+          child.style.opacity = origOpacity || '1';
+        });
+      });
+    });
+  }
+  // Simpler: just fade in the whole SVG
+  svg.style.opacity = '0';
+  svg.style.transition = 'opacity 0.6s ease';
+  requestAnimationFrame(() => { svg.style.opacity = '1'; });
+
+  // Narration
+  const narEl = document.getElementById('narration');
+  narEl.style.opacity = '0';
+  narEl.innerHTML = s.narration;
+  setTimeout(() => { narEl.style.opacity = '1'; narEl.style.transition = 'opacity 0.6s ease'; }, 200);
+}
+
+function toggleAutoPlay() {
+  const btn = document.getElementById('autoBtn');
+  if (autoInterval) {
+    clearInterval(autoInterval);
+    autoInterval = null;
+    btn.textContent = 'Auto-Play';
+    btn.classList.remove('playing');
+  } else {
+    btn.textContent = 'Stop';
+    btn.classList.add('playing');
+    let stage = 0;
+    goStage(stage);
+    autoInterval = setInterval(() => {
+      stage++;
+      if (stage >= STAGES.length) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        btn.textContent = 'Auto-Play';
+        btn.classList.remove('playing');
+        return;
+      }
+      goStage(stage);
+    }, 6000);
+  }
+}
+
+// Initialize
+buildControls();
+goStage(0);
+</script>
+</body>
+</html>
