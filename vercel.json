@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/((?!pat-scan/).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
