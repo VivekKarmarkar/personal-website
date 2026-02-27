@@ -25,26 +25,44 @@ export default function Wonyp() {
             <p className="text-dark-muted text-lg">LLM-driven Indian Food Analysis</p>
           </section>
 
-          {/* Placeholder sections */}
+          {/* Introduction */}
           <section className="mb-12">
-            <h2>The Idea</h2>
+            <h2>Introduction</h2>
             <p>
               Coming soon.
             </p>
           </section>
 
+          {/* Architecture */}
           <section className="mb-12">
-            <h2>How It Works</h2>
+            <h2>Architecture</h2>
             <p>
               Coming soon.
             </p>
           </section>
 
+          {/* Design Philosophy */}
           <section className="mb-12">
-            <h2>Demo</h2>
-            <div className="aspect-video bg-neutral-900 rounded-lg flex items-center justify-center border border-neutral-800">
-              <span className="text-dark-muted">Demo coming soon</span>
-            </div>
+            <h2>Design Philosophy</h2>
+            <p>
+              Coming soon.
+            </p>
+          </section>
+
+          {/* Results */}
+          <section className="mb-12">
+            <h2>Results</h2>
+            <p>
+              Coming soon.
+            </p>
+          </section>
+
+          {/* Findings */}
+          <section className="mb-12">
+            <h2>Findings</h2>
+            <p>
+              Coming soon.
+            </p>
           </section>
 
         </div>
