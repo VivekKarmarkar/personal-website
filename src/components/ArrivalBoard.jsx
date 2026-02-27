@@ -14,7 +14,7 @@ function LineBullet({ line, size = 'md' }) {
       className={`${sizes[size]} rounded-full flex items-center justify-center font-bold`}
       style={{ backgroundColor: line.colorHex }}
     >
-      <span className="text-white">{line.id}</span>
+      <span className={line.id === 'D' ? 'text-black' : 'text-white'}>{line.id}</span>
     </div>
   );
 }
@@ -116,7 +116,8 @@ function SubwayLineVisual({ line }) {
 }
 
 function LineRow({ line, isExpanded, onToggle }) {
-  const arrivalTime = line.id === 'P' ? 2 : line.id === 'A' ? 5 : 3;
+  const arrivalTimes = { D: 1, E: 2, G: 2, S: 2, F: 3, P: 5, A: 7 };
+  const arrivalTime = arrivalTimes[line.id] || 3;
 
   return (
     <div className="border-b border-neutral-800 last:border-b-0">

@@ -43,6 +43,16 @@ export const lines = {
       'interactive-sims',
     ],
   },
+  D: {
+    id: 'D',
+    name: 'D Train',
+    fullName: 'AI Demos',
+    description: 'Applied AI project demos from mainstream to sci-fi',
+    direction: 'AI Island Local',
+    color: 'mta-gold',
+    colorHex: '#FCCC0A',
+    stations: ['wonyp', 'gpt-bhojan', 'vm-claude', 'ai-professor'],
+  },
   G: {
     id: 'G',
     name: 'G Train',
@@ -91,4 +101,4 @@ export const lines = {
   },
 };
 
-export const lineOrder = ['P', 'A', 'E', 'G', 'S', 'F'];
+export const lineOrder = ['P', 'A', 'E', 'D', 'G', 'S', 'F'];

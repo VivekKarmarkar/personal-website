@@ -58,6 +58,32 @@ export const stations = {
     description: 'When real numbers aren\'t real enough',
     url: '/cvnns',
   },
+  'wonyp': {
+    id: 'wonyp',
+    name: 'WONYP',
+    fullName: "What's on your Plate?",
+    position: 10,
+    description: 'LLM-driven Indian Food Analysis',
+    url: '/wonyp',
+  },
+  'gpt-bhojan': {
+    id: 'gpt-bhojan',
+    name: 'GPT-Bhojan',
+    position: 20,
+    description: 'LLM-augmented Indian Food Classification',
+  },
+  'vm-claude': {
+    id: 'vm-claude',
+    name: 'VM Claude',
+    position: 30,
+    description: 'Claude plays games in the cloud',
+  },
+  'ai-professor': {
+    id: 'ai-professor',
+    name: 'AI Professor',
+    position: 40,
+    description: 'A Robot Teacher just for you',
+  },
   'imu-le': {
     id: 'imu-le',
     name: 'IMU-LE',
