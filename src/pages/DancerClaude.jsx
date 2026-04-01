@@ -266,17 +266,21 @@ export default function DancerClaude() {
             </div>
           </section>
 
-          {/* Live App */}
-          <section className="mb-12">
-            <iframe
-              src="/dancer-claude-app/index.html"
-              title="Dancer Claude — Live Demo"
-              className="w-full border-none"
-              style={{ height: '700px', background: 'transparent' }}
-              allow="autoplay"
-            />
-          </section>
+        </div>
 
+        {/* Live App — full width, outside the prose container */}
+        <div className="max-w-[960px] mx-auto mb-12 px-4">
+          <iframe
+            src="/dancer-claude-app/index.html"
+            title="Dancer Claude — Live Demo"
+            className="w-full border-none block"
+            style={{ height: '900px', background: '#000' }}
+            scrolling="no"
+            allow="autoplay"
+          />
+        </div>
+
+        <div className="max-w-2xl mx-auto prose-medium">
           {/* Introduction */}
           <section className="mb-12">
             <h2>Introduction</h2>
