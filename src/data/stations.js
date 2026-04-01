@@ -74,7 +74,7 @@ export const stations = {
   },
   'vm-claude': {
     id: 'vm-claude',
-    name: 'VM Claude',
+    name: 'Dancer Claude',
     position: 30,
     description: 'Claude plays games in the cloud',
   },
