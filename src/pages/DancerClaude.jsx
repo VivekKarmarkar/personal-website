@@ -268,15 +268,13 @@ export default function DancerClaude() {
 
           {/* Live App */}
           <section className="mb-12">
-            <div className="w-full rounded-xl overflow-hidden border border-neutral-800" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.5)' }}>
-              <iframe
-                src="/dancer-claude-app/index.html"
-                title="Dancer Claude — Live Demo"
-                className="w-full border-none"
-                style={{ height: '820px' }}
-                allow="autoplay"
-              />
-            </div>
+            <iframe
+              src="/dancer-claude-app/index.html"
+              title="Dancer Claude — Live Demo"
+              className="w-full border-none"
+              style={{ height: '700px', background: 'transparent' }}
+              allow="autoplay"
+            />
           </section>
 
           {/* Introduction */}
