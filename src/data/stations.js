@@ -72,11 +72,12 @@ export const stations = {
     position: 20,
     description: 'LLM-augmented Indian Food Classification',
   },
-  'vm-claude': {
-    id: 'vm-claude',
+  'dancer-claude': {
+    id: 'dancer-claude',
     name: 'Dancer Claude',
     position: 30,
-    description: 'Claude plays games in the cloud',
+    description: 'A stick figure that dances to music — three ways',
+    url: '/dancer-claude',
   },
   'ai-professor': {
     id: 'ai-professor',
