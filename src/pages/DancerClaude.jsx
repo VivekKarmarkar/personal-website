@@ -251,6 +251,8 @@ export default function DancerClaude() {
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316e0', border: '1px solid #f9731638' }}>Signal Processing</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316c0', border: '1px solid #f9731632' }}>Computer Vision</span>
+              </div>
+              <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316a0', border: '1px solid #f973162c' }}>Machine Learning</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f9731688', border: '1px solid #f9731626' }}>Physics-Based Modeling</span>
               </div>
@@ -261,6 +263,19 @@ export default function DancerClaude() {
               <div className="flex gap-3">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
               </div>
+            </div>
+          </section>
+
+          {/* Live App */}
+          <section className="mb-12">
+            <div className="w-full rounded-xl overflow-hidden border border-neutral-800" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.5)' }}>
+              <iframe
+                src="/dancer-claude-app/index.html"
+                title="Dancer Claude — Live Demo"
+                className="w-full border-none"
+                style={{ height: '820px' }}
+                allow="autoplay"
+              />
             </div>
           </section>
 
