@@ -249,10 +249,12 @@ export default function DancerClaude() {
             <div className="flex flex-col items-start gap-2.5 mt-6">
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316e0', border: '1px solid #f9731638' }}>Signal Processing</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316c0', border: '1px solid #f9731632' }}>Computer Vision</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316a0', border: '1px solid #f973162c' }}>Machine Learning</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f9731688', border: '1px solid #f9731626' }}>Physics-Based Modeling</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Physics-Based Modeling</span>
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#FCCC0A', border: '1px solid #FCCC0A40' }}>Signal Processing</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#FCCC0Ac0', border: '1px solid #FCCC0A32' }}>Computer Vision</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#FCCC0A88', border: '1px solid #FCCC0A26' }}>Machine Learning</span>
               </div>
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Creative Technology</span>
