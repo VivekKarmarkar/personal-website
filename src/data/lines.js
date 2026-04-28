@@ -51,7 +51,17 @@ export const lines = {
     direction: 'AI Island Local',
     color: 'mta-gold',
     colorHex: '#FCCC0A',
-    stations: ['wonyp', 'gpt-bhojan', 'dancer-claude', 'ai-professor'],
+    stations: ['wonyp', 'gpt-bhojan', 'dancer-claude', 'professor-claude'],
+  },
+  I: {
+    id: 'I',
+    name: 'I Train',
+    fullName: 'Infrastructure',
+    description: 'Personal Claude Code Infrastructure',
+    direction: 'Claude Code Borough Local',
+    color: 'mta-silver',
+    colorHex: '#A7A9AC',
+    stations: ['claude-code-os', 'rcp', 'professor-claude', 'vm-claude', 'codeguide'],
   },
   G: {
     id: 'G',
@@ -101,4 +111,4 @@ export const lines = {
   },
 };
 
-export const lineOrder = ['P', 'A', 'E', 'D', 'G', 'S', 'F'];
+export const lineOrder = ['P', 'A', 'E', 'D', 'I', 'G', 'S', 'F'];

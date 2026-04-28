@@ -79,11 +79,36 @@ export const stations = {
     description: 'A stick figure that dances to music — three ways',
     url: '/dancer-claude',
   },
-  'ai-professor': {
-    id: 'ai-professor',
-    name: 'AI Professor',
+  'professor-claude': {
+    id: 'professor-claude',
+    name: 'Professor Claude',
     position: 40,
     description: 'A Robot Teacher just for you',
+  },
+  'claude-code-os': {
+    id: 'claude-code-os',
+    name: 'Claude Code OS',
+    position: 10,
+    description: 'Treating Claude Code as an operating system',
+  },
+  'rcp': {
+    id: 'rcp',
+    name: 'RCP',
+    fullName: 'Remote Control Protocol',
+    position: 20,
+    description: 'A protocol for remote-controlling Claude Code',
+  },
+  'vm-claude': {
+    id: 'vm-claude',
+    name: 'VM Claude',
+    position: 40,
+    description: 'A virtual machine concept for Claude',
+  },
+  'codeguide': {
+    id: 'codeguide',
+    name: 'Codeguide',
+    position: 50,
+    description: 'Guided code walkthroughs with Claude',
   },
   'imu-le': {
     id: 'imu-le',

@@ -1,11 +1,114 @@
 # Project Status Report
-**Last Updated:** January 21, 2026 (Session 8)
+**Last Updated:** February 11, 2026 (Sessions 9-11)
 
 ## Summary
 
-Vivek Karmarkar's personal website — an interactive educational platform at the intersection of Physics and AI. The site uses a NYC subway navigation metaphor with multiple "lines" representing different project areas. **Session 8** integrated the **Feynman Conservation of Energy simulation** — a 3,700+ line interactive recreation of Feynman's famous "Dennis the Menace blocks" analogy from Lectures on Physics Vol I, Chapter 4. This is now simulation #7 in the gallery. Extensive dark mode fixes were applied, and known issues were documented for future sessions.
+Vivek Karmarkar's personal website — an interactive educational platform at the intersection of Physics and AI. The site uses a NYC subway navigation metaphor with multiple "lines" representing different project areas. **Sessions 9-11** (January 28 - February 11, 2026) shifted focus from simulation development to infrastructure and research: the full codebase was committed to Git, Vercel deployment was configured with SPA routing and PAT Scan fixes, and a comprehensive research effort produced a landscape analysis of the interactive educational simulations market. This culminated in a rigorous 5-agent fact-check audit that verified 145+ sources and corrected 4 wrong author attributions before the document could be shared with luminaries.
 
 ## Goals Accomplished
+
+### February 10-11, 2026 (Session 11) — Landscape Analysis Fact-Check Audit
+
+**Comprehensive fact-check of the landscape analysis document using a 5-agent verification swarm.**
+
+The landscape analysis (`research/landscape_analysis.md` and `research/landscape_analysis/index.html`) was destined for an audience including Demis Hassabis, Geoffrey Hinton, Yoshua Bengio, Steven Strogatz, Eugenia Etkina, and Carl Wieman. Every claim needed independent verification to meet that standard.
+
+**5-Agent Swarm Results:**
+
+| Agent | Scope | Verdict |
+|-------|-------|---------|
+| Market Verifier | 22 market numbers against primary sources | 22/25 exact match |
+| Competitor Verifier | Player metrics, funding rounds, dates | PhET & Labster figures outdated |
+| Papers Verifier | Author names, venues, characterizations | 4 wrong first-author attributions found |
+| Study Verifier | Effect sizes, sample sizes, citations | 8/10 verified |
+| Editorial Reviewer | Unsourced claims, subjective language | ~35 issues flagged |
+
+**Critical Discovery -- 4 Wrong Author Attributions:**
+
+| Incorrect | Correct | Paper | Venue |
+|-----------|---------|-------|-------|
+| Markel et al. | Lu & Wang | Generative Students | L@S 2024 |
+| Xu et al. | Gao et al. | Agent4Edu | AAAI 2025 |
+| Kasneci et al. | Yuan et al. | Valid Student Simulation | arXiv 2026 |
+| Naous et al. | Teutloff et al. | Synthetic Founders | arXiv 2025 |
+
+**18 High-Confidence Fixes Applied:**
+- 4 author corrections (both MD and HTML)
+- 2 outdated competitor metrics (PhET 93 -> 120+ languages; Labster 2000+ -> 3000+ institutions)
+- 2 data integrity fixes (arithmetic error in source count; unsourced Freeman ~6% conversion rate removed)
+- 2 attribution gaps filled (Khanmigo source, K-12 revenue multiples source)
+- 5 editorial language fixes (removed "landmark", "world-class", other promotional adjectives)
+- 1 terminology clarification (gamification vs. game-based learning)
+- 1 self-referential language check (zero "we/our/us" remaining outside direct quotes)
+- 1 structural fix (bifurcating -> splitting into three paths)
+
+**Artifacts Produced:**
+- `research/fact-check-audit.pptx` -- 8-slide dark-themed presentation summarizing the audit
+- `research/fact-check-audit.pdf` -- PDF export of the presentation
+- `research/fact-check-notes.html` -- Detailed per-claim verification reference notes
+- `research/session-summary-2026-02-11-fact-check.md` -- Session summary
+
+**Editorial Policy Established:** Every remaining claim in the document is now either (1) a direct quote with attribution, (2) a sourced number with a named primary source, or (3) neutral descriptive language. No unsourced assertions remain.
+
+---
+
+### February 10, 2026 (Session 10) — Research: Landscape Analysis & Literature Reviews
+
+**Three parallel research tracks completed:**
+
+**1. Interactive Sims Landscape Analysis:**
+- Full market research of the interactive educational simulations space
+- Analyzed $189B global EdTech market and $14.4B simulation learning segment
+- Mapped competitors: PhET, Brilliant, Labster, GeoGebra, 3Blue1Brown/Manim, Exploratorium, indie creators
+- Identified blue ocean niche: physics sims + live code generation (no existing player combines both)
+- Created `research/interactive-sims-landscape/` with sources, analysis, and summary
+- Generated `market-research-interactive-sims.pptx` presentation
+
+**2. Learning-by-Doing Literature Review:**
+- Surveyed pedagogical research on interactive and experiential learning
+- Created bibliography and detailed notes
+- Generated `research/learning-by-doing/summary.md` (23,000+ characters)
+- Presentation materials produced
+
+**3. AI Agent Classrooms Literature Review:**
+- Surveyed emerging research on AI agents simulating student behavior
+- Key papers: Lu & Wang (Generative Students, L@S 2024), Gao et al. (Agent4Edu, AAAI 2025)
+- Created bibliography and detailed notes
+- Presentation materials produced
+
+**Unified Landscape Analysis Document:**
+- `research/landscape_analysis.md` -- Comprehensive 19,000+ character analysis synthesizing all three tracks
+- `research/landscape_analysis/index.html` -- Polished HTML version for sharing
+
+**Files Created:**
+- `research/interactive-sims-landscape/` -- Full directory with sources, analysis, summary, presentation
+- `research/learning-by-doing/` -- Papers, notes, bibliography, summary, presentation
+- `research/ai-agent-classrooms/` -- Papers, notes, bibliography, summary, presentation
+- `research/landscape_analysis.md` -- Unified analysis
+- `research/landscape_analysis/index.html` -- HTML version
+
+---
+
+### January 28 - February 3, 2026 (Session 9) — Git Setup & Vercel Deployment
+
+**Initial Git commit and deployment infrastructure:**
+
+| Commit | Date | Description |
+|--------|------|-------------|
+| `8a3a70f` | Jan 28 | Initial commit: Interactive educational platform |
+| `786244f` | Feb 3 | Add web development learning resources from internet deep-dive session |
+| `6bbc510` | Feb 3 | Add vercel.json with SPA rewrites for client-side routing |
+| `ef2ff92` | Feb 3 | Fix PAT Scan home button to link back to main website |
+| `3211b3e` | Feb 3 | Simplify vercel.json rewrite to standard SPA pattern |
+| `a1ba680` | Feb 3 | Convert all PAT Scan relative paths to absolute |
+
+**Key Infrastructure Work:**
+- Full codebase committed to Git (all 7 sims, all pages, all data)
+- Vercel deployment configured with SPA client-side routing
+- PAT Scan static site fixed: home button links back to main website, all relative paths converted to absolute
+- `vercel.json` added with standard SPA rewrite pattern
+
+---
 
 ### January 21, 2026 (Session 8) — Feynman Conservation of Energy Integration
 
@@ -143,39 +246,62 @@ User revealed a "surprise" — a new standalone Feynman Conservation of Energy s
 - "the split screen warning is FUCKING ANNOYING - it is terrible"
 - "make some markdown file" for future session issues
 
+## Completed (as of Feb 11, 2026)
+
+- Landscape analysis fact-checked and ready for distribution to luminaries
+- Full codebase in Git with Vercel deployment configured
+- 7 interactive simulations live on the site
+- Research foundation established (market landscape, pedagogical literature, AI agent classrooms)
+- PAT Scan deployment issues resolved (absolute paths, SPA routing)
+
+## In Progress
+
+- **Landscape analysis distribution** -- Document is verified and ready to share with Demis Hassabis, Geoffrey Hinton, Yoshua Bengio, Steven Strogatz, Eugenia Etkina, Carl Wieman, and others
+- **Research directory** -- Not yet committed to Git (currently untracked); needs decision on what to include in the repository
+
 ## Next Steps
 
-1. **Fix Feynman Sim Issues (Future Session):**
-   - Layout — reduce cramping, give elements breathing room
-   - Size — enlarge garden, toybox, rug for better usability
-   - Save pop-ups — fix finnicky dialog behavior
-   - Rigorous testing — 30+ item checklist in FEYNMAN_SIM_TODO.md
+1. **Share the Landscape Analysis:**
+   - Document is fact-checked and ready for distribution
+   - HTML version (`research/landscape_analysis/index.html`) suitable for web sharing
+   - Presentation materials available for different contexts
 
-2. **Implement Elena Z.'s Sequence Convergence Features:**
+2. **Commit Research to Git:**
+   - Decide which research artifacts belong in the repository
+   - The `research/` directory is currently untracked
+
+3. **Fix Feynman Sim Issues (Dedicated Session):**
+   - Layout -- reduce cramping, give elements breathing room
+   - Size -- enlarge garden, toybox, rug for better usability
+   - Save pop-ups -- fix finnicky dialog behavior
+   - Rigorous testing -- 30+ item checklist in FEYNMAN_SIM_TODO.md
+
+4. **Implement Elena Z.'s Sequence Convergence Features:**
    - Custom sequence input
    - Wrong limit attempts
    - N(ε) staircase visualization
 
-3. **Continue Building:**
+5. **Continue Building:**
    - Quat-PINNs video/paper when available
    - SORA Videos station (G Train)
 
 ## Roadmap
 
 ### Near-term
+- Share landscape analysis with target audience
 - Fix Feynman simulation UX issues
-- Continue populating website with content
 - Real user testing for simulations
 
 ### Medium-term
 - ML Circuit Diagram for JAX Regression tutorial
 - Mobile responsiveness improvements
 - Performance optimization (code splitting)
+- Expand research into actionable strategy (positioning, outreach)
 
 ### Long-term Vision
-- **Veritas^(Blue·Pi)** — human-AI collaborative IDE for physics story videobooks
-- **Position for Physics Education / EdTech** — PhET, Brilliant, Khan Academy
-- **AI Classroom methodology** — Rapid pedagogical iteration before real user testing
+- **Veritas^(Blue·Pi)** -- human-AI collaborative IDE for physics story videobooks
+- **Position for Physics Education / EdTech** -- PhET, Brilliant, Khan Academy
+- **AI Classroom methodology** -- Rapid pedagogical iteration before real user testing
 
 ---
 
@@ -224,5 +350,12 @@ User revealed a "surprise" — a new standalone Feynman Conservation of Energy s
 | `NeuralNetLegoSim.jsx` | Visual NN builder | ★★★★★ |
 | `SequenceConvergenceSim.jsx` | ε-N definition visualizer | ★★★★★ |
 | `JaxRegression.jsx` | Flagship JAX tutorial | ★★★★★ |
+| `research/landscape_analysis.md` | Unified market landscape analysis (fact-checked) | ★★★★★ |
+| `research/landscape_analysis/index.html` | HTML version for sharing | ★★★★★ |
+| `research/fact-check-audit.pptx` | Fact-check audit presentation | ★★★★ |
+| `research/fact-check-notes.html` | Per-claim verification reference | ★★★★ |
 | `AI_CLASSROOM_EXPERIMENT_REPORT.md` | Pedagogical testing methodology | ★★★★ |
 | `CLAUDE.md` | Project guide for Claude instances | ★★★★ |
+| `research/interactive-sims-landscape/summary.md` | Market research executive summary | ★★★★ |
+| `research/learning-by-doing/summary.md` | Learning-by-doing literature review | ★★★ |
+| `research/ai-agent-classrooms/summary.md` | AI agent classrooms literature review | ★★★ |

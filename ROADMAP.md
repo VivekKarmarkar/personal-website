@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Personal Website - Interactive Educational Platform**
-**Last Updated:** January 21, 2026
+**Last Updated:** February 11, 2026
 
 ---
 
@@ -47,6 +47,26 @@ An interactive educational platform at the intersection of **Physics**, **AI**, 
 ## Milestones
 
 ### Completed
+
+#### Phase 16 (Feb 9-11, 2026) — The Brilliant Arc
+- [x] Claude played 134 lessons across 4 Brilliant.org courses via Chrome browser automation
+- [x] **How AI Works** (31/31, 1 wrong) — LLM taking a course about LLMs
+- [x] **Quantum Computing** (26/26, 7 wrong) — Genuinely challenging conceptual content
+- [x] **Number Theory** (75/75, 7 wrong) — Longest course, most enjoyable, ~15 context windows
+- [x] **Geometric Thinking** (2 completed, interrupted) — Account banned mid-L3
+- [x] Account deactivated by Brilliant for automated tool usage (bot detection triggered)
+- [x] X/Twitter also detected automation during tweet attempt about the arc
+- [x] Documented all sessions in persistent memory files (~27 context windows total)
+- [x] Generated cooldown artifacts: PPTX deck, PDF notes, summary
+- **Outcome:** Ban creates hook for Brilliant job application; AI Classroom methodology is the differentiator
+
+#### Phase 15 (Feb 10-11, 2026) — Landscape Analysis Fact-Check Audit
+- [x] 5-agent verification swarm checked 145+ sources across 3 research workstreams
+- [x] Discovered and corrected 4 wrong author attributions (verified via arXiv, ACM DL)
+- [x] Updated outdated competitor metrics (PhET, Labster)
+- [x] Removed unsourced claims and editorial overclaiming
+- [x] 18 total high-confidence fixes applied to both MD and HTML versions
+- [x] Document verified clean: zero old author names, all claims sourced, no self-referential language
 
 #### Session 8 (Jan 21, 2026) — Feynman Conservation of Energy
 - [x] Integrated 3,700+ line Feynman blocks simulation
@@ -95,8 +115,8 @@ An interactive educational platform at the intersection of **Physics**, **AI**, 
 
 | Task | Priority | Complexity |
 |------|----------|------------|
+| Draft Brilliant job application emails (when Vivek is ready) | High | Medium |
 | Fix Feynman simulation UX issues | High | Medium |
-| Deploy website (Git → GitHub → Vercel) | High | Easy |
 | Sequence Convergence: Custom sequence input | Medium | Medium |
 | Sequence Convergence: Wrong limit attempts | Medium | Low |
 | Sequence Convergence: N(ε) staircase visualization | Medium | Medium |
@@ -124,60 +144,10 @@ An interactive educational platform at the intersection of **Physics**, **AI**, 
 ## Deployment & Hosting
 
 ### Current State
-- **Code location:** Local only (`/home/vivekkarmarkar/Python Files/personal-website/`)
-- **Version control:** Not yet initialized
-- **Hosting:** None — site only runs on `localhost`
-
-### Deployment Steps
-
-| Step | Task | Complexity | Status |
-|------|------|------------|--------|
-| 1 | Initialize Git repository | Easy (~2 min) | ⬜ Not started |
-| 2 | Create GitHub repository | Easy (~2 min) | ⬜ Not started |
-| 3 | Push code to GitHub | Easy (~2 min) | ⬜ Not started |
-| 4 | Connect to Vercel/Netlify | Easy (~5 min) | ⬜ Not started |
-| 5 | Configure custom domain (optional) | Easy (~10 min) | ⬜ Not started |
-
-### Recommended Platform: Vercel or Netlify
-
-| Feature | Vercel | Netlify |
-|---------|--------|---------|
-| Free tier | ✅ Generous | ✅ Generous |
-| Auto-deploy from GitHub | ✅ Yes | ✅ Yes |
-| Vite/React support | ✅ Native | ✅ Native |
-| SPA routing | ✅ Automatic | ✅ With config |
-| Build time | ~30 seconds | ~30 seconds |
-
-### How Updates Will Work
-
-```
-You edit code locally
-        ↓
-git add . && git commit -m "message" && git push
-        ↓
-GitHub receives changes
-        ↓
-Vercel/Netlify auto-detects push
-        ↓
-Runs: npm run build
-        ↓
-Deploys new dist/ folder
-        ↓
-Live site updated (~30 seconds)
-```
-
-### Considerations
-
-| Item | Size | Impact |
-|------|------|--------|
-| Audio files (Suno songs) | 24 MB | ✅ Fine for free tier |
-| Simulation card images | ~2 MB | ✅ Fine |
-| JavaScript bundle | ~1-2 MB | ✅ Fine (code splitting later) |
-| PAT Scan static site | ~5 MB | ✅ Will work as-is |
-
-### Priority
-
-**When to deploy:** After Feynman simulation polish is complete, or sooner if you want to share the site with collaborators (Eugenia Etkina, etc.)
+- **Code location:** `/home/vivekkarmarkar/Python Files/personal-website/`
+- **Version control:** ✅ Git initialized, main branch
+- **Hosting:** ✅ Vercel (with `vercel.json` SPA rewrites configured)
+- **PAT Scan:** Static site at `/public/pat-scan/` with absolute paths
 
 ---
 
@@ -303,6 +273,8 @@ Live site updated (~30 seconds)
 | HC Verma | IIT Kanpur | Connected |
 | Roarke Horstmeyer | Duke | Perspective recorded |
 | Rachel Akeson | IPAC Caltech | Perspective recorded |
+| Alice | Brilliant Support | Ban communication (Feb 11, 2026) |
+| Brilliant Jobs | Brilliant.org | Application pending — ban as hook |
 
 ---
 
