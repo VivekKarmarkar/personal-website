@@ -1,22 +1,6 @@
-import { useRef, useCallback } from 'react'
 import Layout from '../components/Layout'
 
 export default function ClaudeCodeOS() {
-  const iframeRef = useRef(null)
-
-  const handleLoad = useCallback(() => {
-    try {
-      const el = iframeRef.current
-      const doc = el?.contentDocument || el?.contentWindow?.document
-      if (doc) {
-        el.style.height = '0px'
-        el.style.height = doc.documentElement.scrollHeight + 'px'
-      }
-    } catch {
-      // cross-origin fallback — keep the CSS height
-    }
-  }, [])
-
   return (
     <Layout>
       <article className="w-full py-16 px-4">
@@ -55,12 +39,10 @@ export default function ClaudeCodeOS() {
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
           <iframe
-            ref={iframeRef}
-            onLoad={handleLoad}
             src="/claude-code-os-app/index.html"
             title="Claude Code OS"
             className="w-full border-none block"
-            style={{ height: '22000px', background: '#0a0a0a' }}
+            style={{ height: '17500px', background: '#0a0a0a' }}
             scrolling="no"
           />
         </div>
