@@ -84,6 +84,7 @@ export const stations = {
     name: 'Professor Claude',
     position: 40,
     description: 'A Robot Teacher just for you',
+    url: '/professor-claude',
   },
   'claude-code-os': {
     id: 'claude-code-os',

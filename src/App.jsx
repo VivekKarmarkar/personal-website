@@ -19,6 +19,7 @@ import SequenceConvergence from './pages/sims/SequenceConvergence'
 import FeynmanConservation from './pages/sims/FeynmanConservation'
 import Wonyp from './pages/Wonyp'
 import DancerClaude from './pages/DancerClaude'
+import ProfessorClaude from './pages/ProfessorClaude'
 import SunoSongs from './pages/SunoSongs'
 import VeritasBluePi from './pages/VeritasBluePi'
 import ImuLe from './pages/ImuLe'
@@ -52,6 +53,7 @@ function App() {
         <Route path="/sims/feynman-conservation" element={<FeynmanConservation />} />
         <Route path="/wonyp" element={<Wonyp />} />
         <Route path="/dancer-claude" element={<DancerClaude />} />
+        <Route path="/professor-claude" element={<ProfessorClaude />} />
         <Route path="/suno-songs" element={<SunoSongs />} />
         <Route path="/veritas-blue-pi" element={<VeritasBluePi />} />
         <Route path="/imu-le" element={<ImuLe />} />
