@@ -91,6 +91,7 @@ export const stations = {
     name: 'Claude Code OS',
     position: 10,
     description: 'Treating Claude Code as an operating system',
+    url: '/claude-code-os',
   },
   'rcp': {
     id: 'rcp',
