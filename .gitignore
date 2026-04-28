@@ -25,6 +25,7 @@ coding tutorials/
 
 # Large files
 *.pdf
+!public/claude-code-os-app/*.pdf
 
 # Session logs and chat history
 chat_history*.txt
