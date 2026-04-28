@@ -105,6 +105,7 @@ export const stations = {
     name: 'VM Claude',
     position: 40,
     description: 'A virtual machine concept for Claude',
+    url: '/vm-claude',
   },
   'codeguide': {
     id: 'codeguide',

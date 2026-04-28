@@ -29,6 +29,7 @@ import TrackMan from './pages/TrackMan'
 import VisualizationTools from './pages/VisualizationTools'
 import PatScan from './pages/PatScan'
 import ClaudeCodeOS from './pages/ClaudeCodeOS'
+import VmClaude from './pages/VmClaude'
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
         <Route path="/visualization-tools" element={<VisualizationTools />} />
         <Route path="/pat-scan" element={<PatScan />} />
         <Route path="/claude-code-os" element={<ClaudeCodeOS />} />
+        <Route path="/vm-claude" element={<VmClaude />} />
       </Routes>
     </BrowserRouter>
   )

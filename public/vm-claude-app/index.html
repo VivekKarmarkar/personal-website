@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VM Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Global ───────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Layout helpers ───────────────────────────────── */
+.section {
+  padding: 80px 24px;
+}
+.section-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.section-header {
+  font-size: 32px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 48px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+.section-text p {
+  margin-bottom: 1.4em;
+  color: #c8c8c8;
+}
+.section-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── 2. Video ─────────────────────────────────────── */
+.video-section {
+  padding: 0 24px 80px;
+}
+.video-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: min(56.25%, 540px);
+  height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #23263a;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+}
+.video-wrap iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+/* ─── Video thumbnail fallback ─────────────────────── */
+.video-thumb {
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000 center/cover no-repeat;
+  text-decoration: none;
+}
+.video-thumb .play-btn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 68px; height: 48px;
+  background: rgba(255,0,0,0.85);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.video-thumb:hover .play-btn { background: #f00; }
+.video-thumb .play-btn::after {
+  content: '';
+  display: block;
+  border-style: solid;
+  border-width: 10px 0 10px 18px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 3px;
+}
+
+/* ─── 4. Architecture ──────────────────────────────── */
+.arch-section {
+  padding: 80px 24px;
+}
+.arch-section .section-header {
+  max-width: 700px;
+  margin: 0 auto 48px;
+}
+
+.arch-diagram {
+  max-width: 1100px;
+  margin: 0 auto 56px;
+}
+.arch-diagram .arch-legend {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  padding: 0 24px 12px;
+  flex-wrap: wrap;
+}
+.arch-diagram .legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.arch-diagram .legend-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.arch-diagram .legend-emoji { font-size: 22px; }
+.arch-diagram .legend-name { font-weight: 700; font-size: 18px; }
+.arch-diagram .legend-model { color: #e0e0e0; font-weight: 700; font-size: 18px; }
+
+.arch-diagram .arch-canvas {
+  width: 100%;
+  aspect-ratio: 980 / 380;
+  max-height: 380px;
+}
+.arch-diagram .arch-canvas svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.arch-diagram .node rect {
+  cursor: pointer;
+  transition: stroke-width 0.15s, filter 0.15s;
+}
+.arch-diagram .node:hover rect { stroke-width: 2.8; }
+.arch-diagram .node-emoji { font-size: 17px; pointer-events: none; }
+.arch-diagram .node-label { font-size: 12.5px; font-weight: 700; pointer-events: none; }
+.arch-diagram .step-num { font-size: 9px; pointer-events: none; fill: #555; }
+
+.arch-diagram .arch-detail {
+  background: #161822;
+  border-top: 1px solid #2e3140;
+  border-radius: 0 0 12px 12px;
+  padding: 14px 24px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.arch-diagram .arch-detail .d-icon { font-size: 26px; flex-shrink: 0; }
+.arch-diagram .arch-detail .d-name {
+  color: #f97316;
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+.arch-diagram .arch-detail .d-desc {
+  color: #bbb;
+  font-size: 13px;
+  line-height: 1.55;
+  flex: 1;
+}
+
+/* ─── GitHub footer ─────────────────────────────── */
+.github-footer {
+  text-align: center;
+  padding: 60px 24px 80px;
+}
+.github-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #a0a0a0;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+.github-footer a:hover { color: #e0e0e0; }
+.github-footer svg { fill: currentColor; }
+
+/* ─── Responsive ───────────────────────────────────── */
+@media (max-width: 640px) {
+  .section { padding: 60px 20px; }
+  .arch-section { padding: 60px 16px; }
+  .section-header { font-size: 26px; margin-bottom: 36px; }
+  .arch-diagram .arch-legend { gap: 24px; }
+  .arch-diagram .arch-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .arch-diagram .arch-detail .d-name { min-width: unset; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 1. HERO (removed for iframe embed)                  -->
+<!-- ════════════════════════════════════════════════════ -->
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 2. VIDEO                                            -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="video-section" style="padding-top:40px;">
+  <div class="video-wrap" id="video-container"></div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 3. INTRODUCTION                                     -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-header">Introduction</h2>
+    <div class="section-text">
+      <p>You're running Claude Code on your laptop. You tell it to go play an educational simulation. Your Claude Code opens an SSH tunnel to a cloud server and launches a second Claude Code instance on the other side &mdash; authenticated via OAuth against your Claude Max subscription, running with <code style="color:#f97316">--dangerously-skip-permissions</code>, with a real Chromium browser at its disposal. That's the inception: Claude Code spinning up Claude Code on a separate computer, handing it a prompt, and walking away.</p>
+      <p>The remote Claude Code wakes up inside a DigitalOcean VM with a virtual 1920&times;1080 display and no physical monitor. It reads a config file that tells it what tools are available &mdash; one of those tools is a Playwright server that gives Claude direct control of Chromium. From there, Claude navigates to the simulation, reads the page through accessibility snapshots, clicks buttons, drags sliders, and reasons about what it sees &mdash; narrating every decision. A split-screen layout captures both sides: Claude's terminal output streams on the left, the browser fills the right. Meanwhile, ffmpeg records the entire virtual display at 30 frames per second. You can close your laptop. The VM doesn't need you.</p>
+      <p>When Claude finishes exploring, the script finalizes the recording, loops a lo-fi music track underneath with faded transitions, and produces a formatted commentary transcript. One command in, one video out.</p>
+      <p>That recording is useful in two very different ways. The first is <strong>educational game design testing</strong>. Claude approaches every simulation like a first-time student &mdash; no prior knowledge, no curse of expertise. When a simulation is poorly designed &mdash; drag-and-drop as the only interaction mode, no scaffolding, unclear feedback &mdash; Claude fails immediately and obviously. It becomes a stress test for your UX: if Claude can't figure out what to do, a confused student won't either.</p>
+      <p>The second is a <strong>novel benchmark for AI capabilities</strong>. Even on beautifully designed simulations, Claude stumbles. It can write you a flawless textbook explanation of any physics concept, but when it's staring at an interactive simulation and needs to predict what will happen next &mdash; where an object will move, how a force diagram will change &mdash; it has been observed to hallucinate at times. The gap between verbal fluency and spatial reasoning is stark &mdash; and interactive science simulations test exactly the skills that text-based benchmarks miss.</p>
+      <p>And the architecture itself &mdash; an AI agent running autonomously in an isolated cloud container with full permissions and nothing to break &mdash; is a reusable pattern for <strong>autonomous AI work</strong> far beyond educational games.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 4. ARCHITECTURE                                     -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="arch-section">
+  <h2 class="section-header">Architecture</h2>
+
+  <div class="arch-diagram">
+    <!-- Legend -->
+    <div class="arch-legend">
+      <div class="legend-item"><div class="legend-top"><span class="legend-emoji">&#x1F4BB;</span><span class="legend-name" style="color:#888">You</span></div><span class="legend-model">Your Laptop</span></div>
+      <div class="legend-item"><div class="legend-top"><span class="legend-emoji">&#x2601;&#xFE0F;</span><span class="legend-name" style="color:#f97316">VM Claude</span></div><span class="legend-model">Cloud VM</span></div>
+      <div class="legend-item"><div class="legend-top"><span class="legend-emoji">&#x1F3AE;</span><span class="legend-name" style="color:#38bdf8">Sim</span></div><span class="legend-model">Educational Game</span></div>
+      <div class="legend-item"><div class="legend-top"><span class="legend-emoji">&#x1F3AC;</span><span class="legend-name" style="color:#4ade80">Output</span></div><span class="legend-model">Recording</span></div>
+    </div>
+
+    <!-- SVG Diagram -->
+    <div class="arch-canvas">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 380" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+            <circle cx="15" cy="15" r="0.5" fill="#1a1c2a"/>
+          </pattern>
+          <filter id="particleGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="nodeGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <marker id="arrowGray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#888"/>
+          </marker>
+          <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#f97316"/>
+          </marker>
+          <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#4ade80"/>
+          </marker>
+        </defs>
+
+        <rect width="980" height="380" fill="url(#dots)"/>
+
+        <!-- Zone boundary -->
+        <line x1="260" y1="30" x2="260" y2="350" stroke="#23263a" stroke-width="2" stroke-dasharray="8,6"/>
+        <text x="130" y="28" font-size="11" fill="#555" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="DM Sans, sans-serif">YOUR WORLD</text>
+        <text x="620" y="28" font-size="11" fill="#555" font-weight="700" letter-spacing="2" text-anchor="middle" font-family="DM Sans, sans-serif">CLAUDE'S WORLD</text>
+
+        <!-- "Laptop can be shut" annotation -->
+        <text x="130" y="280" font-size="11" fill="#555" text-anchor="middle" font-family="DM Sans, sans-serif">laptop can be shut</text>
+        <text x="130" y="298" font-size="16" fill="#444" text-anchor="middle">&#x1F4A4;</text>
+
+        <!-- Main pipeline paths -->
+        <path id="path-1-2" d="M 205,170 C 260,170 290,170 365,170" fill="none" stroke="#888" stroke-width="2" stroke-opacity="0.4" marker-end="url(#arrowGray)"/>
+        <path id="path-2-3" d="M 545,170 C 580,170 600,170 635,170" fill="none" stroke="#f97316" stroke-width="2" stroke-opacity="0.4" marker-end="url(#arrowOrange)"/>
+        <path id="path-3-4" d="M 795,170 C 830,170 850,170 870,170" fill="none" stroke="#4ade80" stroke-width="2" stroke-opacity="0.4" marker-end="url(#arrowGreen)"/>
+
+        <!-- Node 1: Launch & Walk Away -->
+        <g class="node" data-step="1" onclick="selectStep(1)">
+          <rect x="50" y="140" width="155" height="60" rx="12" fill="#88888810" stroke="#888" stroke-width="1.5"/>
+          <text class="step-num" x="60" y="152">1</text>
+          <text class="node-emoji" x="127" y="164" text-anchor="middle" fill="#aaa">&#x1F4BB;</text>
+          <text class="node-label" x="127" y="186" text-anchor="middle" fill="#aaa">Launch &amp; Walk Away</text>
+        </g>
+
+        <!-- Node 2: VM Claude -->
+        <g class="node" data-step="2" onclick="selectStep(2)">
+          <rect x="370" y="140" width="170" height="60" rx="12" fill="#f9731610" stroke="#f97316" stroke-width="1.5"/>
+          <text class="step-num" x="380" y="152">2</text>
+          <text class="node-emoji" x="455" y="164" text-anchor="middle" fill="#f97316">&#x2601;&#xFE0F;</text>
+          <text class="node-label" x="455" y="186" text-anchor="middle" fill="#f97316">VM Claude</text>
+        </g>
+
+        <!-- Node 3: Explore & Play -->
+        <g class="node" data-step="3" onclick="selectStep(3)">
+          <rect x="640" y="140" width="150" height="60" rx="12" fill="#38bdf810" stroke="#38bdf8" stroke-width="1.5"/>
+          <text class="step-num" x="650" y="152">3</text>
+          <text class="node-emoji" x="715" y="164" text-anchor="middle" fill="#38bdf8">&#x1F3AE;</text>
+          <text class="node-label" x="715" y="186" text-anchor="middle" fill="#38bdf8">Explore &amp; Play</text>
+        </g>
+
+        <!-- Node 4: Validation Data -->
+        <g class="node" data-step="4" onclick="selectStep(4)">
+          <rect x="875" y="140" width="90" height="60" rx="12" fill="#4ade8010" stroke="#4ade80" stroke-width="1.5"/>
+          <text class="step-num" x="885" y="152">4</text>
+          <text class="node-emoji" x="920" y="164" text-anchor="middle" fill="#4ade80">&#x1F3AC;</text>
+          <text class="node-label" x="920" y="186" text-anchor="middle" fill="#4ade80">Output</text>
+        </g>
+
+        <!-- Animated particles -->
+        <circle r="4" fill="#888" filter="url(#particleGlow)"><animateMotion dur="2.5s" repeatCount="indefinite" begin="0s"><mpath href="#path-1-2"/></animateMotion></circle>
+        <circle r="4" fill="#888" filter="url(#particleGlow)"><animateMotion dur="2.5s" repeatCount="indefinite" begin="1.25s"><mpath href="#path-1-2"/></animateMotion></circle>
+
+        <circle r="4" fill="#f97316" filter="url(#particleGlow)"><animateMotion dur="2s" repeatCount="indefinite" begin="0.3s"><mpath href="#path-2-3"/></animateMotion></circle>
+        <circle r="4" fill="#f97316" filter="url(#particleGlow)"><animateMotion dur="2s" repeatCount="indefinite" begin="1.3s"><mpath href="#path-2-3"/></animateMotion></circle>
+
+        <circle r="4" fill="#4ade80" filter="url(#particleGlow)"><animateMotion dur="2s" repeatCount="indefinite" begin="0.6s"><mpath href="#path-3-4"/></animateMotion></circle>
+        <circle r="4" fill="#4ade80" filter="url(#particleGlow)"><animateMotion dur="2s" repeatCount="indefinite" begin="1.6s"><mpath href="#path-3-4"/></animateMotion></circle>
+      </svg>
+    </div>
+
+    <!-- Detail bar -->
+    <div class="arch-detail">
+      <div class="d-icon" id="d-icon"></div>
+      <div class="d-name" id="d-name">Click any step to see how it works</div>
+      <div class="d-desc" id="d-desc"></div>
+    </div>
+  </div>
+
+  <!-- Architecture text -->
+  <div class="section-inner">
+    <div class="section-text">
+      <p>Two worlds, completely decoupled. On the left, your laptop &mdash; where your Claude Code opens a secure tunnel and launches a remote Claude Code instance. On the right, Claude's own computer &mdash; a cloud VM with a virtual display, a real browser, and full autonomous permissions via <code style="color:#f97316">--dangerously-skip-permissions</code>. The dashed line between them is the entire point: once you launch, your machine is irrelevant.</p>
+      <p>The VM creates a fake monitor &mdash; a 1920&times;1080 screen that exists only in software, with no physical display attached. Claude reads a config file that gives it direct control of a Chromium browser on that screen. A split-screen layout puts Claude's terminal on the left and the browser on the right, so you can see both what Claude is thinking and what it's doing. A screen recorder captures the entire virtual display at 30 frames per second while Claude's live narration gets formatted into color-coded text visible on screen. The remote Claude Code authenticates via OAuth against a Claude Max subscription &mdash; no per-call API charges, just a flat subscription powering unlimited autonomous exploration.</p>
+      <p>When the session ends, the recording is finalized and a lo-fi music track is layered underneath with gentle fade transitions. The output directory contains the final video and a plain-text commentary transcript. One command in, one video out.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 5. DESIGN PHILOSOPHY                                -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-header">The Closed Laptop Test</h2>
+    <div class="section-text">
+      <p>If your laptop can be shut and the work still happens, the autonomy is real. Everything in this architecture serves that principle.</p>
+      <p>The VM doesn't need your machine to stay connected. The recording doesn't need you to watch. The commentary doesn't need you to prompt. Claude makes its own decisions about what to click, when to re-read instructions, whether to try a different approach. The agent runs with <code style="color:#f97316">--dangerously-skip-permissions</code> &mdash; not because we're reckless, but because the VM is an isolated container with nothing to break. That isolation is what makes full autonomy safe. The dangerous flag becomes a feature, not a risk, when the environment is disposable.</p>
+      <p>But making it work required unexpected setup steps downstream. Autonomous AI sounds like a dream until you're three iterations deep into a problem you didn't know existed. Every Claude Code power user has been there &mdash; the strange, problem-specific blocker that takes a few more unplanned rounds to solve. That's exactly what happened here, and the solutions are baked into the pipeline so you never hit them again.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 7. THE B-MINUS STUDENT                              -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-header">The B-Minus Student</h2>
+    <div class="section-text">
+      <p>Claude behaves like a B-minus student. Strong conceptual knowledge, weak at verifying what's actually on screen versus what it expects to see.</p>
+
+      <!-- YT embed placeholder -->
+      <div class="video-wrap" style="margin:2em auto;">
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;border:1px solid #23263a;">
+          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/8NSzn9czpow" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Energy Skate Park video"></iframe>
+        </div>
+      </div>
+
+      <p>It hallucinated thermal energy in the Energy Skate Park simulation when friction wasn't even toggled on, then declared everything was working perfectly. It confidently narrated physics that wasn't happening.</p>
+
+      <!-- YT embed placeholder -->
+      <div class="video-wrap" style="margin:2em auto;">
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;border:1px solid #23263a;">
+          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/1iY6hLD14P8" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Sequence convergence video"></iframe>
+        </div>
+      </div>
+
+      <p>It got the correct answer on a sequence convergence problem but knew it wasn't optimal, which drove genuine retry behavior.</p>
+      <p>This is the gap that makes educational simulations a novel AI benchmark. Claude can write you a flawless textbook explanation of any physics concept. But put it in front of a simulation that requires spatial reasoning &mdash; predicting trajectories, understanding force diagrams, interpreting visual transformations &mdash; and the confident verbal fluency falls apart. Existing AI benchmarks test text, code, and multiple-choice reasoning. Interactive science simulations test something none of them cover: can the model actually <em>do</em> the physics it claims to understand?</p>
+      <p>PhET has 160+ open-source simulations spanning elementary school through graduate-level physics. That's a ready-made curriculum of increasing difficulty &mdash; a benchmark suite that's reproducible, publicly accessible, and tests capabilities that matter in the real world. The pipeline already works. The evaluation framework is the contribution.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 8. THREE PRINCIPLES                                 -->
+<!-- ════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-header">What Makes a Simulation Work</h2>
+    <div class="section-text">
+      <p>After running the agent through nine different simulations &mdash; PhET physics sims, custom-built math games, third-party educational tools &mdash; three design principles emerged that predict whether Claude will succeed or fail.</p>
+      <p><strong>Multiple affordances.</strong> If the simulation offers visual, numerical, and interactive paths to the same concept, the agent finds its way even when one path is blocked. Simulations with a single interaction mode &mdash; especially drag-and-drop &mdash; consistently produced failures.</p>
+      <p><strong>Gradient of success.</strong> Binary pass/fail kills engagement. The best simulations have a sweet spot where the agent's answer is correct but not optimal, creating a natural drive to try again. Claude re-engaged most enthusiastically with simulations that rewarded partial understanding.</p>
+      <p><strong>Immediate feedback.</strong> Click, result, learn. No waiting, no ambiguity about whether an action had an effect. The simulations where Claude struggled most were the ones where the connection between action and outcome was delayed or unclear.</p>
+      <p>These aren't just AI findings. They're the same principles that make educational software work for human students. The agent just makes them measurable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- 9. GITHUB FOOTER                                    -->
+<!-- ════════════════════════════════════════════════════ -->
+<footer class="github-footer">
+  <a href="https://github.com/VivekKarmarkar/give-claude-a-computer" target="_blank" rel="noopener noreferrer">
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+    </svg>
+    View on GitHub
+  </a>
+</footer>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SCRIPTS                                             -->
+<!-- ════════════════════════════════════════════════════ -->
+<script>
+// ── Video embed (iframe on http/https, thumbnail fallback on file://) ──
+(function() {
+  var container = document.getElementById('video-container');
+  var videoId = 'OKSSocreVzQ';
+  if (location.protocol === 'file:') {
+    container.innerHTML =
+      '<a class="video-thumb" href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" rel="noopener" ' +
+      'style="background-image:url(https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg)">' +
+      '<div class="play-btn"></div></a>';
+  } else {
+    container.innerHTML =
+      '<iframe src="https://www.youtube.com/embed/' + videoId + '" ' +
+      'title="VM Claude — Demo Video" ' +
+      'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+      'allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>';
+  }
+})();
+
+// ── Architecture diagram: step data + selection ──────
+var stepData = {
+  1: { icon: "\u{1F4BB}", name: "Launch & Walk Away",
+       desc: "Your local Claude Code opens a secure tunnel to the cloud and launches a second Claude Code instance on the other side. The script starts screen recording, hands the remote Claude a prompt, and your job is done. Close your laptop." },
+  2: { icon: "☁️", name: "VM Claude",
+       desc: "A cloud VM with a fake monitor (1920×1080, no physical screen), a real Chromium browser, and Claude Code running with full autonomous permissions. Authenticated via OAuth against a Claude Max subscription — flat rate, no per-call charges." },
+  3: { icon: "\u{1F3AE}", name: "Explore & Play",
+       desc: "Claude takes direct control of the browser on the virtual screen. It navigates to the simulation, reads the page, clicks buttons, drags sliders, and reasons about what it sees — narrating every decision. A split-screen layout shows Claude's terminal on the left and the browser on the right, all captured by a screen recorder at 30 frames per second." },
+  4: { icon: "\u{1F3AC}", name: "Output",
+       desc: "When Claude finishes, the recording is finalized and a lo-fi music track is layered underneath with gentle fade transitions. The result: a polished video and a plain-text commentary transcript, ready for UX analysis or sharing." }
+};
+
+var selectedStep = null;
+
+function selectStep(n) {
+  document.querySelectorAll('.arch-diagram .node rect').forEach(function(r) {
+    r.setAttribute('stroke-width', '1.5');
+    r.removeAttribute('filter');
+  });
+
+  selectedStep = n;
+  var s = stepData[n];
+
+  var node = document.querySelector('.arch-diagram .node[data-step="' + n + '"] rect');
+  if (node) {
+    node.setAttribute('stroke-width', '3');
+    node.setAttribute('filter', 'url(#nodeGlow)');
+  }
+
+  document.getElementById('d-icon').textContent = s.icon;
+  document.getElementById('d-name').textContent = s.name;
+  document.getElementById('d-desc').textContent = s.desc;
+}
+</script>
+
+</body>
+</html>
