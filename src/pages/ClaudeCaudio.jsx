@@ -208,7 +208,7 @@ export default function ClaudeCaudio() {
 
           {/* Train Badges */}
           <section className="mb-8">
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <div className="flex items-center gap-4 mb-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <span
                   className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
@@ -235,7 +235,7 @@ export default function ClaudeCaudio() {
           </section>
 
           {/* Motivation */}
-          <section className="mb-12">
+          <section className="mb-12 prose-medium">
             <h2 className="text-xl font-semibold mb-6">The Problem</h2>
             <p className="text-dark-muted leading-relaxed mb-4">
               Keeping up with Claude Code is exhausting. The ecosystem is a firehose — team members tweeting frantically about every new feature, webinars that are hit or miss, and official docs that are technically correct but too terse to actually enjoy reading. If you're trying to learn Claude Code while walking and remote-controlling from your phone, reading dense documentation isn't an option.
@@ -259,7 +259,7 @@ export default function ClaudeCaudio() {
           </section>
 
           {/* Module: Core Concepts */}
-          <section className="mb-12">
+          <section className="mb-12 prose-medium">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-sm font-mono text-dark-muted">MODULE 01</span>
             </div>
