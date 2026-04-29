@@ -49,31 +49,17 @@ export default function Story() {
         {/* World Map */}
         <section className="mb-12">
           <svg viewBox="0 0 800 300" className="w-full" style={{ maxHeight: '280px' }}>
-            <defs>
-              <linearGradient id="trajectory-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#60a5fa" />
-                <stop offset="20%" stopColor="#34d399" />
-                <stop offset="40%" stopColor="#a3e635" />
-                <stop offset="60%" stopColor="#fbbf24" />
-                <stop offset="80%" stopColor="#fb923c" />
-                <stop offset="100%" stopColor="#FF6319" />
-              </linearGradient>
-            </defs>
-
             {/* Subtle latitude grid */}
             {[75, 150, 225].map(y => (
               <line key={y} x1="0" y1={y} x2="800" y2={y} stroke="#333" strokeWidth="0.5" strokeDasharray="4 8" />
             ))}
 
-            {/* Trajectory path: NYC → Pune → Kolkata → Sheffield → Copenhagen → Iowa City */}
-            <path
-              d="M 153 126 C 300 200, 500 280, 646 221 L 695 203 C 600 100, 500 40, 395 71 L 442 61 C 300 -20, 150 40, 95 121"
-              fill="none"
-              stroke="url(#trajectory-grad)"
-              strokeWidth="2"
-              strokeDasharray="6 4"
-              opacity="0.7"
-            />
+            {/* Trajectory segments — each colored chronologically */}
+            <path d="M 153 126 C 300 200, 500 280, 646 221" fill="none" stroke="#34d399" strokeWidth="2" strokeDasharray="6 4" opacity="0.7" />
+            <line x1="646" y1="221" x2="695" y2="203" stroke="#a3e635" strokeWidth="2" strokeDasharray="6 4" opacity="0.7" />
+            <path d="M 695 203 C 600 100, 500 40, 395 71" fill="none" stroke="#fbbf24" strokeWidth="2" strokeDasharray="6 4" opacity="0.7" />
+            <line x1="395" y1="71" x2="442" y2="61" stroke="#fb923c" strokeWidth="2" strokeDasharray="6 4" opacity="0.7" />
+            <path d="M 442 61 C 300 -20, 150 40, 95 121" fill="none" stroke="#FF6319" strokeWidth="2" strokeDasharray="6 4" opacity="0.7" />
 
             {/* City dots and labels */}
             {[
@@ -92,7 +78,17 @@ export default function Story() {
             ))}
 
             {/* Legend */}
-            <rect x="310" y="270" width="180" height="2" rx="1" fill="url(#trajectory-grad)" opacity="0.6" />
+            <defs>
+              <linearGradient id="legend-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#60a5fa" />
+                <stop offset="20%" stopColor="#34d399" />
+                <stop offset="40%" stopColor="#a3e635" />
+                <stop offset="60%" stopColor="#fbbf24" />
+                <stop offset="80%" stopColor="#fb923c" />
+                <stop offset="100%" stopColor="#FF6319" />
+              </linearGradient>
+            </defs>
+            <rect x="310" y="270" width="180" height="2" rx="1" fill="url(#legend-grad)" opacity="0.6" />
             <text x="310" y="290" fill="#666" fontSize="9" fontFamily="system-ui">earlier</text>
             <text x="490" y="290" fill="#666" fontSize="9" fontFamily="system-ui" textAnchor="end">now</text>
           </svg>
@@ -105,7 +101,7 @@ export default function Story() {
               <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42zm2.94 0c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75c.66 0 1.19 2.58 1.19 5.75z"/>
             </svg>
           </a>
-          <a href="https://www.youtube.com/@vizuara" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors" aria-label="YouTube">
+          <a href="https://www.youtube.com/@physicsanimated1623" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors" aria-label="YouTube">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
               <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
@@ -118,7 +114,7 @@ export default function Story() {
         </div>
 
         {/* Collapsible Thesis */}
-        <section className="mb-16 rounded-xl bg-neutral-800 border border-neutral-700 p-6">
+        <section className="mb-16 rounded-xl p-6" style={{ backgroundColor: '#d4d4d820', border: '1px solid #a3a3a340' }}>
           <button
             onClick={() => setThesisOpen(!thesisOpen)}
             className="flex items-center gap-3 w-full text-left group"
@@ -157,7 +153,7 @@ export default function Story() {
                 I know this all sounds a bit Black Mirror. But there's a White Mirror version too—and I think it's worth aspiring to. A future where learning is genuinely about joy and curiosity. AI is already accelerating the creation of interactive educational content. Extrapolate forward: brain-computer interfaces will let us communicate intent directly to these models (this isn't science fiction—researchers are already doing it). Error rates will drop. And when they do, what will actually matter is imagination. Ideas. Personal taste. The ability to iterate on a vision until it's right. And ultimately, the deep domain expertise—in physics, in pedagogy—to know when it <em>is</em> right. That's the future I'm building toward.
               </p>
 
-              <h3 className="flex items-center gap-3 mt-10">
+              <h2 className="flex items-center gap-3 mt-10">
                 <span
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: '#0039A6' }}
@@ -165,7 +161,7 @@ export default function Story() {
                   A
                 </span>
                 Physics for AI
-              </h3>
+              </h2>
               <p>
                 I've always thought like a physicist. That means I instinctively want to strip things down to their building blocks, push them to their limits, and ask: what's <em>really</em> going on here? When I started working with AI systems, I brought that same instinct with me.
               </p>
@@ -179,7 +175,7 @@ export default function Story() {
                 There's also a meta-layer to this work that I find endlessly fascinating: human-AI collaboration itself. I spend a lot of time probing how large language models behave under different modes of interaction. How do they reason? How do they adapt? What happens when you push them in unexpected directions? This isn't just intellectual curiosity—it's practical. Understanding these dynamics is how you engineer better prompting techniques, better workflows, better ways of partnering with machine intelligence.
               </p>
 
-              <h3 className="flex items-center gap-3 flex-wrap mt-10">
+              <h2 className="flex items-center gap-3 flex-wrap mt-10">
                 <span
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: '#FF6319' }}
@@ -194,7 +190,7 @@ export default function Story() {
                   E
                 </span>
                 Education
-              </h3>
+              </h2>
               <p>
                 Now flip it around.
               </p>
@@ -208,9 +204,9 @@ export default function Story() {
                 Generative AI changes the equation. What once took a team and half a year can now be spun up rapidly. The bottleneck isn't resources anymore—it's imagination and tooling. I'm working on bridging that gap, on giving physics educators the ability to create interactive experiences without needing a development team behind them.
               </p>
 
-              <h3 className="mt-10">
+              <h2 className="mt-10">
                 Veritas<sup className="text-accent">(Blue·Pi)</sup>
-              </h3>
+              </h2>
               <p>
                 There are two creators who've shaped how I think about science communication: 3Blue1Brown and Veritasium.
               </p>
@@ -233,7 +229,7 @@ export default function Story() {
                 To build this well, I need to develop AI systems with <em>taste</em>. Systems that understand aesthetics. Systems that can make meaningful choices about visual rhythm, about narrative pacing, about what makes something beautiful versus merely correct. Film is an artistic medium, and teaching through film means grappling with questions of craft and emotional resonance that go way beyond technical accuracy.
               </p>
 
-              <h3 className="mt-10">The Background</h3>
+              <h2 className="mt-10">The Background</h2>
               <p>
                 I didn't arrive at this intersection by accident.
               </p>
@@ -250,7 +246,7 @@ export default function Story() {
                 Nowadays, Claude Code ain't just my hobby—a /slashcommand a day keeps the manual labour away.
               </p>
 
-              <h3 className="flex items-center gap-3 mt-10">
+              <h2 className="flex items-center gap-3 mt-10">
                 <span
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: '#EE352E' }}
@@ -258,7 +254,7 @@ export default function Story() {
                   S
                 </span>
                 Physics for Sports
-              </h3>
+              </h2>
               <p>
                 I wanted to combine my two interests: Physics and Sports. The question was how. I leaned into what I knew best—algorithmic thinking—and followed the thread wherever it led. Sports Physics. Sports Engineering. Motion tracking. Optical motion capture. And eventually, deep into the weeds of optical motion capture algorithms for human walking.
               </p>
@@ -278,7 +274,7 @@ export default function Story() {
                 But there's one place where PINNs and Sports still meet directly: PAT Scan. It's a new scanning technology I'm developing—think of it like a CT scan, but based on touch instead of X-rays. The goal is to map the stiffness of human tissue in 3D using surface measurements and physics-informed reconstruction. Medical physics, biomechanics, and AI, all converging in one project. The S Train isn't just backstory—it's still very much active.
               </p>
 
-              <h3 className="mt-10">What I'm Building Toward</h3>
+              <h2 className="mt-10">What I'm Building Toward</h2>
               <p>
                 I don't have a tidy summary of where all this is going. The intersection of Physics and AI is still being mapped. The question of how humans and machines can genuinely collaborate—creatively, intellectually—is still wide open.
               </p>
@@ -292,7 +288,7 @@ export default function Story() {
                 That's the vibe. That's the work.
               </p>
 
-              <h3 className="mt-10">The Documentation</h3>
+              <h2 className="mt-10">The Documentation</h2>
               <p>
                 I've been documenting all my night projects and spontaneous explorations on Medium. And in the spirit of everything I've said here about human-AI collaboration—most of my articles have their initial drafts written by ChatGPT or Claude, in their voice, with them credited as authors.
               </p>
