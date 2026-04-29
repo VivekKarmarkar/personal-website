@@ -326,7 +326,8 @@ body {
 
 .rcp-canvas-wrapper {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
+  container-type: inline-size;
 }
 .rcp-canvas {
   position: relative;
@@ -334,6 +335,13 @@ body {
   height: 620px;
   margin: 0 auto;
   background: #0a0e17;
+  transform-origin: top center;
+}
+@container (max-width: 960px) {
+  .rcp-canvas {
+    transform: scale(calc(100cqw / 960));
+    margin-bottom: calc(620px * (100cqw / 960) - 620px);
+  }
 }
 
 .rcp-canvas .lines-svg {
