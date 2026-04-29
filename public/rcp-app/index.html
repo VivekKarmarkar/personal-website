@@ -327,20 +327,17 @@ body {
 .rcp-canvas-wrapper {
   width: 100%;
   overflow: visible;
-  container-type: inline-size;
 }
 .rcp-canvas {
   position: relative;
   width: 960px;
   height: 620px;
-  margin: 0 auto;
   background: #0a0e17;
-  transform-origin: top center;
+  margin: 0 auto;
 }
-@container (max-width: 960px) {
-  .rcp-canvas {
-    transform: scale(calc(100cqw / 960));
-    margin-bottom: calc(620px * (100cqw / 960) - 620px);
+@media (max-width: 980px) {
+  .rcp-canvas-wrapper {
+    overflow: hidden;
   }
 }
 
@@ -1070,6 +1067,22 @@ body {
   };
 
   updateAll();
+
+  // Scale canvas to fit narrow viewports (mobile landscape)
+  function scaleCanvas() {
+    var w = canvas.parentElement.clientWidth;
+    if (w < 960) {
+      var s = w / 960;
+      canvas.style.transformOrigin = 'top left';
+      canvas.style.transform = 'scale(' + s + ')';
+      canvas.style.marginBottom = (-620 + 620 * s) + 'px';
+    } else {
+      canvas.style.transform = '';
+      canvas.style.marginBottom = '';
+    }
+  }
+  scaleCanvas();
+  window.addEventListener('resize', scaleCanvas);
 })();
 </script>
 
