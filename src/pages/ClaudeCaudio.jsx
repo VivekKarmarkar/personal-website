@@ -10,29 +10,29 @@ const lessons = [
     number: 1,
   },
   {
+    id: 'extend-claude-code',
+    title: 'Extending Claude Code',
+    description: 'Slash commands, custom skills, MCP servers, hooks — the extension points that turn Claude Code from a tool into an operating system.',
+    filename: 'extend_claude_code_lesson.mp3',
+    number: 2,
+  },
+  {
     id: 'explore-claude-directory',
     title: 'The .claude Directory',
     description: 'Where Claude Code stores its memory, settings, and project context. CLAUDE.md files, permissions, and how the directory structure shapes behavior.',
     filename: 'explore_claude_directory_lesson.mp3',
-    number: 2,
+    number: 3,
   },
   {
     id: 'explore-context-window',
     title: 'The Context Window',
     description: 'How the context window fills up, what gets compressed, why long conversations drift, and strategies for managing context effectively.',
     filename: 'explore_context_window_lesson.mp3',
-    number: 3,
-  },
-  {
-    id: 'extend-claude-code',
-    title: 'Extending Claude Code',
-    description: 'Slash commands, custom skills, MCP servers, hooks — the extension points that turn Claude Code from a tool into an operating system.',
-    filename: 'extend_claude_code_lesson.mp3',
     number: 4,
   },
 ]
 
-function LessonCard({ lesson, isPlaying, isActive, onPlay, onPause, onStop, onSeek, currentTime, duration }) {
+function LessonCard({ lesson, isPlaying, isActive, onPlay, onPause, onStop, onSeek, currentTime, duration, audioBasePath }) {
   const progressRef = useRef(null)
 
   const formatTime = (seconds) => {
@@ -87,6 +87,17 @@ function LessonCard({ lesson, isPlaying, isActive, onPlay, onPause, onStop, onSe
               </svg>
             </button>
           )}
+
+          <a
+            href={`${audioBasePath}${lesson.filename}`}
+            download={lesson.filename}
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 bg-neutral-700 hover:bg-neutral-600"
+            title="Download"
+          >
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 18h16" />
+            </svg>
+          </a>
 
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -221,19 +232,6 @@ export default function ClaudeCaudio() {
             <p className="text-dark-muted text-lg">
               Claude Code docs you can listen to on a walk.
             </p>
-            <div className="flex flex-col items-start gap-2.5 mt-6">
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Education</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Audio Learning</span>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>EdTech Companies</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
-              </div>
-            </div>
           </section>
 
           {/* Motivation */}
@@ -253,7 +251,7 @@ export default function ClaudeCaudio() {
 
             <h2 className="text-xl font-semibold mb-6 mt-8">The Solution</h2>
             <p className="text-dark-muted leading-relaxed mb-4">
-              I took the official Claude Code documentation, gave Claude skills to generate audio, and had it create personalized audio lessons from the doc pages — tailored to how I think, at a pace that works for walking. Then I listened to them while shipping code on remote control.
+              I took the official Claude Code documentation, gave Claude skills to generate audio, and had it create personalized audio lessons from the doc pages — tailored to how I think, at a pace that works for walking. Then I listened to them while walking, and if I feel compelled to try out an item I just learnt about, I try it out right then in the Claude app via remote-control.
             </p>
             <p className="text-dark-muted leading-relaxed">
               These are those lessons. Docs you can listen to on a walk.
@@ -283,6 +281,7 @@ export default function ClaudeCaudio() {
                   onSeek={seekTo}
                   currentTime={currentLesson?.id === lesson.id ? currentTime : 0}
                   duration={currentLesson?.id === lesson.id ? duration : 0}
+                  audioBasePath="/claude-caudio/modules/core-concepts/"
                 />
               ))}
             </div>
