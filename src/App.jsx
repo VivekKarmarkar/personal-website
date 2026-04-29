@@ -30,6 +30,7 @@ import VisualizationTools from './pages/VisualizationTools'
 import PatScan from './pages/PatScan'
 import ClaudeCodeOS from './pages/ClaudeCodeOS'
 import VmClaude from './pages/VmClaude'
+import Rcp from './pages/Rcp'
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
         <Route path="/pat-scan" element={<PatScan />} />
         <Route path="/claude-code-os" element={<ClaudeCodeOS />} />
         <Route path="/vm-claude" element={<VmClaude />} />
+        <Route path="/rcp" element={<Rcp />} />
       </Routes>
     </BrowserRouter>
   )

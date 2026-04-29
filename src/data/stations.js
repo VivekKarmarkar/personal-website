@@ -99,6 +99,7 @@ export const stations = {
     fullName: 'Remote Control Protocol',
     position: 20,
     description: 'A protocol for remote-controlling Claude Code',
+    url: '/rcp',
   },
   'vm-claude': {
     id: 'vm-claude',
