@@ -58,7 +58,7 @@ export const lines = {
     name: 'I Train',
     fullName: 'Infrastructure',
     description: 'Personal Claude Code Infrastructure',
-    direction: 'Claude Code Borough · AI Island',
+    direction: 'Claude Code Borough Local · AI Island',
     color: 'mta-silver',
     colorHex: '#A7A9AC',
     stations: ['claude-code-os', 'rcp', 'professor-claude', 'vm-claude', 'codeguide'],
