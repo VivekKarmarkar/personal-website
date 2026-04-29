@@ -48,7 +48,7 @@ export default function Story() {
 
         {/* World Map */}
         <section className="mb-12">
-          <svg viewBox="0 0 800 300" className="w-full" style={{ maxHeight: '280px' }}>
+          <svg viewBox="0 0 800 330" className="w-full" style={{ maxHeight: '310px' }}>
             {/* Continent outlines — very faint background */}
             <g opacity="0.07" fill="#888" stroke="none">
               {/* North America */}
@@ -111,9 +111,9 @@ export default function Story() {
                 <stop offset="100%" stopColor="#FF6319" />
               </linearGradient>
             </defs>
-            <rect x="310" y="270" width="180" height="2" rx="1" fill="url(#legend-grad)" opacity="0.6" />
-            <text x="310" y="290" fill="#666" fontSize="9" fontFamily="system-ui">earlier</text>
-            <text x="490" y="290" fill="#666" fontSize="9" fontFamily="system-ui" textAnchor="end">now</text>
+            <rect x="310" y="300" width="180" height="2" rx="1" fill="url(#legend-grad)" opacity="0.6" />
+            <text x="310" y="320" fill="#666" fontSize="9" fontFamily="system-ui">earlier</text>
+            <text x="490" y="320" fill="#666" fontSize="9" fontFamily="system-ui" textAnchor="end">now</text>
           </svg>
         </section>
 
