@@ -23,7 +23,7 @@ export default function Rcp() {
               >
                 I
               </span>
-              <span className="text-dark-muted">Claude Code Borough</span>
+              <span className="text-dark-muted">Claude Code Borough · AI Island</span>
             </div>
           </div>
 
