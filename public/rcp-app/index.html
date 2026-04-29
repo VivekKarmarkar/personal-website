@@ -324,10 +324,13 @@ body {
 .rcp-counter span { font-weight: 700; }
 .rcp-counter .on-count { color: #00ff88; }
 
+.rcp-canvas-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
 .rcp-canvas {
   position: relative;
-  width: 100%;
-  max-width: 960px;
+  width: 960px;
   height: 620px;
   margin: 0 auto;
   background: #0a0e17;
@@ -731,6 +734,7 @@ body {
     <div class="rcp-counter"><span class="on-count" id="rcp-on-count">0</span> / <span>8</span> systems online</div>
 
     <!-- Interactive Canvas -->
+    <div class="rcp-canvas-wrapper">
     <div class="rcp-canvas" id="rcp-canvas">
       <svg class="lines-svg" id="rcp-lines-svg"></svg>
 
@@ -756,6 +760,7 @@ body {
           </g>
         </svg>
       </div>
+    </div>
     </div>
 
     <!-- Presets -->

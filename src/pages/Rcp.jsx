@@ -23,14 +23,14 @@ export default function Rcp() {
               >
                 I
               </span>
-              <span className="text-dark-muted">I-Line</span>
+              <span className="text-dark-muted">Claude Code Borough</span>
             </div>
           </div>
 
           {/* Title */}
           <section className="mb-8">
             <h1>RCP: Remote Control Protocol</h1>
-            <p className="text-dark-muted text-lg mt-2">A protocol for remote-controlled GPU compute, born from friction</p>
+            <p className="text-dark-muted text-lg mt-2">A preflight checklist for remote-controlled Claude Code</p>
             <div className="flex flex-col items-start gap-2.5 mt-6">
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>

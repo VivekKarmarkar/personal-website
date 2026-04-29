@@ -23,7 +23,7 @@ export default function ClaudeCodeOS() {
               >
                 I
               </span>
-              <span className="text-dark-muted">I-Line</span>
+              <span className="text-dark-muted">Claude Code Borough</span>
             </div>
           </div>
 
