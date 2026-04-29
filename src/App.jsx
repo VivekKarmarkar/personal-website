@@ -31,6 +31,7 @@ import PatScan from './pages/PatScan'
 import ClaudeCodeOS from './pages/ClaudeCodeOS'
 import VmClaude from './pages/VmClaude'
 import Rcp from './pages/Rcp'
+import ClaudeCaudio from './pages/ClaudeCaudio'
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
         <Route path="/claude-code-os" element={<ClaudeCodeOS />} />
         <Route path="/vm-claude" element={<VmClaude />} />
         <Route path="/rcp" element={<Rcp />} />
+        <Route path="/claude-caudio" element={<ClaudeCaudio />} />
       </Routes>
     </BrowserRouter>
   )

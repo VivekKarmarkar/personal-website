@@ -108,6 +108,13 @@ export const stations = {
     description: 'A virtual machine concept for Claude',
     url: '/vm-claude',
   },
+  'claude-caudio': {
+    id: 'claude-caudio',
+    name: 'Claude Caudio',
+    position: 35,
+    description: 'Claude Code docs you can listen to on a walk',
+    url: '/claude-caudio',
+  },
   'codeguide': {
     id: 'codeguide',
     name: 'Codeguide',

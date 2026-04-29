@@ -39,7 +39,7 @@ export default function Story() {
             <Link to="/teaching-pinns/tutorials" style={{ color: '#6CBE45' }} className="underline underline-offset-2 hover:opacity-80">interactive coding tutorials</Link>,{' '}
             <Link to="/interactive-sims" style={{ color: '#6CBE45' }} className="underline underline-offset-2 hover:opacity-80">interactive games</Link>
             {' '}and as{' '}
-            <a href="#" onClick={e => e.preventDefault()} style={{ color: '#888888' }} className="underline underline-offset-2 cursor-default opacity-60">audio lectures</a>.
+            <Link to="/claude-caudio" style={{ color: '#6CBE45' }} className="underline underline-offset-2 hover:opacity-80">audio lessons</Link>.
           </p>
           <p>
             Finally, I am a citizen of the world. I was born in NJ (USA) in the NYC metropolitan area, spent a lot of time in Pune and Kolkata (India), lived in Sheffield (UK) and Copenhagen (Denmark). NYC (USA) is one of my favourite cities and this website is "NYC-subway" themed — have a look :)

@@ -41,6 +41,7 @@ export const lines = {
       'veritas-blue-pi',
       'teaching-pinns',
       'interactive-sims',
+      'claude-caudio',
     ],
   },
   D: {
@@ -58,10 +59,10 @@ export const lines = {
     name: 'I Train',
     fullName: 'Infrastructure',
     description: 'Personal Claude Code Infrastructure',
-    direction: 'Claude Code Borough Local · AI Island',
+    direction: 'Claude Code Borough Local on AI Island',
     color: 'mta-silver',
     colorHex: '#A7A9AC',
-    stations: ['claude-code-os', 'rcp', 'professor-claude', 'vm-claude', 'codeguide'],
+    stations: ['claude-code-os', 'rcp', 'professor-claude', 'vm-claude', 'claude-caudio', 'codeguide'],
   },
   G: {
     id: 'G',
