@@ -49,6 +49,29 @@ export default function Story() {
         {/* World Map */}
         <section className="mb-12">
           <svg viewBox="0 0 800 300" className="w-full" style={{ maxHeight: '280px' }}>
+            {/* Continent outlines — very faint background */}
+            <g opacity="0.07" fill="#888" stroke="none">
+              {/* North America */}
+              <path d="M 0 13 L 83 9 L 140 34 L 217 94 L 177 111 L 153 124 L 147 133 L 127 193 L 100 176 L 77 189 L 50 201 L 10 163 L 0 94 Z" />
+              {/* Central America */}
+              <path d="M 50 201 L 77 189 L 100 210 L 110 236 L 120 253 L 133 266 L 120 270 L 93 257 L 67 230 Z" />
+              {/* Greenland */}
+              <path d="M 217 43 L 250 30 L 290 9 L 327 0 L 250 0 L 217 21 Z" />
+              {/* Europe */}
+              <path d="M 367 146 L 370 116 L 393 116 L 407 90 L 417 81 L 427 69 L 443 60 L 460 30 L 483 21 L 500 43 L 493 64 L 500 81 L 493 103 L 480 137 L 450 141 L 440 120 L 427 111 Z" />
+              {/* UK + Ireland */}
+              <path d="M 380 90 L 383 77 L 387 64 L 390 51 L 397 56 L 400 69 L 403 81 L 397 90 Z" />
+              <path d="M 370 81 L 373 69 L 377 64 L 380 73 L 377 81 Z" />
+              {/* Africa (north) */}
+              <path d="M 343 150 L 393 146 L 450 150 L 483 163 L 517 167 L 550 193 L 567 257 L 540 279 L 500 300 L 400 300 L 343 279 Z" />
+              {/* Arabian Peninsula */}
+              <path d="M 517 167 L 540 171 L 567 180 L 583 193 L 600 206 L 577 236 L 550 244 L 530 210 Z" />
+              {/* India */}
+              <path d="M 630 197 L 640 206 L 643 218 L 650 244 L 657 266 L 667 253 L 680 227 L 690 210 L 697 201 L 707 184 L 690 167 L 660 163 Z" />
+              {/* Central/South Asia */}
+              <path d="M 600 120 L 660 163 L 690 167 L 707 184 L 730 171 L 770 150 L 800 120 L 800 60 L 740 43 L 680 60 L 630 81 Z" />
+            </g>
+
             {/* Subtle latitude grid */}
             {[75, 150, 225].map(y => (
               <line key={y} x1="0" y1={y} x2="800" y2={y} stroke="#333" strokeWidth="0.5" strokeDasharray="4 8" />
