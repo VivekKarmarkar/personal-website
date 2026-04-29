@@ -47,12 +47,12 @@ export default function Story() {
         </section>
 
         {/* Collapsible Thesis */}
-        <section className="mb-16">
+        <section className="mb-16 rounded-xl bg-neutral-900 border border-neutral-800 p-6">
           <button
             onClick={() => setThesisOpen(!thesisOpen)}
             className="flex items-center gap-3 w-full text-left group"
           >
-            <h2 className="group-hover:opacity-80 transition-opacity">The Thesis</h2>
+            <h2 className="group-hover:opacity-80 transition-opacity m-0">The Thesis</h2>
             <svg
               className="w-5 h-5 text-dark-muted transition-transform duration-300"
               style={{ transform: thesisOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
