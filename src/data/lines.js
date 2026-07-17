@@ -52,7 +52,7 @@ export const lines = {
     direction: 'AI Island Local',
     color: 'mta-gold',
     colorHex: '#FCCC0A',
-    stations: ['wonyp', 'gpt-bhojan', 'dancer-claude', 'professor-claude'],
+    stations: ['wonyp', 'gpt-bhojan', 'claude-code-lm', 'dancer-claude', 'professor-claude'],
   },
   I: {
     id: 'I',
@@ -63,6 +63,16 @@ export const lines = {
     color: 'mta-silver',
     colorHex: '#A7A9AC',
     stations: ['claude-code-os', 'rcp', 'professor-claude', 'vm-claude', 'claude-caudio', 'codeguide'],
+  },
+  W: {
+    id: 'W',
+    name: 'W Train',
+    fullName: 'Writing',
+    description: 'Long-form essays and position papers, co-authored with Claude',
+    direction: 'All Islands Express',
+    color: 'mta-brown',
+    colorHex: '#996633',
+    stations: ['agentic-algorithm-discovery'],
   },
   G: {
     id: 'G',
@@ -112,4 +122,4 @@ export const lines = {
   },
 };
 
-export const lineOrder = ['P', 'A', 'E', 'D', 'I', 'G', 'S', 'F'];
+export const lineOrder = ['P', 'A', 'E', 'D', 'I', 'W', 'G', 'S', 'F'];

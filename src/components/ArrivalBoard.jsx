@@ -116,7 +116,7 @@ function SubwayLineVisual({ line }) {
 }
 
 function LineRow({ line, isExpanded, onToggle }) {
-  const arrivalTimes = { D: 1, I: 1, E: 2, G: 2, S: 2, F: 3, P: 5, A: 7 };
+  const arrivalTimes = { D: 1, I: 1, E: 2, G: 2, S: 2, W: 2, F: 3, P: 5, A: 7 };
   const arrivalTime = arrivalTimes[line.id] || 3;
 
   return (

@@ -72,6 +72,13 @@ export const stations = {
     position: 20,
     description: 'LLM-augmented Indian Food Classification',
   },
+  'claude-code-lm': {
+    id: 'claude-code-lm',
+    name: 'ClaudeCodeLM',
+    position: 25,
+    description: 'Paper podcasts on demand — built in-house when NotebookLM said no',
+    url: '/claude-code-lm',
+  },
   'dancer-claude': {
     id: 'dancer-claude',
     name: 'Dancer Claude',
@@ -120,6 +127,14 @@ export const stations = {
     name: 'Codeguide',
     position: 50,
     description: 'Guided code walkthroughs with Claude',
+  },
+  'agentic-algorithm-discovery': {
+    id: 'agentic-algorithm-discovery',
+    name: 'AAD',
+    fullName: 'Agentic Algorithm Discovery',
+    position: 50, // W-line express stop — essays cut across every island
+    description: 'The case for letting AI agents discover the algorithms',
+    url: '/agentic-algorithm-discovery',
   },
   'imu-le': {
     id: 'imu-le',
