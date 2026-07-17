@@ -75,7 +75,7 @@ export const stations = {
   'claude-code-lm': {
     id: 'claude-code-lm',
     name: 'ClaudeCodeLM',
-    position: 25,
+    position: 50,
     description: 'Paper podcasts on demand — built in-house when NotebookLM said no',
     url: '/claude-code-lm',
   },

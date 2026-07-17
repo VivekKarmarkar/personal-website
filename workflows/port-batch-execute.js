@@ -28,9 +28,12 @@ const LIVE_URL = 'https://vivekkarmarkar.vercel.app'
 const ROOT = '/home/vivekkarmarkar/Python Files/personal-website'
 const CONTEXT = `${ROOT}/porting_context.md`
 
-if (!args || !args.sites || args.sites.length === 0) throw new Error('args.sites is required — pass the approved Stage A plan')
-const NEW_LINES = args.newLines || []
-const DATE = args.date || 'unknown-date'
+// args may arrive as an object or a JSON-encoded string depending on the invoker — accept both.
+const PLAN = (typeof args === 'string') ? JSON.parse(args) : (args || {})
+if (!PLAN.sites || PLAN.sites.length === 0) throw new Error('SITES is required — pass the approved Stage A plan')
+const SITES = PLAN.sites
+const NEW_LINES = PLAN.newLines || []
+const DATE = PLAN.date || 'unknown-date'
 
 // ---------- Phase 1: Port (parallel, disjoint file sets) ----------
 phase('Port')
@@ -50,7 +53,7 @@ const PORT_SCHEMA = {
   },
 }
 
-const ported = await parallel(args.sites.map(s => () =>
+const ported = await parallel(SITES.map(s => () =>
   agent(
     `Port ONE reference site into the React personal website. You may create files but MUST NOT touch shared files.
 
@@ -72,7 +75,7 @@ Return via StructuredOutput.`,
 ))
 
 const okPorts = ported.filter(Boolean).filter(p => p.status === 'ported')
-log(`${okPorts.length}/${args.sites.length} sites ported`)
+log(`${okPorts.length}/${SITES.length} sites ported`)
 if (okPorts.length === 0) return { error: 'All ports failed or blocked', ported }
 
 // ---------- Phase 2: Wire (single agent, owns the shared files) ----------
@@ -94,11 +97,11 @@ const wired = await agent(
 
 Ported stations (files already created):
 ${JSON.stringify(okPorts, null, 2)}
-Approved station identities: ${JSON.stringify(args.sites.map(s => ({ station: s.station, lineIds: s.lineIds })), null, 2)}
+Approved station identities: ${JSON.stringify(SITES.map(s => ({ station: s.station, lineIds: s.lineIds })), null, 2)}
 New lines to inaugurate: ${JSON.stringify(NEW_LINES, null, 2)}
 
 1. FIRST read ${CONTEXT} — Site Conventions section especially.
-2. For each station: add the route in src/App.jsx (lazy/import style matching existing), the entry in src/data/stations.js (match tone and field shape of neighbors), and the station id into each line's array in src/data/lines.js (position it sensibly within the line's narrative order).
+2. For each station: add the route in src/App.jsx (lazy/import style matching existing), the entry in src/data/stations.js (match tone and field shape of neighbors), and the station id into each line's array in src/data/lines.js. ORDERING IS A TASTE CALL AND VIVEK'S ALONE: if the plan/notes state an explicit position ("rightmost", "after X", "first stop"), honor it EXACTLY — never substitute your own reasoning about what is more/less sci-fi or mainstream, even if you disagree. The board renders in the lines.js array order (line.stations.map), so array position IS the visual order; keep the stations.js `position` field consistent with it. Only when the plan is silent on ordering may you place it sensibly and record the judgment in notes.
 3. For each NEW line: study the inauguration commits (git show 5d1c7a4, git show 5eabbef) to enumerate the full blast radius — lines.js entry + lineOrder, ArrivalBoard, landing page (Home.jsx / Story.jsx / map), bullet text color. Apply the approved identity exactly (arrival time and colors are Vivek-approved — do not second-guess). If the subway-map visual needs SVG geometry you cannot confidently derive, wire everything else and record it in notes rather than guessing badly.
 4. If any port shipped PDFs under public/, add the targeted .gitignore negation (!public/<app>/*.pdf).
 5. Do not run git commit. You may run 'npx vite build' briefly ONLY to sanity-check imports resolve; the Verify phase owns real verification.
@@ -144,7 +147,7 @@ const VERIFY_SCHEMA = {
 }
 
 const verifications = build && build.build_passed
-  ? await parallel(args.sites.map((s, i) => () =>
+  ? await parallel(SITES.map((s, i) => () =>
       agent(
         `Verify one ported station against its reference and the checklist. Read-only except you may run the dev server / vite preview to look at the page.
 
@@ -267,12 +270,12 @@ const LIVE_SCHEMA = {
 const liveVerify = async (round) => {
   const waited = await agent(
     `Confirm the new Vercel deploy of ${LIVE_URL} is live. The push just happened; Vercel builds take 1-3 minutes.
-Poll: fetch ${LIVE_URL}, extract the hashed JS bundle path from the HTML, fetch the bundle, and grep it for a new station id (${JSON.stringify(args.sites.map(s => s.station.id))}). Retry every ~30s (bash sleep) for up to 10 minutes. Return via StructuredOutput.`,
+Poll: fetch ${LIVE_URL}, extract the hashed JS bundle path from the HTML, fetch the bundle, and grep it for a new station id (${JSON.stringify(SITES.map(s => s.station.id))}). Retry every ~30s (bash sleep) for up to 10 minutes. Return via StructuredOutput.`,
     { label: `deploy-wait:r${round}`, phase: 'Deploy Verify', schema: DEPLOY_WAIT_SCHEMA }
   )
   if (!waited || !waited.deployed) return { waited, results: [] }
 
-  const results = await parallel(args.sites.map(s => () =>
+  const results = await parallel(SITES.map(s => () =>
     agent(
       `Behaviorally test ONE newly deployed station page on the LIVE site, across aspect ratios. This is a modified /behavioral-test-loop run: read ~/.claude/skills/behavioral-test-loop/SKILL.md for the method (spec → test cases → browser assertions), but target the live URL (no local server, no ffmpeg recording required — screenshots are the artifact).
 

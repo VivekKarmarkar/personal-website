@@ -52,7 +52,7 @@ export const lines = {
     direction: 'AI Island Local',
     color: 'mta-gold',
     colorHex: '#FCCC0A',
-    stations: ['wonyp', 'gpt-bhojan', 'claude-code-lm', 'dancer-claude', 'professor-claude'],
+    stations: ['wonyp', 'gpt-bhojan', 'dancer-claude', 'professor-claude', 'claude-code-lm'],
   },
   I: {
     id: 'I',
