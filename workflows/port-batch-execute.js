@@ -7,9 +7,12 @@ export const meta = {
     { title: 'Wire', detail: 'single agent for shared files (routes, stations, lines, board, map)' },
     { title: 'Verify', detail: 'build + per-site fidelity checks' },
     { title: 'Learn', detail: 'append case notes to porting_context.md' },
-    { title: 'Commit', detail: 'targeted commit and push' },
+    { title: 'Commit', detail: 'targeted commit + push via gitcommit/gitpush skills' },
+    { title: 'Deploy Verify', detail: 'live Vercel testing across aspect ratios, fix-redeploy loop' },
   ],
 }
+
+const LIVE_URL = 'https://vivekkarmarkar.vercel.app'
 
 // args: {
 //   date: 'YYYY-MM-DD',                     // stamped into case notes (scripts cannot call Date)
@@ -207,21 +210,108 @@ const COMMIT_SCHEMA = {
 }
 
 const commit = await agent(
-  `Commit and push the batch. TARGETED adds only — the working tree may contain unrelated changes that must NOT be swept in.
+  `Commit and push the batch using Vivek's git skills. TARGETED adds only — the working tree may contain unrelated changes that must NOT be swept in.
 
 Files created by ports: ${JSON.stringify(okPorts.flatMap(p => p.files_created))}
 Files modified by wiring: ${JSON.stringify(wired ? wired.files_modified : [])}
 Also include: porting_context.md (updated by the Learn phase).
 
-1. git status first. git add ONLY the listed paths (plus .gitignore if wiring modified it). Leave everything else untracked/unstaged.
-2. Match the repo's commit-message style (git log --oneline -15): short imperative subject lines. One commit per station plus one for wiring/inauguration is the house style; a single batch commit is acceptable if cleaner. porting_context.md goes with the final commit.
-3. End each commit message body with:
+1. FIRST read ~/.claude/skills/gitcommit/SKILL.md and ~/.claude/skills/gitpush/SKILL.md and follow their conventions (they are the house way to commit and push). Where they conflict with these rules, targeted-adds-only wins.
+2. git status first. git add ONLY the listed paths (plus .gitignore if wiring modified it). Leave everything else untracked/unstaged.
+3. Match the repo's commit-message style (git log --oneline -15): short imperative subject lines. One commit per station plus one for wiring/inauguration is the house style; a single batch commit is acceptable if cleaner. porting_context.md goes with the final commit.
+4. End each commit message body with:
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-4. git push. Report exactly what was committed and pushed.
+5. Push to remote (per the gitpush skill). The push triggers the Vercel auto-deploy of ${LIVE_URL}. Report exactly what was committed and pushed.
 
 Return via StructuredOutput.`,
   { label: 'commit', phase: 'Commit', schema: COMMIT_SCHEMA }
 )
+
+// ---------- Phase 6: Deploy Verify (live site, real viewports, bounded fix loop) ----------
+phase('Deploy Verify')
+
+const DEPLOY_WAIT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['deployed', 'evidence'],
+  properties: {
+    deployed: { type: 'boolean' },
+    evidence: { type: 'string', description: 'how you confirmed the new deploy is live (e.g. station id found in the served JS bundle)' },
+  },
+}
+
+const LIVE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['station_id', 'overall', 'viewport_results', 'issues'],
+  properties: {
+    station_id: { type: 'string' },
+    overall: { type: 'string', enum: ['pass', 'issues'] },
+    viewport_results: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['viewport', 'verdict', 'notes'],
+        properties: {
+          viewport: { type: 'string' },
+          verdict: { type: 'string', enum: ['pass', 'fail'] },
+          notes: { type: 'string' },
+        },
+      },
+    },
+    issues: { type: 'array', items: { type: 'string' }, description: 'concrete, fixable defects with file-level hypotheses' },
+  },
+}
+
+const liveVerify = async (round) => {
+  const waited = await agent(
+    `Confirm the new Vercel deploy of ${LIVE_URL} is live. The push just happened; Vercel builds take 1-3 minutes.
+Poll: fetch ${LIVE_URL}, extract the hashed JS bundle path from the HTML, fetch the bundle, and grep it for a new station id (${JSON.stringify(args.sites.map(s => s.station.id))}). Retry every ~30s (bash sleep) for up to 10 minutes. Return via StructuredOutput.`,
+    { label: `deploy-wait:r${round}`, phase: 'Deploy Verify', schema: DEPLOY_WAIT_SCHEMA }
+  )
+  if (!waited || !waited.deployed) return { waited, results: [] }
+
+  const results = await parallel(args.sites.map(s => () =>
+    agent(
+      `Behaviorally test ONE newly deployed station page on the LIVE site, across aspect ratios. This is a modified /behavioral-test-loop run: read ~/.claude/skills/behavioral-test-loop/SKILL.md for the method (spec → test cases → browser assertions), but target the live URL (no local server, no ffmpeg recording required — screenshots are the artifact).
+
+Page: ${LIVE_URL}/${s.station.id === 'home' ? '' : s.station.id}  (station: ${s.station.name}, pattern ${s.pattern})
+Reference site (ground truth for content): ${s.sitePath}
+Spec source: porting_context.md §Invariants item 9 checklist + the approved plan: ${JSON.stringify(s.station)}
+
+Use browser automation (Playwright MCP tools — load via ToolSearch if deferred; claude-in-chrome tools are the fallback). Test at THREE viewports:
+- Desktop 1440x900: the optimized experience — everything perfect (no horizontal scroll, no duplicate titles, no iframe scrollbar, no background seams, embeds render, diagrams interactive).
+- Phone landscape 932x430: the intended phone experience — clean rendering, correct aspect ratios, YouTube frames visible, tap targets usable.
+- Phone portrait 430x932: if the page has a rotate-to-landscape warning, it MUST appear here; AND the page must still render acceptably in portrait (the warning is guidance, not an excuse for a broken layout — Vivek's explicit requirement).
+${NEW_LINES.length ? `Also spot-check the landing page ${LIVE_URL}/ renders the new line(s) ${JSON.stringify(NEW_LINES.map(l => l.id))} on the board/map at desktop viewport.` : ''}
+Screenshot each viewport. Report concrete fixable issues with file-level hypotheses. Return via StructuredOutput.`,
+      { label: `live:${s.station.id}:r${round}`, phase: 'Deploy Verify', schema: LIVE_SCHEMA }
+    )
+  ))
+  return { waited, results: results.filter(Boolean) }
+}
+
+let liveRounds = []
+for (let round = 1; round <= 2; round++) {
+  const { waited, results } = await liveVerify(round)
+  liveRounds.push({ round, waited, results })
+  const failing = results.filter(r => r.overall === 'issues')
+  if (!waited || !waited.deployed) { log(`Round ${round}: deploy never confirmed — stopping live verification`); break }
+  if (failing.length === 0) { log(`Round ${round}: all stations pass live verification`); break }
+  if (round === 2) { log(`Round 2 still has issues — reporting for human review, not looping further`); break }
+
+  log(`Round ${round}: ${failing.length} station(s) with live issues — fixing and redeploying`)
+  await agent(
+    `Fix concrete live-site defects found on the deployed pages, then re-commit and push (targeted adds, gitcommit/gitpush skill conventions, Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>).
+
+Defects by station:
+${JSON.stringify(failing, null, 2)}
+
+Rules: read porting_context.md first; minimal fixes only; NEVER delete features to silence a failure; do not touch files unrelated to these defects. Return a short text summary of what you changed and committed.`,
+    { label: `live-fix:r${round}`, phase: 'Deploy Verify' }
+  )
+}
 
 return {
   ported,
@@ -230,4 +320,5 @@ return {
   verifications,
   learned,
   commit,
+  liveRounds,
 }
