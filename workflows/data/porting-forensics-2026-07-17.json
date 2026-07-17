@@ -1,0 +1,324 @@
+{
+  "generated": "2026-07-17",
+  "method": "7 parallel agents, one per reference-to-ported pair, workflow run wf_4a3e72c1-e51",
+  "stations": [
+    {
+      "station": "WONYP",
+      "reference_summary": "A 703-line standalone dark single-page site (\"What's on your Plate?\", bg #0f1019, DM Sans from Google Fonts) presenting a GPT-4o + YOLOv8 + SAM food-analysis pipeline. Sections top-to-bottom: Hero (large centered clamp() title, tagline, three rows of pill tags \u2014 tech orange #f97316, domain sky #38bdf8, audience green #4ade80), YouTube video (JS-injected iframe with a file:// thumbnail fallback), Introduction, Architecture (interactive 9-node SVG flow diagram with Brain/Eyes/Scissors legend, SMIL animateMotion glowing particles, clickable nodes that populate a detail bar via vanilla-JS selectStep()), Design Philosophy, Results (5-image auto-advancing crossfade slideshow with prev/next buttons, 6s timer), Findings (key_result.png pie chart + caption), and a GitHub footer link. All interactivity is inline vanilla JS; all styling is a single inline stylesheet.",
+      "ported_summary": "/home/vivekkarmarkar/Python Files/personal-website/src/pages/Wonyp.jsx (418 lines) is a single React page wrapped in the site's Layout, structured as an article in a max-w-2xl prose-medium column that opens with a gold D Train badge (\"AI Demos\") and the title/tags, then alternates between prose sections and two extracted components \u2014 ArchitectureDiagram (max-w-[1100px]) and ResultsSlideshow (max-w-[800px]) \u2014 which break out of the prose column full-bleed by closing and reopening the max-w-2xl wrapper. State is idiomatic React: STEP_DATA module constant + useState for node selection (replacing DOM mutation), useRef/useEffect/useCallback for the slideshow timer, and the 9 SVG nodes are data-driven arrays mapped in JSX instead of hand-written <g> blocks. Styling is Tailwind utilities plus inline style objects for the exact reference hex colors.",
+      "kept": [
+        "All body prose verbatim: Introduction (3 paragraphs), the 9-paragraph Architecture walkthrough, Design Philosophy ('Anchoring Principle'), Results (90% accuracy, Modak/Salmon/Rasmalai no-output cases), and Findings (Sambar-bias analysis)",
+        "The entire SVG architecture diagram: identical viewBox 980x480, dot-grid pattern, all path geometry, arrow markers, nodeGlow/particleGlow filters, and all 18 SMIL animateMotion particles with the same durations and begin offsets",
+        "Interactive click-a-node detail bar with the same visual treatment (bg #161822, borderTop #2e3140, glow + stroke-width 3 on selected node)",
+        "Brain/Eyes/Scissors legend with GPT-4o/YOLOv8/SAM model names and colors",
+        "YouTube embed y4ACvU-SSX0 with the same 16:9-capped wrapper (paddingBottom: min(56.25%, 540px)) and box shadow",
+        "All six hero tags with exact text and hex colors (LLMs/Applied AI/Computer Vision in orange shades, Food Tech/Health in sky blue, AI Startups in green)",
+        "5-image results slideshow with prev/next round buttons (same rgba(15,16,25,0.7) styling) and 6-second auto-advance",
+        "Findings figure: key_result.png at max-w-[500px] with the same caption text",
+        "GitHub footer link to VivekKarmarkar/GPT-bhojan-attempt-new-v0-b with the identical octocat SVG path"
+      ],
+      "dropped": [
+        "The standalone hero section (120px-padded, centered clamp(36px,6vw,64px) title) \u2014 replaced by the site's article-style left-aligned h1 title block",
+        "DM Sans Google Fonts links and the whole standalone CSS reset/global stylesheet \u2014 the site's typography (prose-medium) takes over",
+        "The file:// protocol video-thumbnail fallback JS (video-thumb play button) \u2014 the port always renders the iframe directly",
+        "The 0.8s opacity crossfade between slideshow images \u2014 the port renders only the current image's src, so slides swap instantly",
+        "Portions of the STEP_DATA detail descriptions, condensed for nearly every step: step 2 lost 'No item-by-item work yet; this is the big-picture read', step 3 lost 'The sorting happens next', step 4 lost the 'not as a rule, but as context' box-size nuance, step 5 lost 'This prevents redundancy', step 8 lost the 'Is there actually something here?' opener",
+        "Centered section-header styling on Introduction, Design Philosophy, and Findings h2s (now left-aligned prose headings; only Architecture and Results keep text-center)",
+        "The <title>/meta viewport of the standalone page (identity now comes from the SPA)"
+      ],
+      "changed": [
+        "Vanilla-JS selectStep() DOM mutation (querySelector + setAttribute stroke-width/filter) became declarative useState \u2014 strokeWidth={selectedStep === n.step ? 3 : 1.5} and conditional filter prop",
+        "The 9 hand-written SVG <g class=\"node\"> blocks became two data arrays (Row 1 and Row 2) of {step, x, y, w, h, emoji, label, color, fill} objects mapped in JSX",
+        "STEP_DATA gained a per-step color field, and the detail bar name is now tinted with the selected step's color \u2014 the reference hard-coded #f97316 orange for every step's d-name",
+        "Global window.slideNav + setInterval closure became a ResultsSlideshow component with useRef timer, useCallback goTo/resetTimer, and cleanup on unmount",
+        "CSS classes translated to Tailwind utilities (e.g. .slide-btn \u2192 'absolute top-1/2 left-3 -translate-y-1/2 w-11 h-11 rounded-full'), with exact reference hex colors preserved via inline style objects",
+        "Kebab-case SVG presentation attributes (stroke-width, stroke-dasharray, marker-end, text-anchor) camelCased for JSX",
+        "Layout width system: 700px .section-inner \u2192 max-w-2xl (672px) prose column; the wide diagram (1100px) and slideshow (800px) render via container-breakout between prose wrappers",
+        "Slideshow alt text changed from source-image numbering ('Sample food analysis 3') to slide-index numbering (`Sample food analysis ${current + 1}`)",
+        "Asset URLs changed from relative (results_slideshow/..., key_result.png) to site-absolute (/images/wonyp/...)"
+      ],
+      "added": [
+        "Site Layout wrapper (header/navigation/theme) around the whole article",
+        "D Train badge: 40px gold #FCCC0A circle with black bold 'D' plus 'AI Demos' label in text-dark-muted \u2014 the site-wide train-line identity marker absent from the standalone site",
+        "Site typography classes (prose-medium, text-dark-muted, hover:text-white) binding the page to the personal-website design system"
+      ],
+      "novel_patterns": [
+        "None \u2014 this station is itself the canonical worked example (a): a static content page with prose text, an interactive SVG architecture diagram (SMIL particles preserved in JSX), an image slideshow, and a YouTube embed. Everything observed here (asset copy to public/images/<station>/, prose-column breakout for wide components, vanilla-JS-to-hooks state conversion, single train badge) constitutes the WONYP pattern rather than extending it. No PDF references, JS mobile scaling, audio players, iframed app, or download buttons appear."
+      ],
+      "assets_flow": "Images were copied unchanged from the reference folder '/home/vivekkarmarkar/Python Files/personal-website/wonyp reference project website/' (key_result.png + results_slideshow/ with 5 sample_food_*_annotated.png files) into '/home/vivekkarmarkar/Python Files/personal-website/public/images/wonyp/' preserving the results_slideshow/ subfolder structure \u2014 key_result.png md5-verified identical. The JSX references them by absolute web paths (/images/wonyp/key_result.png, /images/wonyp/results_slideshow/...). No JS, PDF, or audio assets exist for this station, and no app folder was created under public/ (no wonyp-app); the video stays an external YouTube embed."
+    },
+    {
+      "station": "Dancer Claude",
+      "reference_summary": "The reference is a single-page standalone site (529-line index.html + css/, js/, library/, videos/ folders) whose top half IS the live app: a header with title, tagline, 8 color-coded hero tags and a Minimal/Stylized/Wild theme toggle, an 800x500 dance-floor canvas, playback bar, Freestyle/Learnt/Fusion mode panels (song dropdown of 10 choreographies, fusion slider), and Play/Record controls driven by ES-module vanilla JS (audio-engine, skeleton, move-sequencer, pose-player, themes). Below a divider sits a `.proj` writeup zone in DM Sans on dark (#e0e0e0 on dark, 700px columns): Introduction, Project Overview (YouTube embed z62DJVUxkVw), an interactive Architecture section (980x480 SVG with 11 clickable step nodes, dot-grid background, SMIL animateMotion glow particles along colored arrow paths, an Ears/Body/Eyes legend, and a detail bar populated by an inline-JS `selectStep()`/`stepData` script), Design Philosophy, The Claude Code Angle, Professor Claude Teaches Dancer Claude (embed zjzYER-Vaco), Opa Gangnam Style! (embed Hw2BSMZRFg4), and a GitHub octocat footer link.",
+      "ported_summary": "DancerClaude.jsx (416 lines) wraps everything in the site `Layout` and alternates container widths: narrow `max-w-2xl prose-medium` columns for prose, broken by full-bleed blocks for the live app (a 1060px-wide, 950px-tall `scrolling=\"no\"` iframe pointing at `/dancer-claude-app/index.html`) and the 1100px `ArchitectureDiagram` component. The diagram is a full React re-implementation: `STEP_DATA` module constant (now with a per-step `color`), node definitions as data arrays rendered via `.map()`, selection via `useState` (strokeWidth/nodeGlow filter as conditional props instead of DOM `setAttribute`), and the SMIL particle animations carried verbatim into JSX. A reusable `YouTubeEmbed` component renders the three videos, and the page opens with the D Train gold badge + reworked tag rows before the iframe.",
+      "kept": [
+        "All writeup prose verbatim: Introduction (3 paras), Architecture prose (4 paras incl. the angle-invariant paragraph), Design Philosophy (3 paras), The Claude Code Angle (6 paras incl. 'The vibes have physics underneath them'), Professor Claude section (3 paras)",
+        "The entire interactive app functionality (canvas, theme toggle, playback bar, Freestyle/Learnt/Fusion panels, 10-song choreo dropdown, fusion slider, Play/Record/Record Full Song) \u2014 via iframe; js/ and library/ copied byte-identical",
+        "The full interactive architecture diagram: same 980x480 viewBox, dot-grid pattern, particleGlow/nodeGlow filters, 4 colored arrow markers, 11 step nodes at identical coordinates, RUNTIME/LEARNING PIPELINE labels, '\u2192 into Sequencer' annotation, and all 14 SMIL animateMotion particles with identical timings",
+        "All 11 STEP_DATA descriptions word-for-word (FFT bands, biased coin, 13-joint skeleton, yt-dlp, MediaPipe 33 landmarks, dictionary learning, GTK human-picks dialog, angle decomposition)",
+        "Ears/Body/Eyes legend with same emoji + colors (#f97316/#38bdf8/#4ade80) and Audio Engine / Skeleton + Sequencer / MediaPipe CV sublabels",
+        "All three YouTube embeds with same video IDs and titles (z62DJVUxkVw, zjzYER-Vaco, Hw2BSMZRFg4)",
+        "GitHub footer link to VivekKarmarkar/dancer-claude with the same octocat SVG path",
+        "Title 'Dancer Claude' and tagline 'A stick figure that dances to music \u2014 three ways'",
+        "All 8 hero tags by name (Claude Code, Signal Processing, Computer Vision, Machine Learning, Physics-Based Modeling, Creative Technology, Music & Dance, AI Startups)"
+      ],
+      "dropped": [
+        "The app's standalone header inside the demo: h1 title, subtitle, and all hero tags were stripped from public/dancer-claude-app/index.html (they now live only in the React page above the iframe); only the theme toggle survived inside the app",
+        "Google Fonts preconnects + DM Sans stylesheet link and the DM Sans font-family (site typography takes over)",
+        "The entire ~85-line scoped `.proj` stylesheet and the inline <style> block (replaced by Tailwind utilities)",
+        "The <hr class='divider'> separating app from writeup",
+        "The inline <script> with `stepData` and `selectStep()` DOM manipulation (superseded by React state, not iframed)",
+        "The reference's videos/ folder \u2014 10 local mp4/webm files (project overview, architecture walkthrough, freestyle/fusion/learnt demos) that even the reference index.html never referenced; not copied to public/",
+        "The reference's `min-height: 100vh` full-viewport app sizing (set to `auto` so the app fits the fixed 950px iframe)"
+      ],
+      "changed": [
+        "App extraction: the top-half live demo was cut out of the reference page into public/dancer-claude-app/ (index.html shrunk 529 \u2192 92 lines) and embedded via <iframe src='/dancer-claude-app/index.html'> at max-w-[1060px], height 950px, scrolling='no', allow='autoplay', black background",
+        "App CSS mutated for embedding: body background #1a1a2e \u2192 #000000 and min-height 100vh \u2192 auto (the only 2-line diff in otherwise byte-identical css/js/library)",
+        "Tag color system regrouped by concept: reference had 5 orange-alpha-fading tags (Claude Code\u2026Physics-Based Modeling) + 2 sky + 1 green; port splits them \u2014 Claude Code + Physics-Based Modeling stay full orange #f97316, Signal Processing/Computer Vision/Machine Learning become D-Train gold with alpha fade (#FCCC0A / #FCCC0Ac0 / #FCCC0A88), Creative Technology/Music & Dance keep #38bdf8, AI Startups keeps #4ade80",
+        "Architecture diagram interactivity rebuilt in React: `selectStep()` querySelector/setAttribute mutation \u2192 `useState(selectedStep)` with conditional strokeWidth={3} and filter='url(#nodeGlow)' props; 11 hand-written SVG <g> groups \u2192 three data arrays mapped to a shared node template; SVG attributes camelCased (strokeWidth, markerEnd, textAnchor)",
+        "Detail bar upgraded: STEP_DATA gained a per-step `color` field so the step name renders in its pipeline color (orange/blue/green/purple) instead of the reference's always-orange #f97316 d-name",
+        "YouTube embeds factored into a reusable <YouTubeEmbed> component, gaining a box-shadow '0 4px 32px rgba(0,0,0,0.5)' the reference lacked",
+        "Layout rhythm: reference 700px .section-inner columns with 80px section padding and all-centered 32px headers \u2192 max-w-2xl (672px) prose-medium with mb-12 sections; only Project Overview / Architecture / Opa Gangnam Style! headers stay centered, Introduction / Design Philosophy / Claude Code Angle / Professor Claude become standard left-aligned prose h2s",
+        "Page composition inverted: app-first standalone site \u2192 badge + title + tags first, then the iframed app, then writeup"
+      ],
+      "added": [
+        "D Train badge: gold #FCCC0A circle with black 'D' plus 'AI Demos' label \u2014 site-wide station header pattern absent from the reference",
+        "Site chrome via <Layout> wrapper (header/navigation, theme integration) around the whole article",
+        "The iframe embedding mechanism itself (fixed 950px height, scrolling='no', allow='autoplay', bg #000)",
+        "Box shadow on video embeds",
+        "Per-step color coding in the architecture detail bar (name matches node color)",
+        "Alternating narrow-prose / full-bleed container structure (max-w-2xl text interleaved with 1060px iframe and 1100px diagram breakouts)"
+      ],
+      "novel_patterns": [
+        "Selective interactivity split: the same reference page contains TWO interactive systems, handled oppositely \u2014 the canvas app is stripped-and-iframed, but the clickable SVG architecture diagram is fully re-implemented as a React component (vanilla `selectStep()` DOM mutation \u2192 useState + conditional props). The worked examples only document 'iframe the app' and 'static SVG diagram'; porting inline-script interactivity into native React state is a third route",
+        "SMIL animation preserved verbatim in JSX: 14 <animateMotion>/<mpath> glow particles carried straight into React with no JS animation rewrite \u2014 declarative SVG animation survives the port untouched",
+        "SVG node de-duplication into data-driven rendering: hand-written per-node <g> markup converted to arrays of {step, x, y, w, h, emoji, label, color, fill} mapped through one template \u2014 a structural refactor, not a copy",
+        "Two-line CSS surgery on the extracted app to make it iframe-safe: min-height 100vh \u2192 auto and background recolored to pure black so the fixed-height iframe seam disappears (everything else byte-identical)",
+        "Unused-asset pruning during extraction: the reference's videos/ folder (10 mp4/webm files) was deliberately not copied to public/ because the page serves video via YouTube embeds \u2014 asset copy is selective, not wholesale",
+        "Data enrichment during port: STEP_DATA gained a `color` field the reference stepData lacked, upgrading the detail bar beyond parity rather than merely translating it"
+      ],
+      "assets_flow": "css/, js/ (12 ES modules incl. themes/), and library/ (10 choreo .json+.mp3 pairs, moves/ manifest + wav + 2 move JSONs, catalog.md) were copied byte-identical from \"/home/vivekkarmarkar/Python Files/personal-website/dancer-claude reference project website/\" to \"/home/vivekkarmarkar/Python Files/personal-website/public/dancer-claude-app/\"; the sole modification is a 2-line edit to css/styles.css (background #1a1a2e \u2192 #000000, min-height 100vh \u2192 auto). The reference's videos/ folder (10 local mp4/webm demo files, unreferenced even by the reference HTML) was dropped entirely \u2014 all video content is served from YouTube embeds. The React page consumes the app via <iframe src=\"/dancer-claude-app/index.html\">; no images or PDFs are involved for this station."
+    },
+    {
+      "station": "Professor Claude",
+      "reference_summary": "A single self-contained ~43 KB dark-theme HTML file (`index.html`, bg #0f1019, DM Sans via Google Fonts) titled \"Professor Claude aka Robo Chat\" \u2014 a voice-AI system (LiveKit + OpenAI Realtime + Claude Code MCP channels). Sections top-to-bottom: centered Hero with three tiers of concept-split tag pills (tech orange #f97316, domain sky #38bdf8, audience green #4ade80), a JS-injected hero YouTube embed (iS7eBHtN4SE) with a file://-protocol thumbnail fallback, Introduction (3 paragraphs), an interactive Architecture section (Voice/Brain/Bridge legend, a 980x480 SVG with 11 clickable step nodes across STANDALONE MODE and CLAUDE CODE MODE rows, SMIL animateMotion glow particles flowing along paths, and a vanilla-JS `selectStep()` detail bar), then prose sections Design Philosophy, The Physicist's Method, Three Modes of Use, The Origin Story, a Use Cases section with 3 more YouTube embeds, and a GitHub footer linking VivekKarmarkar/livekit-project.",
+      "ported_summary": "`src/pages/ProfessorClaude.jsx` (~33 KB) is a Layout-wrapped page at `/professor-claude` built around a `max-w-2xl prose-medium` column: dual train badges (D gold #FCCC0A \"AI Demos\" + I silver #A7A9AC \"Infrastructure\", both black text), title + tagline + tag pills, then all prose sections verbatim. Two local components do the heavy lifting: `YouTubeEmbed` (reused 4 times: hero demo + 3 use-case videos) and `ArchitectureDiagram`, a stateful React re-implementation of the reference's vanilla-JS diagram \u2014 a module-level `STEP_DATA` dictionary, node definitions as data arrays mapped into SVG `<g>` groups, `useState(selectedStep)` driving conditional strokeWidth/nodeGlow and the detail bar, with all SMIL particle animations preserved. The diagram sits in a full-width breakout (`max-w-[1100px]`) sandwiched between two prose-column wrappers. Registered in App.jsx routes, stations.js (position 40, \"A Robot Teacher just for you\"), and in BOTH the D and I line station arrays in lines.js.",
+      "kept": [
+        "All body text verbatim: Introduction, Architecture prose, Design Philosophy, The Physicist's Method, Three Modes of Use, The Origin Story \u2014 every paragraph carried over word-for-word including em-dashes and the speak-tool <code> styling",
+        "The three-tier concept-split tag pill system with identical hex/alpha values: tech orange (#f97316 / b0 / 80 variants), domain sky (#38bdf8 / a0), audience green (#4ade80) \u2014 same rows, same labels (Claude Code, Voice Agents, MCP Channels / Creative Technology, EdTech / AI Startups)",
+        "The entire 980x480 SVG architecture diagram byte-for-byte in geometry: dot-grid pattern, particleGlow/nodeGlow filters, four arrow markers, all 11 node positions, mode labels, divider line, the '\u21b5' turn glyph and '\u2714 TTS' annotation",
+        "All 22 SMIL animateMotion particle circles with identical dur/begin timings along the same path ids (p-1-2 ... p-10-11)",
+        "All 11 step detail descriptions verbatim (moved from inline <script> stepData to module-level STEP_DATA)",
+        "The Voice/Brain/Bridge legend with same emoji, colors, and model names",
+        "All 4 YouTube videos: hero demo iS7eBHtN4SE plus use cases iS7eBHtN4SE, ajq4H-btOLA, zjzYER-Vaco (including the reference's duplication of the hero video as Use Case 1)",
+        "GitHub footer with identical octocat SVG path and link to github.com/VivekKarmarkar/livekit-project",
+        "The 56.25% padding-bottom responsive video-wrap trick with the same 0 4px 32px shadow"
+      ],
+      "dropped": [
+        "'aka Robo Chat' from the page title \u2014 reference h1 is 'Professor Claude aka Robo Chat', port h1 is just 'Professor Claude' (the alias survives only inside body text)",
+        "The standalone centered hero block (clamp(36px,6vw,64px) centered h1, 120px top padding) \u2014 replaced by a left-aligned h1 inside the prose column",
+        "The file://-protocol video fallback: the ~15-line IIFE that swaps the iframe for a YouTube thumbnail + play button when opened locally, plus its .video-thumb/.play-btn CSS",
+        "Google Fonts DM Sans preconnect/link \u2014 the port inherits the site's font stack",
+        "The entire ~250-line <style> block including the reset, page background #0f1019, and the @media (max-width:640px) rules (notably the arch-detail column-stacking on mobile has no explicit Tailwind equivalent)",
+        "The <footer class=\"github-footer\"> element semantics \u2014 becomes a plain centered <section>"
+      ],
+      "changed": [
+        "Interactivity engine: vanilla-JS selectStep() that mutates DOM attributes (querySelectorAll, setAttribute stroke-width/filter, getElementById textContent) rebuilt as React useState \u2014 strokeWidth={selectedStep === n.step ? 3 : 1.5} and conditional filter='url(#nodeGlow)' as props, detail bar as conditional JSX",
+        "11 hand-written SVG <g class=\"node\"> blocks refactored into three data arrays ({step, x, y, w, h, emoji, label, color, fill}) rendered via .map() \u2014 one array per diagram row",
+        "STEP_DATA extended with a per-step color field so the detail-bar step name renders in that step's color; the reference hard-coded the d-name to orange #f97316 for every step",
+        "CSS classes to Tailwind utilities plus inline style objects for exact hex values (e.g. .arch-detail becomes flex items-center gap-4 px-6 py-3.5 min-h-16 with inline background #161822); SVG attributes converted kebab-case to camelCase (stroke-width -> strokeWidth, marker-end -> markerEnd)",
+        "HTML entities (&#x1F3A4; &mdash;) converted to JS unicode escapes and literal characters",
+        "Section header alignment: reference centers every .section-header; port centers only Architecture and Use Cases, leaving other h2s left-aligned per site prose style",
+        "Layout topology: single 700px-max flow becomes a prose-column 'sandwich' \u2014 max-w-2xl container closes, the max-w-[1100px] ArchitectureDiagram renders full-width, then a new max-w-2xl container reopens for the architecture prose",
+        "Video embedding: JS innerHTML injection replaced by a declarative reusable YouTubeEmbed component with border-neutral-800 and rounded-xl",
+        "Hero video border #23263a replaced by the site's border-neutral-800 token; muted text uses text-dark-muted instead of #a0a0a0"
+      ],
+      "added": [
+        "Dual train badges D + I: gold #FCCC0A 'AI Demos' circle and silver #A7A9AC 'Infrastructure' circle, both with black text for contrast \u2014 the first I-Train badge, establishing the silver convention",
+        "Site navigation via the Layout wrapper (site header, theme, routing context) \u2014 the reference had no nav at all",
+        "Route /professor-claude in App.jsx and a stations.js entry (position 40, description 'A Robot Teacher just for you')",
+        "Cross-line registration: the station id appears in BOTH the D line and I line station arrays in lines.js, making it a transfer station on the subway map",
+        "Site theme integration: text-dark-muted tagline/GitHub link with hover:text-white transition-colors, Tailwind code-chip styling (bg-neutral-800 rounded) for the speak tool mention"
+      ],
+      "novel_patterns": [
+        "Native React port of an interactive vanilla-JS diagram: unlike Dancer Claude (interactive app iframed from public/) or WONYP (static SVG), the clickable 11-step SVG with a JS detail bar was re-implemented as a stateful in-page React component (useState selection, conditional SVG props) \u2014 interactivity translated, not embedded",
+        "SMIL animation preserved in JSX: 22 animateMotion/mpath particle circles carried straight into React markup, an animated architecture diagram rather than WONYP's static one",
+        "Data-driven SVG refactor during port: repeated hand-authored SVG node groups collapsed into JS arrays + .map(), and the <script> stepData object lifted into a module constant and extended (color field) \u2014 the port restructures the source's code, not just its markup",
+        "Full-width breakout sandwich: closing the prose container, rendering a max-w-[1100px] component, then reopening a second prose container for the section's continuation text",
+        "Multi-embed video gallery via a reusable YouTubeEmbed component (4 embeds including a 3-video Use Cases section) vs WONYP's single embed",
+        "Cross-line station registration (one station in two lines' arrays) paired with a dual D+I badge header \u2014 first I-Train port defining the silver #A7A9AC badge/direction convention",
+        "Intentional deletion of environment-sniffing JS (the file:// thumbnail fallback) because the React app always serves over http \u2014 porting includes recognizing dead code paths"
+      ],
+      "assets_flow": "No assets moved: the reference is one fully self-contained index.html with no local images, audio, JS files, or PDFs. All four videos are remote YouTube embeds (iS7eBHtN4SE, ajq4H-btOLA, zjzYER-Vaco) referenced identically in the port; the architecture diagram is inline SVG transcribed into JSX; the GitHub icon is an inline SVG path copied verbatim. No public/ app folder was created for this station (unlike dancer-claude-app, rcp-app, vm-claude-app), and the only external asset \u2014 the Google Fonts DM Sans stylesheet \u2014 was dropped in favor of the site's fonts."
+    },
+    {
+      "station": "Claude Code OS",
+      "reference_summary": "A standalone single-file \"data portrait\" site (index.html, 1,569 lines, dark #0f1019 background, DM Sans from Google Fonts, D3 v7 from CDN) analyzing the author's 8-week, 97-skill Claude Code setup as a personal operating system. Top-to-bottom: Hero (title/tagline/tag pills), cover.png, Introduction, The Foundation (Hansen 1970 essay + interactive hover-highlighted \"Abstraction Ladder\" from Machine Code to Remote Control + Claude Code/Codex/Cursor/VS Code comparison table), The Real Agentic OS, The Constellation (D3 force-simulation of 97 skill \"stars\" with tooltips, category legend, heartbeat-canvas timeline scrubber with play button and annotations), a stats bar (Active Skills / Total Skills / Plugins / Hooks / Lines of Instruction), then prose sections The Skill Bang, The Big Picture, Design Philosophy (McIlroy), Composite Skills (SVG hub-and-spoke slideshow with prev/next buttons), Skill Complexity (canvas rank-size bar chart with category filters, \"Has Code\" toggle, and live power-law fit showing R\u00b2), Actionable Insights (Tukey), What's Next, Meta Lessons, References, a footer linking three reference PDFs (unix_philosophy, tukey_1962, hansen_1970), and a GitHub Repository section. All visualizations are driven by a 126KB data.json fetched at runtime.",
+      "ported_summary": "src/pages/ClaudeCodeOS.jsx is a 61-line thin React shell: Layout wrapper, a portrait-phone-only landscape-rotation warning banner (orange #f97316, sm:hidden), a silver I Train badge (#A7A9AC circle, \"Claude Code Borough Local on AI Island\"), and a re-created hero (h1, muted tagline, tag pills) inside a max-w-2xl prose column \u2014 followed by a wider max-w-[1200px] iframe embedding /claude-code-os-app/index.html at a fixed 17,500px height with scrolling=\"no\" and background #0a0a0a so the parent page scrolls seamlessly. The public app is a near-verbatim copy of the reference: the only diffs are the hero section removed (commented \"removed for iframe embed\") and the body background recolored from #0f1019 to #0a0a0a. Registered at route /claude-code-os in App.jsx and as station 'claude-code-os' (position 10) in stations.js.",
+      "kept": [
+        "Essentially the entire reference site is carried over verbatim inside the iframe: all prose sections (Introduction, The Foundation, The Real Agentic OS, The Skill Bang, The Big Picture, Design Philosophy, Actionable Insights, What's Next, Meta Lessons), the References section, the PDF footer, and the GitHub Repository section",
+        "All interactive visualizations intact: D3 constellation force sim with tooltips/legend, heartbeat timeline scrubber + play button + annotations, stats bar, abstraction ladder, comparison table, composite-skills slideshow, skill-complexity canvas with filters and power-law fit",
+        "data.json (126,404 bytes) and cover.png (113,445 bytes) copied byte-identical to public/claude-code-os-app/",
+        "All three reference PDFs (hansen_1970_nucleus_multiprogramming.pdf, tukey_1962_future_of_data_analysis.pdf, unix_philosophy.pdf) with their relative-href footer links opening in new tabs",
+        "External CDN dependencies unchanged inside the iframe: d3js.org/d3.v7.min.js and Google Fonts DM Sans",
+        "Hero content (title 'Claude Code OS', tagline 'A personalized operating system for Claude Code \u2014 visualized', and the three tags with identical wording and colors) \u2014 reproduced in the React shell"
+      ],
+      "dropped": [
+        "The hero <section> was cut from the embedded index.html (replaced by the React-side hero) \u2014 marked '1. HERO (removed for iframe embed)' in the copy",
+        "A React-side GitHub footer/icon present in the initial port (commit 6be7a70) was deleted \u2014 twice, in 88267c5 and again in ead2fe0 after 485cde7 restored it \u2014 as redundant with the iframe's own Repository section; the React shell now has no GitHub chrome of its own",
+        "An onLoad auto-resize handler (useRef/useCallback reading contentDocument.scrollHeight, added in 485cde7) was removed in d8ac629 because it crashed on phone rotation \u2014 replaced with a fixed 17,500px height"
+      ],
+      "changed": [
+        "Iframe body background recolored #0f1019 \u2192 #0a0a0a to match the React site's --color-dark-bg and eliminate the visible seam on mobile (initial port used #000000, fixed in 485cde7)",
+        "Hero restructured into the site-wide station template: reference's centered .hero with clamp() sizing became a left-aligned prose h1 + text-dark-muted tagline + Tailwind pill tags (same #f97316 orange tech tags 'Claude Code'/'Exploratory Data Analysis', same #4ade80 green audience tag 'AI Startups', preserving the two-row tech/audience split)",
+        "Iframe height tuned across four commits: 11,000px (cut off at Design Philosophy) \u2192 17,300px \u2192 auto-resize with 22,000px fallback \u2192 fixed 17,500px with scrolling='no'",
+        "Train badge label re-worded from 'Claude Code Borough \u00b7 AI Island' to 'Claude Code Borough Local on AI Island' (current uncommitted edit)",
+        ".gitignore changed in ba03337: added negation '!public/claude-code-os-app/*.pdf' so the three PDFs could be committed despite the repo-wide '*.pdf' ignore"
+      ],
+      "added": [
+        "I Train badge: silver #A7A9AC circle with black 'I' and 'Claude Code Borough Local on AI Island' label \u2014 pure site-navigation identity absent from the reference",
+        "Landscape-rotation warning banner for portrait phones (orange #f97316 tinted, sm:hidden so it disappears at 640px+): 'For the best experience on phone, rotate to landscape view'",
+        "Site chrome and routing: Layout/Header wrapper, /claude-code-os route in App.jsx, station entry in stations.js (position 10, description 'Treating Claude Code as an operating system')",
+        "Two-tier width layout: max-w-2xl prose header column vs max-w-[1200px] iframe container, matching the site's wide-content pattern"
+      ],
+      "novel_patterns": [
+        "Whole-site iframe embed: the entire reference site \u2014 all prose sections, visualizations, references, PDF footer, and GitHub link \u2014 is embedded wholesale; React recreates only the hero. This inverts the Dancer Claude pattern, where the vanilla-JS app was stripped down and the writeup rebuilt as React sections",
+        "Seamless-scroll iframe technique: giant fixed height (17,500px) + scrolling='no' + background color matched to the host site so the iframe reads as native page content and the parent page scrolls through it; a JS onLoad auto-resize approach was tried and reverted after a rotation crash",
+        "PDF references as first-class shipped assets: three primary-source paper PDFs copied into public/claude-code-os-app/ in a dedicated commit (ba03337) with a targeted .gitignore negation ('!public/claude-code-os-app/*.pdf') overriding the repo-wide *.pdf ignore, linked via relative hrefs from inside the iframe",
+        "Runtime data fetch inside the embedded app: the app fetch()es a 126KB data.json (copied to public/) that drives all D3/canvas charts \u2014 data stays separate from presentation rather than being inlined or rebuilt as React state",
+        "External CDN dependencies retained inside the iframed app (d3js.org d3.v7, Google Fonts DM Sans) \u2014 the port does not vendor or bundle them",
+        "Deduplication by deferral to the iframe: React-side chrome (GitHub footer) was deleted because the embedded site already owns that element \u2014 the iframe, not the React shell, is the source of truth for page furniture",
+        "Mobile handling via a rotate-to-landscape warning banner (sm:hidden) instead of JS scaling or responsive re-layout"
+      ],
+      "assets_flow": "All six files from '/home/vivekkarmarkar/Python Files/personal-website/i-line reference project website folder/claude-code-os reference project website/' moved to '/home/vivekkarmarkar/Python Files/personal-website/public/claude-code-os-app/': data.json, cover.png, and the three PDFs (hansen, tukey, unix_philosophy) are byte-identical copies; index.html is copied with only the hero removed and the body background recolored. The app and its data/image shipped in the initial port commit (6be7a70); the PDFs landed in a follow-up commit (ba03337) that also added a .gitignore exception for them. cover.png and data.json are loaded by the embedded app via relative paths at runtime; nothing moved into src/ or public/images/."
+    },
+    {
+      "station": "RCP",
+      "reference_summary": "A standalone single-file dark HTML site (1116 lines, 46.9 KB) titled \"RCP: Remote Control Protocol\", styled with DM Sans (Google Fonts), background #0f1019, terminal-green #00ff88 accent and orange #f97316. Sections top-to-bottom: (1) Hero with h1, tagline \"a protocol for remote-controlled GPU compute, born from friction\", and two stacked pill tags (Claude Code orange / AI Startups green); (2) YouTube demo embed (ZtF7B43adgU) with a file:// thumbnail fallback; (3) Introduction prose (training MNIST from a phone on a walk); (4) \"The Abstraction Ladder\" \u2014 a 10-rung vertical timeline from Assembly (1950s-60s) to Remote Control (2026) with an orange-gradient spine, hover glow, and a pulsing top rung; (5) Architecture \u2014 the interactive \"RCP Playground\": a central laptop SVG with 8 click-to-toggle condition nodes (Power, WiFi, Sleep Inhibit, GPU Driver, CUDA, Git Public, GWS CLI, Phone) on a 960x620px absolute-positioned canvas, glowing SVG connection lines, READY/NOT READY scanline banner, failing list, 0/8 counter, 5 preset buttons, and a NEXT STEP box printing real shell commands; (6) Design Philosophy (\"Friction-Forged Protocol\"); (7) \"RCP and MCP\" comparison; (8) \"A Claude Code Project\"; (9) GitHub footer with \"View on GitHub\" and a relative-link \"View Skill\" pointing at the companion remote-control-protocol-rcp-website.md (the actual 15-step protocol skill document).",
+      "ported_summary": "The React page (src/pages/Rcp.jsx, only 60 lines) is the thinnest wrapper in the fleet: Layout + I Train badge (gray #A7A9AC circle, black \"I\", \"Claude Code Borough Local on AI Island\"), h1 title, a re-worded subtitle, the two tag pills rebuilt as Tailwind spans, and a portrait-only \"rotate to landscape\" warning \u2014 then a single iframe to /rcp-app/index.html at a fixed 8000px height with scrolling=\"no\", in a max-w-[1200px] container wider than the max-w-2xl prose column. The entire reference site minus the hero (video, all prose sections, the Abstraction Ladder, the interactive Playground, the GitHub footer) lives inside public/rcp-app/index.html, near-verbatim, with added JS scaleCanvas() mobile scaling. Route /rcp registered in App.jsx; station registered in stations.js and on the I line in lines.js.",
+      "kept": [
+        "The entire app body verbatim in public/rcp-app/index.html: video embed with file:// fallback, all five prose sections (Introduction, ladder commentary, Architecture, Design Philosophy, RCP and MCP, A Claude Code Project), the 10-rung Abstraction Ladder with hover/pulse animations, and the full RCP Playground (8 toggleable conditions, glowing lines, scanline banner, failing list, counter, 5 presets, NEXT STEP command box)",
+        "GitHub footer with both links: 'View on GitHub' (remote-control-test-gpu repo) and 'View Skill' (relative link to the markdown skill document)",
+        "remote-control-protocol-rcp-website.md copied byte-identical into public/rcp-app/ so the footer's relative link still resolves inside the iframe",
+        "Hero tag pills recreated in JSX with identical colors and stacked two-row layout: 'Claude Code' (#f97316, border #f9731640) over 'AI Startups' (#4ade80, border #4ade8040)",
+        "Title 'RCP: Remote Control Protocol'",
+        "DM Sans Google Fonts link and all app styling/colors (#00ff88 green, orange ladder spine, monospace status text)",
+        "YouTube video ID ZtF7B43adgU"
+      ],
+      "dropped": [
+        "The hero section inside the app copy \u2014 h1, tagline, and tag pills deleted (comment left: '1. HERO (removed for iframe embed)'), along with all .hero* CSS rules and the hero line in the 640px media query, since the React page now provides the header",
+        "The original tagline wording 'RCP \u2014 a protocol for remote-controlled GPU compute, born from friction' (replaced by a new subtitle on the React side)"
+      ],
+      "changed": [
+        "Background recolored from #0f1019 to #0a0a0a in three places (body, .rcp-failing-list, .rcp-counter) to blend the iframe into the site's dark background; the iframe element also sets background #0a0a0a",
+        "Canvas responsiveness rebuilt: reference used width:100%/max-width:960px (which breaks the absolute-positioned nodes when squeezed); port pins .rcp-canvas at a fixed 960px, wraps it in a new .rcp-canvas-wrapper (overflow:hidden below 980px), and adds a scaleCanvas() JS function applying transform:scale(w/960) with transform-origin top-left plus negative marginBottom compensation, run on load and window resize (commit 8eb1953, replacing a broken CSS calc attempt)",
+        "Video section top padding overridden inline to 40px since the hero above it is gone",
+        "Escaped unicode sequences in the JS conditions array (\u26a1, \ud83d\udcf6, etc.) replaced with literal emoji characters (\u26a1 \ud83d\udcf6 \ud83d\udee1\ufe0f \ud83d\udd27 \ud83d\udfe9 \ud83d\udce6 \u2601\ufe0f \ud83d\udcf1), and \u2022/\u2014 replaced with literal \u2022 and \u2014",
+        "Subtitle re-worded to 'A preflight checklist for remote-controlled Claude Code' (vs the reference's GPU-compute tagline)",
+        "Title and tags moved out of the app's hero into the React page chrome above the iframe",
+        "I Train label text tweaked (uncommitted): 'Claude Code Borough \u00b7 AI Island' \u2192 'Claude Code Borough Local on AI Island'"
+      ],
+      "added": [
+        "I Train badge: gray #A7A9AC circle with black 'I' and borough label \u2014 site-standard station header absent from the reference",
+        "Mobile-portrait warning banner: 'For the best experience on phone, rotate to landscape view' \u2014 orange text on #f9731620, shown only below the sm breakpoint via sm:hidden",
+        "JS scaleCanvas() mobile scaling of the 960px fixed-coordinate diagram (transform scale + negative margin compensation) \u2014 the reference had no working small-screen story for the playground",
+        ".rcp-canvas-wrapper element with conditional overflow:hidden under 980px",
+        "Site navigation via the Layout/Header wrapper",
+        "Station wiring: /rcp route in App.jsx, station entry in stations.js (fullName 'Remote Control Protocol', position 20), placement on the I line in lines.js between claude-code-os and professor-claude"
+      ],
+      "novel_patterns": [
+        "Whole-site-as-iframe: unlike Dancer Claude (interactive app stripped out and iframed, writeup rebuilt as React sections), here the ENTIRE reference site \u2014 all prose sections, the Abstraction Ladder, the playground, and the footer \u2014 is iframed wholesale from public/rcp-app/; the React page replaces only the hero. The writeup never becomes JSX.",
+        "Fixed tall iframe as inline page flow: height hardcoded to 8000px with scrolling='no', so the embedded site scrolls with the host page instead of behaving as a scrollable widget",
+        "Companion document shipped into public/: the skill markdown (remote-control-protocol-rcp-website.md) is copied byte-identical next to the app so an in-app relative 'View Skill' link keeps working \u2014 a document-asset reference pattern with no analogue in WONYP or Dancer Claude",
+        "JS-driven transform scaling for a fixed-coordinate interactive canvas on mobile: scaleCanvas() computes scale(w/960) with transform-origin top-left and negative marginBottom to reclaim layout height, wired to window resize \u2014 chosen after a CSS calc approach broke (commit 8eb1953)",
+        "Explicit orientation guidance UI: a portrait-only 'rotate to landscape' banner using Tailwind's sm:hidden, acknowledging the diagram is landscape-shaped rather than trying to reflow it",
+        "Cosmetic host-integration recolor inside the embedded app: background #0f1019 \u2192 #0a0a0a in body and sub-bars so the iframe is visually seamless against the React site's dark theme"
+      ],
+      "assets_flow": "No images, audio, or PDFs \u2014 the reference is a single self-contained HTML file. The whole index.html moved from 'i-line reference project website folder/rcp reference project website/' to public/rcp-app/index.html (hero excised, backgrounds recolored, mobile-scaling JS added), and the companion remote-control-protocol-rcp-website.md was copied byte-identical alongside it so the footer's relative 'View Skill' link resolves at /rcp-app/remote-control-protocol-rcp-website.md. External assets stay remote in both versions: DM Sans loads from Google Fonts and the demo video/thumbnail from YouTube. Nothing was placed under public/images/."
+    },
+    {
+      "station": "VM Claude",
+      "reference_summary": "A single self-contained 561-line dark HTML page (#0f1019 bg, DM Sans via Google Fonts) presenting the VM Claude project: (1) centered Hero with h1, tagline, and three rows of pill tags with primary/secondary opacity variants (tech orange #f97316, domain sky #38bdf8, audience green #4ade80); (2) JS-injected main YouTube demo embed (OKSSocreVzQ) with a file:// thumbnail fallback; (3) 6-paragraph Introduction; (4) interactive Architecture section \u2014 emoji legend, inline SVG (980x380) with dot-grid, dashed YOUR WORLD / CLAUDE'S WORLD zone boundary, 4 clickable nodes with SMIL animateMotion glowing particles, and a selectStep() JS detail bar, plus 3 prose paragraphs; (5) \"The Closed Laptop Test\" philosophy section; (6) \"The B-Minus Student\" with two inline YouTube embeds (8NSzn9czpow, 1iY6hLD14P8); (7) \"What Makes a Simulation Work\" three design principles; (8) GitHub octocat footer linking to VivekKarmarkar/give-claude-a-computer.",
+      "ported_summary": "src/pages/VmClaude.jsx is a thin 66-line React shell: Layout wrapper, an orange sm:hidden \"rotate to landscape\" banner, an I Train badge (gray #A7A9AC bullet, \"Claude Code Borough Local on AI Island\"), then a natively rebuilt hero (h1 + tagline + the six tags as Tailwind pill spans) inside the max-w-2xl prose column. Everything else \u2014 video, Introduction, interactive SVG architecture diagram, all writeup sections, GitHub footer \u2014 is delivered by a single wide iframe (max-w-[1200px], fixed height 7000px, scrolling=\"no\") pointing at /vm-claude-app/index.html, which is the reference file copied with the hero excised and the background retinted to #0a0a0a. Routed at /vm-claude in App.jsx with a stations.js entry (position 40).",
+      "kept": [
+        "All prose sections verbatim inside the iframe: Introduction (6 paragraphs), Architecture text (3 paragraphs), The Closed Laptop Test, The B-Minus Student, What Makes a Simulation Work, GitHub footer with octocat SVG",
+        "Interactive SVG architecture diagram kept fully intact \u2014 legend, dot-grid pattern, zone boundary, 'laptop can be shut \ud83d\udca4' annotation, SMIL animated particles, clickable nodes, selectStep() detail bar",
+        "Main demo video JS injection (OKSSocreVzQ) including the file:// protocol thumbnail-fallback logic",
+        "Two inline B-Minus Student YouTube embeds (Energy Skate Park 8NSzn9czpow, Sequence Convergence 1iY6hLD14P8)",
+        "Hero h1 text, exact tagline, and all six tag labels (recreated in React rather than iframed)",
+        "DM Sans Google Fonts link and all reference CSS (minus hero block) inside the iframed copy"
+      ],
+      "dropped": [
+        "Standalone hero section stripped from the iframed copy (marked '<!-- 1. HERO (removed for iframe embed) -->') along with its entire CSS block and mobile padding rule \u2014 content recreated in React, but the centered clamp(36px,6vw,64px) display typography is gone",
+        "Secondary-opacity tag variants (tag-tech-secondary #f97316b0, tag-domain-secondary #38bdf8a0, tag-audience-secondary #4ade80a0) \u2014 the React hero renders both tags in each row at full primary intensity",
+        "Reference <head> metadata identity (title 'VM Claude', viewport) is subsumed by the SPA \u2014 the iframe copy keeps them but they no longer drive the visible tab"
+      ],
+      "changed": [
+        "Body background of the app copy changed from #0f1019 to #0a0a0a, matching the iframe wrapper's inline background so the embed blends into the site",
+        "Hero rebuilt as a left-aligned React title section in the max-w-2xl prose column using site theme classes (text-dark-muted tagline) instead of the reference's centered #a0a0a0 hero",
+        "Tag pills converted from CSS classes to inline-styled Tailwind spans (px-4 py-1.5 rounded-full text-sm) with border colors like '1px solid #f9731640' preserved",
+        "Video section given inline padding-top:40px in the app copy to compensate for the removed hero above it",
+        "Curly apostrophe normalized to straight apostrophe in stepData step-3 description (Claude's terminal)"
+      ],
+      "added": [
+        "I Train badge: gray #A7A9AC circular 'I' bullet with 'Claude Code Borough Local on AI Island' direction text",
+        "Mobile portrait warning banner (orange #f97316 on #f9731620, sm:hidden): 'For the best experience on phone, rotate to landscape view'",
+        "Site chrome via Layout wrapper (header/navigation), which the standalone reference lacked",
+        "Route /vm-claude registered in App.jsx and stations.js entry ('vm-claude', position 40, description 'A virtual machine concept for Claude')",
+        "Full-bleed breakout: the iframe sits in its own max-w-[1200px] container outside the max-w-2xl prose column"
+      ],
+      "novel_patterns": [
+        "Whole-writeup iframe port: unlike Dancer Claude (only the interactive app iframed, writeup rebuilt as native React sections), here the ENTIRE content site \u2014 prose sections, video embeds, interactive diagram, GitHub footer \u2014 is iframed wholesale; only the hero is natively rebuilt",
+        "Fixed-pixel-height seamless iframe (height: 7000px, scrolling=\"no\") so the embedded page scrolls as part of the parent document instead of being an internally scrolling app window",
+        "Hero excision + compensation pattern: hero removed from the iframed copy with an explanatory HTML comment and an inline padding-top:40px added to the next section to restore spacing",
+        "Background-color harmonization: iframe body retinted (#0f1019 \u2192 #0a0a0a) to exactly match the React wrapper's iframe background style, hiding the embed seam",
+        "Interactivity pass-through: the clickable SVG architecture diagram with SMIL particle animation and its selectStep() vanilla-JS detail bar is preserved by embedding rather than being reimplemented as a React SVG component (WONYP's diagram was natively ported)",
+        "In-iframe environment-adaptive video embed: retained JS that swaps a YouTube iframe for a clickable thumbnail when served from file://",
+        "CSS-only mobile handling via an orange sm:hidden rotate-to-landscape banner (contrast with RCP's JS-scaling approach; neither is part of the WONYP/Dancer Claude worked examples)"
+      ],
+      "assets_flow": "The reference is a single fully self-contained index.html with zero local assets \u2014 fonts load from Google Fonts CDN, all three videos from YouTube, the fallback thumbnail from img.youtube.com, and the architecture diagram is inline SVG. Porting therefore moved no images/audio/PDF files: the reference HTML at \"i-line reference project website folder/vm-claude reference project website/index.html\" (561 lines) was copied to public/vm-claude-app/index.html (498 lines) with the hero stripped and background retinted, and the hero content migrated into src/pages/VmClaude.jsx."
+    },
+    {
+      "station": "Claude Caudio",
+      "reference_summary": "The \"reference\" is not a website at all \u2014 /claude-code-docs-audio-lessons/ contains exactly four mp3 files under modules/core-concepts/ (how_claude_code_works_lesson.mp3, extend_claude_code_lesson.mp3, explore_claude_directory_lesson.mp3, explore_context_window_lesson.mp3; 7.5\u20138.8 MB each, ~8\u20139 minutes each, ~34 min total, generated Apr 24 2026). There is no index.html, no README, no metadata, no text, and no visual design of any kind. The only structure the source carries is its directory hierarchy: a \"modules\" tree with one module, \"core-concepts\", holding the four lessons.",
+      "ported_summary": "src/pages/ClaudeCaudio.jsx (312 lines, route /claude-caudio) is a Layout-wrapped single-column page (max-w-3xl) with: a dual train-badge header (E green #6CBE45 \"Education\" + I silver #A7A9AC \"Claude Code Borough Local on AI Island\"), title \"Claude Caudio\" with tagline \"Claude Code docs you can listen to on a walk\"; a three-part narrative section (The Problem / What I Actually Believe / The Solution); a \"MODULE 01 \u2014 Core Concepts\" section rendering four LessonCard components; and a footer crediting the official Claude Code docs. The player is a near-verbatim clone of the SunoSongs.jsx pattern: an inline `lessons` array, one shared `useRef` Audio element created via `new Audio(path)` with loadedmetadata/timeupdate/ended listeners, per-card play/pause/stop SVG buttons, active-card border highlight, and a click-to-seek progress bar with formatTime display. Lesson metadata (titles, descriptions, ordering) is authored in-page, not derived from any reference markup.",
+      "kept": [
+        "The four mp3 audio files themselves, byte-identical (md5 checksums match between claude-code-docs-audio-lessons/ and public/claude-caudio/)",
+        "The source directory hierarchy modules/core-concepts/ \u2014 preserved verbatim under public/claude-caudio/ and mirrored in the served URL paths (/claude-caudio/modules/core-concepts/*.mp3)",
+        "The original snake_case mp3 filenames \u2014 used unchanged for streaming paths and as the download attribute on the download links",
+        "The module concept \u2014 the folder name 'core-concepts' surfaces in the UI as the 'MODULE 01: Core Concepts' section heading"
+      ],
+      "dropped": [
+        "Nothing droppable existed \u2014 the reference contained zero HTML, text, styling, or interactive elements; it was audio files only, so there were no hero titles, headers, or footers to omit",
+        "The raw alphabetical/filesystem ordering of the files was discarded in favor of a curated pedagogical order (commit 95e40c8 reordered to: How CC Works, Extending, .claude Directory, Context Window)"
+      ],
+      "changed": [
+        "Branding: folder name 'claude-code-docs-audio-lessons' became the station pun 'Claude Caudio' (Claude + audio)",
+        "snake_case filenames transformed into display titles: how_claude_code_works_lesson.mp3 -> 'How Claude Code Works', explore_claude_directory_lesson.mp3 -> 'The .claude Directory', explore_context_window_lesson.mp3 -> 'The Context Window', extend_claude_code_lesson.mp3 -> 'Extending Claude Code'",
+        "The SunoSongs player template was recolored from G-Train purple #7C3AED (hover #9F7AEA, accents #A78BFA) to E-Train green #6CBE45, with play/pause icon color flipped from white to black for contrast on green",
+        "The SongCard was restructured into LessonCard: lyrics toggle, emoji, and style chip removed; a mono '0N' lesson-number prefix and an audioBasePath prop added; the audio 'error' event listener from SunoSongs was not carried over",
+        "I-Train direction string reworded in lines.js from 'Claude Code Borough Local \u00b7 AI Island' to 'Claude Code Borough Local on AI Island'",
+        "Story.jsx landing page: the grayed-out dead 'audio lectures' placeholder (#888888, onClick preventDefault) was replaced with a live green Link 'audio lessons' to /claude-caudio",
+        "Layout iterated across 3 commits (all dated Apr 29 2026 in git, not July, despite being the newest station): commit 2 removed the initially-applied orange/blue/green tag chips and rewrote the Solution paragraph to mention remote-control from the Claude app; commit 3 aligned to the VeritasBluePi dual-badge pattern (badge row gap-3 -> gap-4, prose-medium on content sections)"
+      ],
+      "added": [
+        "Entire page content authored from scratch: lesson titles and one-sentence descriptions, the module blurb, and the three-section motivation narrative (The Problem / What I Actually Believe / The Solution) \u2014 none of this text existed in the source",
+        "Full custom audio player UI (play/pause/stop buttons, seekable progress bar, time display, active-card green border) cloned from SunoSongs.jsx",
+        "Per-lesson Download button (<a download>) for offline listening \u2014 added in commit 95e40c8 explicitly for walk/offline use; no equivalent exists in SunoSongs or any prior station",
+        "Dual train-badge header making it a cross-line E+I station (Education + Infrastructure)",
+        "Site integration: route in App.jsx, station entry in stations.js (id 'claude-caudio', position 35), membership in BOTH lines.js E and I station arrays, and the Story.jsx landing-page link swap",
+        "Footer attribution linking to the official Claude Code documentation at docs.anthropic.com"
+      ],
+      "novel_patterns": [
+        "Asset-only reference: the source has no page to port \u2014 no HTML, text, or design. 'Porting' here meant copying raw media into public/ and authoring 100% of the page structure and copy in React, the inverse of WONYP (translate existing content) and Dancer Claude (strip and iframe an existing app)",
+        "Intra-repo template cloning: the page's structure was ported from another page in the same repo (SunoSongs.jsx G-Train player), not from the reference \u2014 the porting template came from inside the site, recolored and adapted",
+        "Custom HTML5 Audio player pattern: shared useRef Audio element with loadedmetadata/timeupdate/ended listeners, single-active-track state, click-to-seek progress bar \u2014 no audio exists in either worked example",
+        "Per-item file-download affordance (<a download> on each lesson mp3) as a first-class UI control for offline consumption",
+        "Source directory hierarchy as information architecture: the reference's modules/core-concepts/ tree is preserved verbatim under public/, mirrored in asset URLs, and surfaced in the UI as the 'MODULE 01: Core Concepts' heading \u2014 leaving room for future modules by adding folders",
+        "Public/ holds only media, no app: unlike Dancer Claude's public/dancer-claude-app/index.html, public/claude-caudio/ contains zero HTML \u2014 no iframe, no standalone app to diff",
+        "Tag-color-system reversal: the Dancer Claude concept-split tag chips (orange Claude Code / blue Education+Audio Learning / green EdTech+AI Startups) were initially applied, then deliberately deleted one commit later as 'not relevant' \u2014 the first station to opt out of that pattern"
+      ],
+      "assets_flow": "Four mp3s copied byte-identical (md5-verified: e.g. be8c1c46... for how_claude_code_works_lesson.mp3) from repo-root /home/vivekkarmarkar/Python Files/personal-website/claude-code-docs-audio-lessons/modules/core-concepts/ to /home/vivekkarmarkar/Python Files/personal-website/public/claude-caudio/modules/core-concepts/, preserving the modules/core-concepts/ hierarchy (~31 MB total, committed as binaries in 1993e66). Served at /claude-caudio/modules/core-concepts/<filename>.mp3 for both streaming (new Audio(path)) and the download links (audioBasePath prop). No images, JS, or PDFs involved; the original folder remains untracked at repo root."
+    }
+  ]
+}
