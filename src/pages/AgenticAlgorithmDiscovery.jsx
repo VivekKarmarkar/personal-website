@@ -245,9 +245,9 @@ function SessionTriangleDiagram() {
       </div>
 
       {/* Detail bar */}
-      <div className="flex items-center gap-4 px-6 py-3.5" style={{ background: '#161822', border: '1px solid #2e3140', borderRadius: '12px', minHeight: '64px' }}>
+      <div className="flex flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-3.5" style={{ background: '#161822', border: '1px solid #2e3140', borderRadius: '12px', minHeight: '64px' }}>
         <span className="text-[26px] flex-shrink-0">{step ? step.icon : "\u{1F441}️"}</span>
-        <span className="font-bold text-[15px] min-w-[200px] flex-shrink-0" style={{ color: step ? step.color : '#f97316' }}>
+        <span className="font-bold text-[15px] sm:min-w-[200px] sm:flex-shrink-0" style={{ color: step ? step.color : '#f97316' }}>
           {step ? step.name : 'Click any node to see what it can — and cannot — see'}
         </span>
         <span className="text-[13px] leading-relaxed" style={{ color: '#bbb' }}>
