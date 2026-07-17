@@ -30,8 +30,9 @@ function SubwayLineVisual({ line }) {
         {line.direction}
       </div>
 
-      {/* Subway line visualization */}
-      <div className="relative">
+      {/* Subway line visualization — scrolls horizontally so dense lines don't crowd on narrow/portrait screens */}
+      <div className="overflow-x-auto pb-2">
+      <div className="relative" style={{ minWidth: `${Math.max(totalStations * 88, 260)}px` }}>
         {/* The track line with animated train */}
         <div
           className="absolute top-4 left-6 right-6 h-1 rounded-full overflow-hidden"
@@ -110,6 +111,7 @@ function SubwayLineVisual({ line }) {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
