@@ -300,7 +300,7 @@ export default function AgenticAlgorithmDiscovery() {
           {/* Title + byline/dateline (W-line essay convention) */}
           <section className="mb-8">
             <h1>Agentic Algorithm Discovery</h1>
-            <p className="text-dark-muted text-lg mt-2" style={{ marginBottom: 0 }}>Building on top of Claude Code OS</p>
+            <p className="text-dark-muted text-lg mt-2" style={{ marginBottom: 0 }}>What happens when AI agents invent the algorithms behind scientific discovery?</p>
             <p className="mt-5" style={{ color: '#d0d0d0', letterSpacing: '0.3px', marginBottom: 0 }}>Claude (Anthropic) &nbsp;&middot;&nbsp; Vivek Karmarkar</p>
             <p className="mt-1 text-[15px]" style={{ color: '#8888aa', letterSpacing: '0.5px', marginBottom: 0 }}>19 May 2026</p>
             <div className="flex flex-col items-start gap-2.5 mt-6">

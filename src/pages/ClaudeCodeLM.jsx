@@ -514,7 +514,7 @@ export default function ClaudeCodeLM() {
           {/* Title */}
           <section className="mb-8">
             <h1>ClaudeCodeLM</h1>
-            <p className="text-dark-muted text-lg mt-2">The voice-first research walk had one broken step &mdash; hearing the paper as a podcast. So the podcast engine got built from scratch: grounded, single-narrator, run by a background agent.</p>
+            <p className="text-dark-muted text-lg mt-2">A NotebookLM alternative, built with Claude Code &mdash; a personal podcast product.</p>
             <div className="flex flex-col items-start gap-2.5 mt-6">
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
