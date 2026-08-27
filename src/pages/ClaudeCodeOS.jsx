@@ -88,7 +88,7 @@ export default function ClaudeCodeOS() {
           {/* Intro */}
           <section className="mb-10 prose-medium">
             <p>
-              One station, two platforms — and by the way, in our world we call platforms layers. The <strong>main layer</strong> is the system itself — a data portrait of a personalized operating system built on Claude Code, examined the way a physicist examines anything. The <strong>life layer</strong> is the same OS out in the world: three MCP test campaigns — flights, phone calls, news — each distilled into a repeatable skill.
+              This station has multiple platforms — and in our world, we call platforms layers. Claude Code OS is an extended agentic harness — skills, hooks, MCPs, and plugins — that has let this human personalize and augment their bare-bones Claude Code. The <strong>main layer</strong> dives deep into the concept. The <strong>life layer</strong> discusses extensions that reduce friction in daily life — directly enhancing the quality of life through AI, especially Claude Code.
             </p>
           </section>
 
