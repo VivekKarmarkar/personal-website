@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Layout from '../components/Layout'
+import ResolutionNotice from '../components/ResolutionNotice'
 
 const SLIDE_IMAGES = [
   '/images/wonyp/results_slideshow/sample_food_3_annotated.png',
@@ -232,6 +233,9 @@ export default function Wonyp() {
     <Layout>
       <article className="w-full py-16 px-4">
         <div className="max-w-2xl mx-auto prose-medium">
+
+          {/* Resolution guidance: portrait → landscape, laptop split → fullscreen */}
+          <ResolutionNotice />
 
           {/* Train Badge */}
           <div className="flex items-center gap-4 mb-8">

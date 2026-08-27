@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>/ask-reddit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #0a0a0a; margin: 0; padding: 48px 16px; font-family: "DM Sans", system-ui, sans-serif; }
+    main { max-width: 920px; margin: 0 auto; }
+    h1 { color: #f4eee2; }
+    .caveat { font-weight: bold; color: #fbbf24; }
+    pre { background: #18150f; border: 1px solid #3d362a; border-radius: 14px; padding: 24px; color: #d6cebf; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; line-height: 1.6; overflow-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>/ask-reddit</h1>
+    <p class="caveat">[We show you the markdown file, but the skill is part of a folder.]</p>
+    <pre>---
+name: ask-reddit
+description: Answer a raw question from Vivek using Reddit, via the reddit MCP (adhikasp/mcp-reddit, Goose's official pick). He asks anything in his own words ("has Opus gotten worse?", "what's the internet talking about today?", "what do people think of X?"); Claude judges the right shelf (subreddit, multireddit union, or r/all), pulls hot piles, drills into posts + comment trees, and answers with quotes and links — or honestly refuses when the question needs a search Reddit's public API doesn't have. Use for any "ask Reddit / what's the community saying / what's trending" request, via /ask-reddit or naturally.
+---
+
+# ask-reddit — Raw question in, community intelligence out
+
+Born 2026-08-26 from a 17-test characterization campaign (11 machine tests + 6 real questions — see `artifacts/reddit_test_suite.md`, the PDF report, and `artifacts/discussions.md`). Every rule below is a verified observation.
+
+**The contract:** Vivek gives a raw question or topic. Everything else — shelf choice, pulls, drills, synthesis, refusal — is Claude's job.
+
+## Engine
+
+Global user-scope MCP `reddit`: `uvx --from git+https://github.com/adhikasp/mcp-reddit.git mcp-reddit`. Two tools only:
+- `fetch_reddit_hot_threads(subreddit, limit)` — a shelf's hot pile (titles, scores, authors, text/link content)
+- `fetch_reddit_post_content(post_id, comment_limit, comment_depth)` — one post + its comment tree
+
+Load via ToolSearch if deferred. If missing, re-register at USER scope (never project). NOTE: a mid-session `claude mcp add` bounces the Telegram channel — plan installs accordingly.
+
+## Workflow
+
+### 1 — Classify the question (this decides everything)
+
+**THE SWEET SPOT (Vivek's scoping, confirmed by 4 live runs 2026-08-26): "What's hot with X?" — that is the question this skill actually answers well.** Questions of the form "do people do Y with X?" or "find evidence of Y" do NOT work reliably — they need search. Steer usage toward the sweet spot; treat everything else with the classification below.
+
+- **Pulse question** ("what's hot with X", "what's the buzz", "what's trending", "community verdict on Y") → the sweet spot. Proceed.
+- **Existence/lookup question** ("find posts about &lt;niche topic&gt;") → structurally UNANSWERABLE: the API has no search, and non-trending topics are invisible however good the shelf guess. REFUSE upfront, say why in one line, and offer the right tool instead (google-scholar MCP for academic topics; web search otherwise). Verified twice: palpation-assisted tomography, Codex-voice opinions, Hermes sentiment.
+- **Popularity question** ("is X blowing up?", "what's the world talking about today?") → use r/all or r/popular. r/all answers popularity, never existence — it tells you what's loud, not what's out there.
+
+### 2 — Pick the shelf (client-side judgment, like the 1-hour airport rule)
+
+Map the topic to where that conversation canonically lives: Claude/Opus → r/ClaudeAI; OpenAI/Codex → r/OpenAI + r/ChatGPTCoding; open models → r/LocalLLaMA; and so on from Reddit's community map. Options verified to work:
+- Single shelf: `subreddit="ClaudeAI"`
+- **Union of shelves in ONE call**: `subreddit="ClaudeAI+OpenAI+LocalLLaMA"` — merged hot pile, re-ranked (it's a union; intersection is empty by construction)
+- Whole site: `subreddit="all"` or `"popular"`
+Say honestly when the shelf is a guess.
+
+### 3 — Pull and scan
+
+`fetch_reddit_hot_threads`, **limit ≤15 for inline results** (limit=100 works but returns ~90KB → file spill; use only for deliberate bulk processing). Read every title yourself against the question. r/ClaudeAI convention: pinned hub posts link to megathreads (Performance Hub etc.) — their linked IDs are drillable.
+
+### 4 — Drill
+
+`fetch_reddit_post_content` on matching posts. `comment_limit=10-20, depth=2-3` covers most needs; 50@5 verified fine on a 193-comment thread (nesting preserved via `--` depth markers — parseable). Gold to look for: r/ClaudeAI's mod-bot auto-TL;DR comment summarizes big threads for free. Extract the **post_id** (bare base-36, e.g. `1vy3f0s`) from URLs yourself — full URLs are REJECTED by the tool.
+
+### 5 — Answer
+
+Answer first, in Vivek's terms; then evidence: quotes with scores, thread links, and what was checked. On Telegram: plain text. **Speak magazine-stand, not API** — the jargon lesson in `artifacts/discussions.md` was learned the hard way. If nothing relevant was trending: say so in one line + what you checked + the honest boundary, no essays.
+
+## Verified operational facts (2026-08-26)
+
+- Errors are clean and distinct: nonexistent shelf → "page not found"; private → "private"; bad post_id/URL → "target not found". Branch on them.
+- Parallel-safe: 13 concurrent calls, zero throttling → fan-out 6-8 wide is fine (swarm-enhanced uses this).
+- Data is LIVE (same post, different scores in simultaneous calls), not cached.
+- Media posts: `content` = link only (no images/captions); the comment tree still tells the story.
+- NSFW is served UNGATED — this skill does not surface adult content unless Vivek explicitly asks; filtering is entirely client-side.
+
+## Bundled artifacts (this folder)
+
+- `artifacts/reddit_test_suite.md` — the 17-test campaign, all outcomes
+- `artifacts/reddit_mcp_test_report.pdf` (+ `reddit_report_print.html` source) — the 3-page report, plain-language edition
+- `artifacts/reddit_tools_eli5.{html,pdf,png}` + `reddit_tools_eli5_grid.{html,png}` — the magazine-stand explainer
+- `artifacts/discussions.md` — the design Q&amp;A: r/all semantics, union-not-intersection, shelf-picking judgment, the refusal rule, the jargon lesson
+</pre>
+  </main>
+</body>
+</html>

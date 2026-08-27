@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
+import ResolutionNotice from '../components/ResolutionNotice'
 
 const STEP_DATA = {
   1:  { icon: "\u{1F3B5}", name: "Upload Song", color: "#f97316",
@@ -228,6 +229,9 @@ export default function DancerClaude() {
     <Layout>
       <article className="w-full py-16 px-4">
         <div className="max-w-2xl mx-auto prose-medium">
+
+          {/* Resolution guidance: portrait → landscape, laptop split → fullscreen */}
+          <ResolutionNotice />
 
           {/* Train Badge */}
           <div className="flex items-center gap-4 mb-8">

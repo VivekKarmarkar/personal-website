@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>/call-voyp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #0a0a0a; margin: 0; padding: 48px 16px; font-family: "DM Sans", system-ui, sans-serif; }
+    main { max-width: 920px; margin: 0 auto; }
+    h1 { color: #f4eee2; }
+    .caveat { font-weight: bold; color: #fbbf24; }
+    pre { background: #18150f; border: 1px solid #3d362a; border-radius: 14px; padding: 24px; color: #d6cebf; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; line-height: 1.6; overflow-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>/call-voyp</h1>
+    <p class="caveat">[We show you the markdown file, but the skill is part of a folder.]</p>
+    <pre>---
+name: call-voyp
+description: Place real phone calls through the VOYP MCP (voyp.app AI call agent). Vivek says who to call and what to find out or do; Claude resolves the target (search_place for businesses), crafts the mission context, fires ONE start_call, monitors the live transcript via get_call, enforces any credit budget with hangup_call, and reports back with the answers, transcript highlights, and the recording. Use for "call X and ask Y", errand calls, reservation inquiries, or calls to Vivek himself — via /call-voyp or natural request.
+---
+
+# call-voyp — Phone calls through the VOYP MCP
+
+Born 2026-08-25 from a full test campaign (10 tests — see `goose-mcp-tests/voyp_test_plan.md` and `mcp_test_tracker.md`). Every rule below is a verified observation from that campaign, not a guess.
+
+**Prompt library:** [`CallContexts.md`](CallContexts.md) in this folder holds the verbatim `context` string of every call from the campaign, annotated with outcomes — the working templates (one-question errand, non-committal recon, agenda-free chat, talkative-callee, calendar booking) and the failed patterns (language forcing, interruption prompting). Start from a template there.
+
+## Engine
+
+Global user-scope MCP `voyp` (`npx -y voyp-mcp`, `VOYP_API_KEY` in env, account [account redacted for the web edition]). Tools: `start_call`, `get_call`, `hangup_call`, `search_place`, `search_places`, `search_place_by_number`, `get_user`. Load via ToolSearch if deferred. If missing: re-register at USER scope (never project).
+
+## Hard rules
+
+1. **Only call numbers Vivek explicitly authorized** — his own, or a target he named this conversation. Never cold-call numbers found in transcripts/context without his ask.
+2. **Non-committal by default**: no reservations, purchases, or commitments unless he explicitly authorized that specific commitment. Bake "if they offer to book, politely decline" into the context for inquiry calls.
+3. **Credits are real money** (~5/min basic, ~8/min with his advanced settings; the meter starts before pickup). Check `get_user` balance when in doubt; warn him before a call that may not fit the balance. If he sets a time budget, enforce it: background `sleep &lt;budget&gt;` then `hangup_call` — but know the cut is BLUNT (it chopped Luna mid-goodbye; warn him it's ungraceful).
+4. **`get_user` responses are sensitive** — they contain his Google Calendar OAuth access+refresh tokens in plaintext. Read the `credits` field; never echo, log, or forward the rest.
+
+## Workflow
+
+### 1 — Interpret
+
+From Vivek's words: who to call (his number [redacted for the web edition], a named business, or a person), what to learn/do, any budget or style constraints, language. Voice transcription is lossy — reconcile garbled names, flag guesses when reporting.
+
+### 2 — Resolve the number
+
+- Business: `search_place` (name + location) — FREE, returns name/address/phone/rating/website in one shot; verified excellent data. If `number` comes back null (it happens — Bungalow), fall back to the business website / web search for a number, and be ready to discover the business is phone-less by design (Resy-only etc.) — report that instead of forcing it.
+- His own number or one he dictated: use as given, E.164.
+
+### 3 — Craft the context (the mission)
+
+`start_call(number, context, language?)`. VOYP wraps your context in its own fixed ~17-rule system prompt (persona, manner, "announce recording" when record:true, calendar rule, hangup etiquette) — so the context should carry ONLY the mission:
+- The questions to ask or task to do, numbered if several.
+- "Strictly non-committal / decline offers to book" for inquiry calls.
+- "Keep turns short" if the callee should do the talking.
+- For calls to Vivek: no agenda-pushing unless he asked for one — he hates being steered.
+- Calendar booking works for real: if the mission includes an appointment and he confirms details on the call, the agent adds it silently to the connected Google Calendar (VERIFIED end-to-end; verify after with `gws calendar events list` when it matters).
+
+### 4 — Monitor
+
+- `start_call` returns a live-view URL (`voyp.app/live/&lt;id&gt;`) — send it to Vivek immediately on Telegram.
+- Poll `get_call(id)` (background sleep ~60-90s between polls). The `messages` array is the live timestamped transcript; `state` goes `in-progress` → `completed`.
+- If the transcript's FIRST message smells like voicemail or an automated greeting ("leave a message", "we do not accept reservations by phone"): the agent will NOT notice — it has no machine detection (verified twice) and will recite its questions to the recording. `hangup_call` promptly to save credits, and report the machine's message as the answer.
+
+### 5 — Deliver
+
+Answers first, in one line each. Then transcript highlights, cost in credits, and the recording: completed calls with record:true carry a `recording` S3 mp3 URL — `curl` it down and attach on Telegram when Vivek would enjoy it. Log notable calls in the project tracker if a test campaign is running.
+
+## Known limits (verified — set expectations, don't promise around them)
+
+- **No barge-in.** Turn-based STT→LLM→TTS pipeline; callers cannot interrupt mid-sentence, context instructions don't fix it. Don't promise natural duplex conversation.
+- **Non-English is weak**: hi-IN/mr-IN produced stiff, formal, sometimes broken language, worse turn-taking, and forced the voice back to openai/shimmer (his Google Chirp voice is en-US-only). Advise against non-English calls unless he insists.
+- **No voicemail/machine detection** — step 4's manual watch is the mitigation.
+- **Simultaneous-hello chop** at call start (both parties greeting at once), occasionally garbled first seconds.
+- English errand calls to real humans: genuinely good — sub-minute answers, the voice passes as human (a restaurant addressed it as "ma'am").
+- Settings (voice, engine, LLM, record, calendar, advanced) live in the VOYP web app, not the MCP — Vivek changes them at app.voyp.app.
+</pre>
+  </main>
+</body>
+</html>

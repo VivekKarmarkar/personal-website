@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>/find-flight-kiwi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #0a0a0a; margin: 0; padding: 48px 16px; font-family: "DM Sans", system-ui, sans-serif; }
+    main { max-width: 920px; margin: 0 auto; }
+    h1 { color: #f4eee2; }
+    .caveat { font-weight: bold; color: #fbbf24; }
+    pre { background: #18150f; border: 1px solid #3d362a; border-radius: 14px; padding: 24px; color: #d6cebf; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; line-height: 1.6; overflow-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>/find-flight-kiwi</h1>
+    <p class="caveat">[We show you the markdown file, but the skill is part of a folder.]</p>
+    <pre>---
+name: find-flight-kiwi
+description: Natural-language flight finder on the Kiwi.com MCP server (mcp.kiwi.com). Vivek describes the flight he wants in his own words — route, dates, stay length, layover tolerance, airlines, bags, budget — and Claude interprets that directly into ONE `mcp__kiwi__search-flight` call, then presents the best 2–3 bookable itineraries with kiwi.com links. Engine-sibling of /find-flight (which used the now-broken google-flights scraper); interpretation replaces the old hardcoded-prior pipeline. Use for any "find me a flight" request, including via /find-flight-kiwi.
+---
+
+# find-flight-kiwi — Interpret-mode flight finder on the Kiwi MCP
+
+One tool call, no solver, no hardcoded optimization pipeline. The user's words ARE the spec; Claude maps them onto the Kiwi parameter surface in the moment. Born 2026-08-25 from live A/B tests against `/find-flight` (whose google-flights scraper backend silently died) and a 12-test suite against `mcp.kiwi.com` — see `goose-mcp-tests/kiwi_test_suite.md` for the evidence behind every rule below.
+
+Do NOT modify `/find-flight`, `/find-flight-rt`, or any sibling skill — they are working (or archival) siblings.
+
+## Engine
+
+`mcp__kiwi__search-flight` on the globally-registered `kiwi` MCP server (user scope, `https://mcp.kiwi.com`, no auth). If the tool is deferred, load it via ToolSearch first. If the server is missing, re-register: `claude mcp add --scope user --transport http kiwi https://mcp.kiwi.com` (NEVER project scope).
+
+## Arguments
+
+`/find-flight-kiwi &lt;free-form text&gt;` — anything: "Iowa City to Paris second week of September, no ridiculous layovers", "round trip to NYC late September, at least a week, I'm bringing a bag", "cheapest way to Europe in October, surprise me".
+
+## Workflow
+
+### 1 — Interpret intent
+
+Extract from the user's words: origin, destination, one-way vs round trip, date range, stay length, and every soft constraint they voiced (time-of-day, layover tolerance, airlines to avoid/prefer, bags, cabin, budget, nonstop, weekdays). Voice transcription is lossy — reconcile garbled place/airline names against context and flag the guess when reporting back.
+
+### 2 — Resolve geography CLIENT-SIDE (the server won't)
+
+- 1-hour-travel-radius rule for serving airports, same as the find-flight family: Iowa City → CID only; NYC → JFK,LGA,EWR; Chicago → ORD,MDW; Boston → BOS; Bay Area → SFO,OAK,SJC.
+- `flyFrom`/`flyTo` accept comma-separated IATA lists ("JFK,LGA,EWR") — verified. Prefer explicit IATA codes.
+- Metro nicknames FAIL SILENTLY on the server ("Bay Area" → 0 results, no error). Ambiguous city names are SILENTLY GUESSED ("Portland" → PDX). Resolve both yourself; if genuinely ambiguous, ask.
+- Region names DO work as destinations ("Europe") — see Explore mode below.
+
+### 3 — Build the call
+
+Always:
+- `currency="USD"`, `sort="price"`
+- **Hygiene defaults** (unless the user explicitly asks for the ugly cheap stuff): `allow_self_transfer=false` (no virtual-interlining — separate glued tickets with zero missed-connection protection), `allow_overnight_stopovers=false` (no airport sleepovers). These kill the fake-cheap 21-hour itineraries at the source.
+
+Taste defaults (soft — user's words override):
+- `dtime_from=10, dtime_to=23` (Vivek is not a dawn flyer); mirror with `ret_dtime_from/to` on round trips. For international, 9 is acceptable if he says so.
+- `max_sector_stopovers=1` domestic, `2` for international from CID.
+
+Map the rest 1:1 from his words:
+- Dates are **dd/mm/yyyy**. Range = `departureDate` + `departureDateTo`. Round trip = `returnDate` (+`returnDateTo`) OR, for "at least a week"-style stays, `nights_in_dst_from`/`nights_in_dst_to` — this replaces the old outer duration-sweep loop entirely.
+- "layover under N hours" → `stopover_to=N`. Budget → `price_to`. "no Spirit/Frontier/Allegiant" → `exclude_airlines="NK,F9,G4"`; "only Delta" → `select_airlines="DL"`. Bag → `adults_hold_bags=[1]` (reprices honestly; ~+$67 on UA domestic). Cabin → `cabinClass` M/W/C/F. Weekdays → `fly_days` (0=Sun..6=Sat). Nonstop → `max_sector_stopovers=0`.
+- `max_fly_duration` = TOTAL elapsed hours including layovers, whole itinerary — use sparingly; prefer `stopover_to`.
+
+### 4 — One call, then judgment
+
+Empty result (`resultsCount:0, error:null` — Kiwi never explains why):
+- NO diagnosis essays. Quickly try 1–3 relaxed permutations (drop the tightest constraint first: price cap, then duration/stopover caps, then widen dates). Each call is ~0.3–1s.
+- Still nothing: say so in one line, mention what you relaxed, and let the user take it from there (worst case: Google Flights by hand).
+- Near-term caveat: inventory ends ~9–10 months out and thins silently near the edge — beyond that, "no flights" means "not priced yet", say that instead.
+
+### 5 — Present the best 2–3
+
+Server returns ≤15 itineraries, pre-sorted. Pick the top 2–3 by judgment (price first, then elapsed time / departure time — a $5 saving never justifies an extra stop or +2h). For each: date, airline + flight numbers, route with stops, local times, elapsed duration, price, and the `bookingUrl`. Lead with the recommendation, one line on why. On Telegram: plain text, no markdown tables.
+
+### Explore mode (bonus capability)
+
+"Where should I go?" queries: `flyTo="&lt;region or country&gt;"` + `one_for_city=true` → one best fare per city (verified: "Europe" from CID → Copenhagen $292, Paris $364, ...). Present as a ranked destination list.
+
+## Schema gotchas (verified 2026-08-25)
+
+- 15-result server cap, no pagination.
+- `price_to` works WITH `currency` (USD fine — the EUR default is avoidable).
+- Premium economy (`W`) from regional airports: genuinely empty, expect it.
+- `fly_days` indexing is 0=Sun..6=Sat per schema; verified plausible but re-check when it matters.
+- Multi-airport CSV works for both `flyFrom` and `flyTo`.
+</pre>
+  </main>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
+import ResolutionNotice from '../components/ResolutionNotice'
 
 // Sub-layer exits of the Life layer (Teaching PINNs exit idiom)
 const LIFE_EXITS = [
@@ -58,6 +59,9 @@ export default function ClaudeCodeOS() {
       <article className="w-full py-16 px-4">
         <div className="max-w-3xl mx-auto">
 
+          {/* Resolution guidance: portrait → landscape, laptop split → fullscreen */}
+          <ResolutionNotice />
+
           {/* Train Badge */}
           <div className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-2">
@@ -107,7 +111,7 @@ export default function ClaudeCodeOS() {
                 <div>
                   <div className="text-white font-medium text-lg mb-1">The Operating System</div>
                   <p className="text-dark-muted text-sm m-0">
-                    The data portrait — skills as processes, the constellation, and the design philosophy behind the personal OS.
+                    A deep dive into the concept.
                   </p>
                 </div>
                 <svg
@@ -134,7 +138,7 @@ export default function ClaudeCodeOS() {
                   <div>
                     <div className="text-white font-medium text-lg mb-1">The OS Out in the World</div>
                     <p className="text-dark-muted text-sm m-0">
-                      Flights, phone calls, and the news — three MCP test campaigns turned into daily-life skills.
+                      Extensions that reduce friction in daily life.
                     </p>
                   </div>
                   <svg

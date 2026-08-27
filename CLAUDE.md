@@ -963,3 +963,13 @@ This was suggested by Claude (the chatbot) after reading the experiment results 
 1. Build simulation → 2. Create AI student agents → 3. Run rapid experiments (hours) → 4. Identify patterns → 5. THEN run real user study with better hypotheses
 
 This is not a replacement for real user testing — it's a **rapid iteration layer** that comes before it.
+
+---
+
+## Enforce Consistency on Requested Changes
+
+When changes are requested, do not hyper-focus on local things. A given change possibly applies in multiple places — apply it so consistency is enforced throughout and nothing breaks. Even if it applies in only one place, apply it in a way that keeps the whole consistent.
+
+**Exception:** battle-tested places that work well — don't touch those. Everywhere else, apply it.
+
+(Dictated by Vivek, 2026-08-27.)
