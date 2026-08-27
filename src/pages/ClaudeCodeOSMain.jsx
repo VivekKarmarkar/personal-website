@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import ResolutionNotice from '../components/ResolutionNotice'
+import AutoHeightIframe from '../components/AutoHeightIframe'
 
 export default function ClaudeCodeOSMain() {
   return (
@@ -58,12 +59,10 @@ export default function ClaudeCodeOSMain() {
 
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
-          <iframe
+          <AutoHeightIframe
             src="/claude-code-os-app/index.html"
             title="Claude Code OS"
-            className="w-full border-none block"
-            style={{ height: '17500px', background: '#0a0a0a' }}
-            scrolling="no"
+            initialHeight={17500}
           />
         </div>
 
