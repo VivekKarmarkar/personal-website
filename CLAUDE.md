@@ -1,5 +1,7 @@
 # CLAUDE.md - Project Guide for Claude Code
 
+> **📌 Active personal task (2026-07-17):** NYC event contacts to add on LinkedIn tonight — see [`contacts_NYC_event_2026-07-17.md`](contacts_NYC_event_2026-07-17.md). Pending: (1) Vivek confirms the 3 name spellings (voice-transcription-uncertain), (2) build a lightweight LinkedIn-like connect tool (dispatch agents + browser automation, since not logged in yet), (3) add the contacts at night after login. **Do these only when Vivek says — not automatically.**
+
 ## Project Overview
 
 This is **Vivek Karmarkar's personal website** - an interactive educational platform that goes far beyond traditional tutorials or Jupyter notebooks. The site teaches machine learning, physics, and mathematics through visual, interactive experiences.

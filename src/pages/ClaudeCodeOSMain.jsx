@@ -1,9 +1,25 @@
+import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 
-export default function VmClaude() {
+export default function ClaudeCodeOSMain() {
   return (
     <Layout>
-      <article className="w-full py-16 px-4">
+      {/* Back to station */}
+      <div className="w-full pt-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Link
+            to="/claude-code-os"
+            className="inline-flex items-center gap-2 text-dark-muted hover:text-white text-sm transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            Back to Claude Code OS Station
+          </Link>
+        </div>
+      </div>
+
+      <article className="w-full py-8 px-4">
         <div className="max-w-2xl mx-auto prose-medium">
 
           {/* Landscape warning — only visible on narrow portrait screens */}
@@ -29,19 +45,14 @@ export default function VmClaude() {
 
           {/* Title */}
           <section className="mb-8">
-            <h1>VM Claude</h1>
-            <p className="text-dark-muted text-lg mt-2">An autonomous AI agent that plays educational simulations on its own computer &mdash; while yours is shut</p>
+            <h1>Claude Code OS</h1>
+            <p className="text-dark-muted text-lg mt-2">A personalized operating system for Claude Code &mdash; visualized</p>
             <div className="flex flex-col items-start gap-2.5 mt-6">
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>AI Agents</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Exploratory Data Analysis</span>
               </div>
               <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>EdTech</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>AI Benchmarking</span>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>EdTech Companies</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
               </div>
             </div>
@@ -52,10 +63,10 @@ export default function VmClaude() {
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
           <iframe
-            src="/vm-claude-app/index.html"
-            title="VM Claude"
+            src="/claude-code-os-app/index.html"
+            title="Claude Code OS"
             className="w-full border-none block"
-            style={{ height: '7000px', background: '#0a0a0a' }}
+            style={{ height: '17500px', background: '#0a0a0a' }}
             scrolling="no"
           />
         </div>

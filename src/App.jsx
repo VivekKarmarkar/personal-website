@@ -29,6 +29,10 @@ import TrackMan from './pages/TrackMan'
 import VisualizationTools from './pages/VisualizationTools'
 import PatScan from './pages/PatScan'
 import ClaudeCodeOS from './pages/ClaudeCodeOS'
+import ClaudeCodeOSMain from './pages/ClaudeCodeOSMain'
+import ClaudeCodeOSFlight from './pages/ClaudeCodeOSFlight'
+import ClaudeCodeOSPhoneCall from './pages/ClaudeCodeOSPhoneCall'
+import ClaudeCodeOSNews from './pages/ClaudeCodeOSNews'
 import VmClaude from './pages/VmClaude'
 import Rcp from './pages/Rcp'
 import ClaudeCaudio from './pages/ClaudeCaudio'
@@ -69,6 +73,10 @@ function App() {
         <Route path="/visualization-tools" element={<VisualizationTools />} />
         <Route path="/pat-scan" element={<PatScan />} />
         <Route path="/claude-code-os" element={<ClaudeCodeOS />} />
+        <Route path="/claude-code-os/main" element={<ClaudeCodeOSMain />} />
+        <Route path="/claude-code-os/flight" element={<ClaudeCodeOSFlight />} />
+        <Route path="/claude-code-os/phone-call" element={<ClaudeCodeOSPhoneCall />} />
+        <Route path="/claude-code-os/news" element={<ClaudeCodeOSNews />} />
         <Route path="/vm-claude" element={<VmClaude />} />
         <Route path="/rcp" element={<Rcp />} />
         <Route path="/claude-caudio" element={<ClaudeCaudio />} />

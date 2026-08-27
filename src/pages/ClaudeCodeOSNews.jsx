@@ -1,9 +1,25 @@
+import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 
-export default function Rcp() {
+export default function ClaudeCodeOSNews() {
   return (
     <Layout>
-      <article className="w-full py-16 px-4">
+      {/* Back to station */}
+      <div className="w-full pt-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Link
+            to="/claude-code-os"
+            className="inline-flex items-center gap-2 text-dark-muted hover:text-white text-sm transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            Back to Claude Code OS Station
+          </Link>
+        </div>
+      </div>
+
+      <article className="w-full py-8 px-4">
         <div className="max-w-2xl mx-auto prose-medium">
 
           {/* Landscape warning — only visible on narrow portrait screens */}
@@ -29,16 +45,8 @@ export default function Rcp() {
 
           {/* Title */}
           <section className="mb-8">
-            <h1>RCP: Remote Control Protocol</h1>
-            <p className="text-dark-muted text-lg mt-2">A preflight checklist for remote-controlled Claude Code</p>
-            <div className="flex flex-col items-start gap-2.5 mt-6">
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
-              </div>
-            </div>
+            <h1>Reddit &mdash; The Magazine Stand</h1>
+            <p className="text-dark-muted text-lg mt-2">The Reddit MCP test campaign behind the <code className="text-sm bg-neutral-800 px-1.5 py-0.5 rounded">/ask-reddit</code> skill</p>
           </section>
 
         </div>
@@ -46,10 +54,10 @@ export default function Rcp() {
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
           <iframe
-            src="/rcp-app/index.html"
-            title="RCP: Remote Control Protocol"
-            className="w-full border-none block"
-            style={{ height: '8000px', background: '#0a0a0a' }}
+            src="/reddit-app/index.html"
+            title="Reddit — The Magazine Stand"
+            className="w-full border-none block h-[4900px] md:h-[3500px]"
+            style={{ background: '#0a0a0a' }}
             scrolling="no"
           />
         </div>
