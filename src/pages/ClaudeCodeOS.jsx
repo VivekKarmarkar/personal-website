@@ -88,7 +88,7 @@ export default function ClaudeCodeOS() {
           {/* Intro */}
           <section className="mb-10 prose-medium">
             <p>
-              One station, two layers. The <strong>main layer</strong> is the system itself — a data portrait of a personalized operating system built on Claude Code, examined the way a physicist examines anything. The <strong>life layer</strong> is the same OS out in the world: three MCP test campaigns — flights, phone calls, news — each distilled into a repeatable skill.
+              One station, two platforms — and by the way, in our world we call platforms layers. The <strong>main layer</strong> is the system itself — a data portrait of a personalized operating system built on Claude Code, examined the way a physicist examines anything. The <strong>life layer</strong> is the same OS out in the world: three MCP test campaigns — flights, phone calls, news — each distilled into a repeatable skill.
             </p>
           </section>
 

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
+import ResolutionNotice from '../components/ResolutionNotice'
 
 export default function ClaudeCodeOSMain() {
   return (
@@ -22,13 +23,8 @@ export default function ClaudeCodeOSMain() {
       <article className="w-full py-8 px-4">
         <div className="max-w-2xl mx-auto prose-medium">
 
-          {/* Landscape warning — only visible on narrow portrait screens */}
-          <div
-            className="mb-6 rounded-lg px-4 py-3 text-sm text-center sm:hidden"
-            style={{ backgroundColor: '#f9731620', color: '#f97316', border: '1px solid #f9731640' }}
-          >
-            For the best experience on phone, rotate to <strong>landscape view</strong>
-          </div>
+          {/* Resolution guidance: portrait → landscape, laptop split → fullscreen */}
+          <ResolutionNotice />
 
           {/* Train Badge */}
           <div className="flex items-center gap-4 mb-8">
