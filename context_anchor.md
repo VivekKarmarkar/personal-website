@@ -1,0 +1,20 @@
+# Context Anchor
+
+Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is current unless it says otherwise. On compaction: read this file first.
+
+---
+
+## 2026-08-27 18:56 EDT — Caching is an issue; we fix it later, not now
+
+**Vivek's dictation (via goosemcptest relay):** caching IS an issue, and we will fix it later, not now.
+
+**The finding being anchored:** Vivek hit a dead "Back to Claude Code OS Station" link on his phone tonight. Six emulated reproduction attempts (desktop click, phone tap, early tap, overlay probe, iframe scan, hub scan) reproduced nothing — the link navigates correctly on every fresh load. Diagnosis: a **stale tab across tonight's multiple redeploys** — old bundle JS in his open tab tried to lazy-load route chunks the new deploy had purged, the router fetch failed silently, and the click appeared to do nothing. **Confirmed by Vivek: after a hard refresh on his phone, the link works.**
+
+**The deferred fix (do NOT build until he green-lights it):** chunk-load-error recovery — catch the failed dynamic-import/chunk fetch and reload the page once, so tabs left open across deploys self-heal instead of going dead.
+
+**Current shipped state alongside (as of this anchor):**
+- All fixes through commit `fce06a3` are live on vivekkarmarkar.vercel.app; main == origin/main, tree clean.
+- Tonight's arc: Claude Code OS layered hub (MAIN + LIFE → Flight/Phone Call/News) + three Pattern C ports (`1461847`) → device-first ResolutionNotice standard (`295f328`) → Vivek's 4-agent fix round: tiles/hub banner/additive SKILL.md cards with redactions (`65e4484`) → combined Codex+CC review fixes: AutoHeightIframe, narrow-phone CSS, 3-col actions, NNLego PyTorch comma (`f6ab1af`, hardened `de85cca`) → AutoHeightIframe propagated to /claude-code-os/main (`fce06a3`). All verified on live via reviewer↔fixer loop (5/5) + independent re-verification.
+- **Open item awaiting Vivek's call:** pre-existing internal horizontal overflow in the data portrait app (public/claude-code-os-app) at ≤350px widths — battle-tested class, not touched.
+
+*Subordinate additions (Claude, non-contradicting): the review union file lives at `goose-mcp-tests/mcp_lean_project_webpages/codex_and_cc_relay_session_combined_feedback.md`; the porting system's learned rules from tonight are appended in `porting_context.md`; the chunk-error recovery, when green-lit, belongs in the React shell (a lazy-route error boundary or a `vite:preloadError` listener in `src/main.jsx`) — noted here only so the future session starts in the right file.*
