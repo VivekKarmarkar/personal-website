@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import ResolutionNotice from '../components/ResolutionNotice'
+import AutoHeightIframe from '../components/AutoHeightIframe'
 
 export default function ClaudeCodeOSPhoneCall() {
   return (
@@ -49,12 +50,10 @@ export default function ClaudeCodeOSPhoneCall() {
 
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
-          <iframe
+          <AutoHeightIframe
             src="/voyp-app/index.html"
             title="VOYP — The Errand Caller"
-            className="w-full border-none block h-[5900px] md:h-[4650px]"
-            style={{ background: '#0a0a0a' }}
-            scrolling="no"
+            initialHeight={4650}
           />
         </div>
 

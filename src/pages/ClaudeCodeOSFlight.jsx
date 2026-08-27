@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import ResolutionNotice from '../components/ResolutionNotice'
+import AutoHeightIframe from '../components/AutoHeightIframe'
 
 export default function ClaudeCodeOSFlight() {
   return (
@@ -49,12 +50,10 @@ export default function ClaudeCodeOSFlight() {
 
         {/* Live App — wider than prose, outside the max-w-2xl container */}
         <div className="max-w-[1200px] mx-auto mb-12 px-4">
-          <iframe
+          <AutoHeightIframe
             src="/kiwi-app/index.html"
             title="Kiwi — The Flight Vending Machine"
-            className="w-full border-none block h-[4500px] md:h-[3200px]"
-            style={{ background: '#0a0a0a' }}
-            scrolling="no"
+            initialHeight={3200}
           />
         </div>
 

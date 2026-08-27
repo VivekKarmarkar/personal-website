@@ -27,7 +27,6 @@
 
     body {
       margin: 0;
-      min-width: 320px;
       background:
         radial-gradient(circle at 8% 4%, rgba(255, 122, 69, 0.08), transparent 25rem),
         radial-gradient(circle at 92% 16%, rgba(143, 173, 232, 0.06), transparent 28rem),
@@ -244,7 +243,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
       max-width: 980px;
       margin: 24px auto 0;
@@ -313,6 +312,11 @@
       .comparison-heading { display: block; }
       .comparison-heading p { margin-top: 12px; }
       .actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 380px) {
+      .page { width: calc(100% - 16px); }
+      .story-block { padding: 28px 0 32px; }
     }
 
     @media (prefers-reduced-motion: reduce) {

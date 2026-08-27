@@ -183,7 +183,7 @@ model = MLP(layer_sizes)`
       if (i < layers.length - 1) {
         const actClass = ACTIVATIONS[layers[i].activation].pytorch
         if (actClass) {
-          seqLayers.push(`            ${actClass}`)
+          seqLayers.push(`            ${actClass},`)
         }
       }
     }
