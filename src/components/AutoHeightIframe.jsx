@@ -54,10 +54,29 @@ export default function AutoHeightIframe({ src, title, initialHeight = 3000 }) {
 
     iframe.addEventListener('load', attach)
     if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') attach()
+    // Early re-attach: until the inner 'load' event fires (it waits on slow
+    // subresources, e.g. the VOYP page's YouTube embed) the observer may still
+    // be bound to the interstitial about:blank document, leaving the height
+    // stale. Re-attach on a short interval so the real document is observed
+    // as soon as it exists; stop once it is fully loaded (or after ~10s).
+    let ticks = 0
+    const early = setInterval(() => {
+      attach()
+      ticks += 1
+      let done = false
+      try {
+        const doc = iframe.contentDocument
+        done = !!(doc && doc.readyState === 'complete')
+      } catch {
+        /* keep polling */
+      }
+      if (done || ticks >= 20) clearInterval(early)
+    }, 500)
     window.addEventListener('resize', scheduleMeasure)
     window.addEventListener('orientationchange', scheduleMeasure)
 
     return () => {
+      clearInterval(early)
       iframe.removeEventListener('load', attach)
       window.removeEventListener('resize', scheduleMeasure)
       window.removeEventListener('orientationchange', scheduleMeasure)
