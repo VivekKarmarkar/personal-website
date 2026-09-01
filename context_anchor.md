@@ -25,4 +25,14 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 
 **Deployment:** "Agentic Research Beats Agentic Product Development — Hypothesis" ported as second W-line station (after AAD). Commit `459b973`, live at `https://vivekkarmarkar.vercel.app/agentic-research-vs-product`. Station label ARPD, Pattern A native rebuild (content-only essay — callout boxes, Research/Product comparison grid, no diagrams/citations/interactive elements). Source: `goose-mcp-tests/agentic_research_vs_product.html`. Verified on live at desktop 1440×900: W badge, orange HYPOTHESIS kicker, comparison grid two-column, all callouts rendered, prose verbatim. The ResolutionNotice component is applied (device-first standard, consistent with every other project page).
 
-**Tag updates (commit `0526f0d`):** Professor Claude green row → LiveKit / DevRel / AI Startups; three life pages (flight/phone-call/news) → orange Skills/MCPs/Agentic Coding + blue Life Automation + green DevRel; Claude Code LM blue row → +Workflow Automation (2nd), EdTech demoted to 3rd; ARPD → AAD's rows + equally-bright blue "Product Development".
+**Tag updates (commit `0526f0d`):** Professor Claude green row → LiveKit / DevRel / AI Startups; three life pages (flight/phone-call/news) → orange Skills/MCPs/Agentic Coding + blue Life Automation + green DevRel; Claude Code LM blue row → +Workflow Automation (2nd), EdTech demoted to 3rd; ARPD → AAD's rows + equally-bright blue "Product Development". **Follow-up (commit `2a2f0a3`):** life pages' first orange tag corrected from "Skills" to "Agent Skills."
+
+---
+
+## 2026-09-01 16:54 EDT — Current shipped state: all deployments live, tree clean
+
+**Shipped and verified live on vivekkarmarkar.vercel.app (main at `2a2f0a3`):**
+- ARPD deployed as second W-line station (`/agentic-research-vs-product`), Pattern A native rebuild with W badge, callout boxes, comparison grid, ResolutionNotice.
+- Tag updates across five pages: Professor Claude (LiveKit/DevRel/AI Startups green row), three life pages (Agent Skills/MCPs/Agentic Coding orange + Life Automation blue + DevRel green), Claude Code LM (+Workflow Automation blue, EdTech demoted), ARPD (AAD's rows + Product Development blue).
+- All prior fixes from the Aug 27 deployment round remain live: layered Claude Code OS hub, three Pattern C life pages with AutoHeightIframe, device-first ResolutionNotice across 12 pages, additive SKILL.md cards with privacy redactions, NNLego PyTorch comma fix.
+- Open items unchanged: stale-tab caching fix deferred (do NOT build until green-lit); data portrait sub-350px internal overflow awaiting Vivek's call.
