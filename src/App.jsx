@@ -38,6 +38,7 @@ import Rcp from './pages/Rcp'
 import ClaudeCaudio from './pages/ClaudeCaudio'
 import ClaudeCodeLM from './pages/ClaudeCodeLM'
 import AgenticAlgorithmDiscovery from './pages/AgenticAlgorithmDiscovery'
+import AgenticResearchVsProduct from './pages/AgenticResearchVsProduct'
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
         <Route path="/claude-caudio" element={<ClaudeCaudio />} />
         <Route path="/claude-code-lm" element={<ClaudeCodeLM />} />
         <Route path="/agentic-algorithm-discovery" element={<AgenticAlgorithmDiscovery />} />
+        <Route path="/agentic-research-vs-product" element={<AgenticResearchVsProduct />} />
       </Routes>
     </BrowserRouter>
   )

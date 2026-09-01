@@ -72,7 +72,7 @@ export const lines = {
     direction: 'All Islands Express',
     color: 'mta-brown',
     colorHex: '#996633',
-    stations: ['agentic-algorithm-discovery'],
+    stations: ['agentic-algorithm-discovery', 'agentic-research-vs-product'],
   },
   G: {
     id: 'G',

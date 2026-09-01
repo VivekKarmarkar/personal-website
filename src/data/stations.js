@@ -136,6 +136,14 @@ export const stations = {
     description: 'The case for letting AI agents discover the algorithms',
     url: '/agentic-algorithm-discovery',
   },
+  'agentic-research-vs-product': {
+    id: 'agentic-research-vs-product',
+    name: 'ARPD',
+    fullName: 'Agentic Research Beats Agentic Product Development',
+    position: 55,
+    description: 'Why one-shotting works for research and fails for novel products',
+    url: '/agentic-research-vs-product',
+  },
   'imu-le': {
     id: 'imu-le',
     name: 'IMU-LE',
