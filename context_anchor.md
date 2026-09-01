@@ -18,3 +18,9 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 - **Open item awaiting Vivek's call:** pre-existing internal horizontal overflow in the data portrait app (public/claude-code-os-app) at ≤350px widths — battle-tested class, not touched.
 
 *Subordinate additions (Claude, non-contradicting): the review union file lives at `goose-mcp-tests/mcp_lean_project_webpages/codex_and_cc_relay_session_combined_feedback.md`; the porting system's learned rules from tonight are appended in `porting_context.md`; the chunk-error recovery, when green-lit, belongs in the React shell (a lazy-route error boundary or a `vite:preloadError` listener in `src/main.jsx`) — noted here only so the future session starts in the right file.*
+
+---
+
+## 2026-09-01 15:33 EDT — ARPD deployed as second W-line station
+
+**Deployment:** "Agentic Research Beats Agentic Product Development — Hypothesis" ported as second W-line station (after AAD). Commit `459b973`, live at `https://vivekkarmarkar.vercel.app/agentic-research-vs-product`. Station label ARPD, Pattern A native rebuild (content-only essay — callout boxes, Research/Product comparison grid, no diagrams/citations/interactive elements). Source: `goose-mcp-tests/agentic_research_vs_product.html`. Verified on live at desktop 1440×900: W badge, orange HYPOTHESIS kicker, comparison grid two-column, all callouts rendered, prose verbatim. The ResolutionNotice component is applied (device-first standard, consistent with every other project page).
