@@ -46,7 +46,7 @@ export default function ClaudeCodeOSPhoneCall() {
             <p className="text-dark-muted text-lg mt-2">The VOYP MCP test campaign behind the <code className="text-sm bg-neutral-800 px-1.5 py-0.5 rounded">/call-voyp</code> skill</p>
             <div className="flex flex-col items-start gap-2.5 mt-6">
               <div className="flex gap-3 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Skills</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Agent Skills</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316b0', border: '1px solid #f9731630' }}>MCPs</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f9731680', border: '1px solid #f9731620' }}>Agentic Coding</span>
               </div>
