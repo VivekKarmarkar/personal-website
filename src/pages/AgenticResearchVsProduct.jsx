@@ -36,6 +36,19 @@ export default function AgenticResearchVsProduct() {
             <h1>Agentic Research Beats Agentic Product Development</h1>
             <p className="text-dark-muted text-lg mt-4" style={{ marginBottom: 0 }}>Why a coding agent can one-shot a novel algorithm but not a novel product &mdash; and what that means for how you build each.</p>
             <p className="mt-5" style={{ color: '#8888aa', fontSize: '15px', letterSpacing: '0.5px', marginBottom: 0 }}>1 September 2026</p>
+            <div className="flex flex-col items-start gap-2.5 mt-6">
+              <div className="flex gap-3 flex-wrap">
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Agentic Coding</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316b0', border: '1px solid #f9731630' }}>Claude Code</span>
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Algorithm Discovery</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Product Development</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
+              </div>
+            </div>
           </section>
 
           {/* The observation */}

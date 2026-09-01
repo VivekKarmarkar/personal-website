@@ -518,7 +518,8 @@ export default function ClaudeCodeLM() {
               </div>
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Document Analysis</span>
-                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8a0', border: '1px solid #38bdf825' }}>EdTech</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8b0', border: '1px solid #38bdf830' }}>Workflow Automation</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf880', border: '1px solid #38bdf820' }}>EdTech</span>
               </div>
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
