@@ -515,6 +515,7 @@ export default function ClaudeCodeLM() {
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316', border: '1px solid #f9731640' }}>Claude Code</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f97316b0', border: '1px solid #f9731630' }}>Agentic AI</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#f9731680', border: '1px solid #f9731620' }}>Technical Storytelling</span>
               </div>
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#38bdf8', border: '1px solid #38bdf840' }}>Document Analysis</span>
@@ -524,6 +525,7 @@ export default function ClaudeCodeLM() {
               <div className="flex gap-3 flex-wrap">
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80', border: '1px solid #4ade8040' }}>AI Startups</span>
                 <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade80a0', border: '1px solid #4ade8025' }}>NotebookLM Team</span>
+                <span className="px-4 py-1.5 rounded-full text-sm" style={{ color: '#4ade8080', border: '1px solid #4ade8020' }}>DevRel</span>
               </div>
             </div>
           </section>
