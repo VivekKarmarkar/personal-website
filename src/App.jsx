@@ -33,7 +33,6 @@ import ClaudeCodeOSMain from './pages/ClaudeCodeOSMain'
 import ClaudeCodeOSFlight from './pages/ClaudeCodeOSFlight'
 import ClaudeCodeOSPhoneCall from './pages/ClaudeCodeOSPhoneCall'
 import ClaudeCodeOSNews from './pages/ClaudeCodeOSNews'
-import ClaudeCodeOSSubway from './pages/ClaudeCodeOSSubway'
 import VmClaude from './pages/VmClaude'
 import Rcp from './pages/Rcp'
 import ClaudeCaudio from './pages/ClaudeCaudio'
@@ -79,7 +78,6 @@ function App() {
         <Route path="/claude-code-os/flight" element={<ClaudeCodeOSFlight />} />
         <Route path="/claude-code-os/phone-call" element={<ClaudeCodeOSPhoneCall />} />
         <Route path="/claude-code-os/news" element={<ClaudeCodeOSNews />} />
-        <Route path="/claude-code-os/subway" element={<ClaudeCodeOSSubway />} />
         <Route path="/vm-claude" element={<VmClaude />} />
         <Route path="/rcp" element={<Rcp />} />
         <Route path="/claude-caudio" element={<ClaudeCaudio />} />

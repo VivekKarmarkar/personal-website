@@ -8,7 +8,6 @@ const LIFE_EXITS = [
   { label: 'Flight', street: 'Kiwi — The Flight Vending Machine', to: '/claude-code-os/flight' },
   { label: 'Phone Call', street: 'VOYP — The Errand Caller', to: '/claude-code-os/phone-call' },
   { label: 'News', street: 'Reddit — The Magazine Stand', to: '/claude-code-os/news' },
-  { label: 'Subway', street: 'Metro — The Subway Navigator', to: '/claude-code-os/subway' },
 ]
 
 function LayerChip({ children }) {
