@@ -70,3 +70,17 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 **3/4 Phone Call (VOYP) — done, commit `f1693a0`.** Native rebuild of `codex_voyp_lean_project_website.html`; hero byte-identical at `public/images/voyp/hero_voyp.png`; comparison table + video panel reproduced with the source's own values and compared side by side (desktop + phone); fidelity 31/31; `public/voyp-app` removed.
 
 **4/4 News (Reddit) — done, commit `48843a1`.** Native rebuild of `codex_reddit_lean_project_website.html`; hero byte-identical at `public/images/reddit/hero_reddit.png`; fidelity 17/17; figures compared side by side; `public/reddit-app` removed. **Round complete: all four pages native, no iframes remain on the life layer or ClaudeSense.** Open: Vivek says the ClaudeSense flowchart shown is "not the flowchart" — awaiting his pointer to the artifact he means; no ClaudeSense changes until then.
+
+---
+
+## 2026-09-02 19:31 EDT — Site state after the native rebuild round (Vivek: "OK, this lands. This is really fucking awesome.")
+
+**Vivek's verdict (via goosemcptest, from Telegram):** "OK, this lands. This is really fucking awesome."
+
+**Current shipped state (main at `348aa7e`, tree clean, all verified on live):**
+- Claude Code OS station: layered hub (MAIN → `/claude-code-os/main` data portrait iframe, untouched; LIFE → Flight `/claude-code-os/flight`, Phone Call `/claude-code-os/phone-call`, News `/claude-code-os/news`). The three life pages are now NATIVE React pages (Pattern A) — hero explainers byte-identical in `public/images/{kiwi,voyp,reddit}/`, SKILL.md views in `public/skill-files/` (call-voyp redacted), no iframes. Metro exit removed 2026-09-02 — do not redeploy without his go.
+- D line: WONYP → GPT-Bhojan → Dancer Claude → Professor Claude → ClaudeCodeLM → ClaudeSense (`/claudesense`, native, flow chart reproduced from the source; tags Claude Code → Agentic Coding → Embodied AI).
+- W line: AAD → ARPD (`/agentic-research-vs-product`).
+- Device-first ResolutionNotice on every project page; AutoHeightIframe only where iframes remain (`/claude-code-os/main`).
+- Andon showcase: preview branch `preview/andon-showcase` + Vercel preview 6232703242 still exist, gated by Vercel Authentication — teardown staged, awaiting Vivek's word. Housing and Claude-art showcases: no deliverables yet; nothing ships without his go.
+- Open: Vivek says the ClaudeSense chain is "not the flowchart" he means — awaiting his pointer; ClaudeSense untouched until relayed. Deferred: stale-tab chunk-load recovery (do not build until green-lit); data portrait sub-350px internal overflow.
