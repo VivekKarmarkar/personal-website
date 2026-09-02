@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Phone — Interactive Scatter</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0f1019;
+  color: #e0e0e0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-header {
+  text-align: center;
+  padding: 48px 24px 16px;
+}
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.page-header .subtitle {
+  color: #a0a0a0;
+  font-size: 15px;
+  margin-top: 8px;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hint-bar {
+  text-align: center;
+  padding: 12px 24px;
+  font-size: 14px;
+  color: #a0a0a0;
+}
+.hint-bar .icon { font-size: 16px; }
+.hint-bar em { color: #f97316; font-style: normal; font-weight: 700; }
+
+.chart-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+  position: relative;
+}
+
+#scatter-canvas {
+  width: 100%;
+  aspect-ratio: 1060 / 520;
+  background: #13151f;
+  border-radius: 12px;
+  border: 1px solid #23263a;
+  cursor: crosshair;
+  display: block;
+}
+
+.now-playing {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+.now-playing-inner {
+  background: #161822;
+  border: 1px solid #23263a;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 72px;
+  transition: border-color 0.3s;
+}
+.now-playing-inner.active {
+  border-color: #f97316;
+}
+.np-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+.np-text {
+  flex: 1;
+}
+.np-label {
+  font-size: 17px;
+  font-weight: 700;
+  color: #e0e0e0;
+}
+.np-label.idle { color: #666; font-weight: 400; }
+.np-detail {
+  font-size: 13px;
+  color: #a0a0a0;
+  margin-top: 4px;
+}
+.np-progress-wrap {
+  width: 100%;
+  height: 3px;
+  background: #23263a;
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.np-progress {
+  height: 100%;
+  background: #f97316;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.2s linear;
+}
+
+#audio-player { color-scheme: dark; }
+
+.legend-bar {
+  max-width: 1100px;
+  margin: 0 auto 16px;
+  padding: 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #a0a0a0;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.compare-bar {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.compare-btn {
+  background: #161822;
+  border: 1px solid #23263a;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: #e0e0e0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.compare-btn:hover {
+  border-color: #f97316;
+  background: #1a1d2e;
+}
+.compare-btn .btn-icon { margin-right: 6px; }
+
+.back-link {
+  text-align: center;
+  padding: 24px;
+}
+.back-link a {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.back-link a:hover { color: #e0e0e0; }
+
+@media (max-width: 640px) {
+  .page-header { padding: 32px 16px 12px; }
+  .page-header h1 { font-size: 22px; }
+  .chart-container { padding: 0 12px 16px; }
+  #scatter-canvas { aspect-ratio: 1 / 1.1; }
+  .now-playing { padding: 0 12px; }
+  .compare-bar { flex-direction: column; align-items: center; }
+}
+/* Embedded mode (inside index.html iframe): index.html already shows the title + hint above the frame */
+body.embedded .page-header, body.embedded .hint-bar, body.embedded .back-link { display: none; }
+body.embedded .legend-bar { padding-top: 16px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>135 Calls — Click to Listen</h1>
+  <p class="subtitle">Every call plotted on time × engagement. The glowing dots are real calls — click one to hear what happened.</p>
+</div>
+
+<div class="hint-bar">
+  <span class="icon">🔊</span> <em>Glowing dots</em> have real call audio. Click to play. Hover any dot for details.
+</div>
+
+<div class="legend-bar">
+  <div class="legend-item"><div class="legend-dot" style="background:#d4a940"></div>no human response (n=90)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#999"></div>human minimal (n=24)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>AI response (n=13)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>human substantive (n=5)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>profanity abuse (n=3)</div>
+</div>
+
+<div class="chart-container">
+  <canvas id="scatter-canvas" width="1060" height="520"></canvas>
+  <div id="tooltip" style="position:absolute;display:none;background:#1e2030;border:1px solid #33364a;border-radius:8px;padding:10px 14px;font-size:13px;color:#ccc;pointer-events:none;max-width:300px;z-index:10;"></div>
+</div>
+
+<div class="now-playing">
+  <div class="now-playing-inner" id="np-panel">
+    <div class="np-icon" id="np-icon">📞</div>
+    <div class="np-text">
+      <div class="np-label idle" id="np-label">Click a glowing dot to hear a real call</div>
+      <div class="np-detail" id="np-detail"></div>
+      <audio id="audio-player" preload="none" controls style="display:none; width:100%; margin-top:10px"></audio>
+    </div>
+  </div>
+</div>
+
+<div class="compare-bar">
+  <button class="compare-btn" onclick="playCompare('ai')"><span class="btn-icon">🔵</span> Hear an AI call</button>
+  <button class="compare-btn" onclick="playCompare('human')"><span class="btn-icon">🟢</span> Hear a human call</button>
+  <button class="compare-btn" onclick="playCompare('hostile')"><span class="btn-icon">🔴</span> Hear a hostile call</button>
+</div>
+
+<div class="back-link">
+  <a href="index.html" target="_top">← Back to Claude Phone</a>
+</div>
+
+<script>
+if (window.self !== window.top) document.body.classList.add('embedded');
+const DATA = [{"id":"conv_3401ksgw6qnje609db6py2s7wwhy","ts":"2026-05-25T19:50:55","dur":2.02,"dur_s":121,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1801ksgwjkd2e1ya64t6f6kfh62r","ts":"2026-05-25T19:57:33","dur":0.75,"dur_s":45,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6701ksgxtcrje3fr6jgfa6ts3dbd","ts":"2026-05-25T20:19:08","dur":1.38,"dur_s":83,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1701ksgy67twedyv2g0wrj2e7syt","ts":"2026-05-25T20:25:36","dur":1.32,"dur_s":79,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4601ksgyppp2ewc977hqf7rw0yge","ts":"2026-05-25T20:34:36","dur":0.57,"dur_s":34,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5001ksgypt24ft7shez30dz8qef6","ts":"2026-05-25T20:34:39","dur":1.52,"dur_s":91,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_0201ksgypxk9f56tnqqec0y26npv","ts":"2026-05-25T20:34:43","dur":0.32,"dur_s":19,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8901ksgyq0x2f3rt4n95ebyyhpxj","ts":"2026-05-25T20:34:45","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3401ksgyq40kfbvb15czrr1ws59v","ts":"2026-05-25T20:34:49","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9401ksgyq6m5f4w91b1rxz0g77se","ts":"2026-05-25T20:34:51","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2701ksgyq9qhe3rv90dhatytyax7","ts":"2026-05-25T20:34:54","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6401ksgyqc6petsb54zqfbghperg","ts":"2026-05-25T20:34:57","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8501ksgyqevzf6eaxfqb9k3s1dh3","ts":"2026-05-25T20:35:00","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1301ksgyz78aeshasj8tyhva9rp5","ts":"2026-05-25T20:39:15","dur":0.47,"dur_s":28,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1001ksgyzaf0exz8wneyg68xq987","ts":"2026-05-25T20:39:57","dur":0.68,"dur_s":41,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8501ksgz0kkafwjbhdbr35p91fzg","ts":"2026-05-25T20:40:15","dur":0.17,"dur_s":10,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5001ksgz85cpf56rtjw5e0b5qwry","ts":"2026-05-25T20:44:37","dur":0.55,"dur_s":33,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_0001ksgz95eeejw81gxnpw6scakq","ts":"2026-05-25T20:44:55","dur":0.18,"dur_s":11,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6101ksgz9q3ke2xsq1gaqng6spt8","ts":"2026-05-25T20:45:17","dur":1.98,"dur_s":119,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2201ksgzrxrkfykr6rrbyc905tgc","ts":"2026-05-25T20:53:17","dur":0.87,"dur_s":52,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5601ksgzs13yfemrdb49frxggbpf","ts":"2026-05-25T20:53:32","dur":0.4,"dur_s":24,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_1201ksgzsfy1f1zrycp6ecpa4xj0","ts":"2026-05-25T20:53:36","dur":0.48,"dur_s":29,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_0801ksh0596meqets77mzg4bsx5m","ts":"2026-05-25T21:00:09","dur":0.32,"dur_s":19,"b":"human minimal","agent":"Restaurant Inquiries","audio":"minimal","audioLabel":"Minimal — full call: 'Hello? Hello? Hello?' (no engagement)"},{"id":"conv_6601ksh05ke5e8fsn47ttskmafft","ts":"2026-05-25T21:00:22","dur":0.22,"dur_s":13,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9301ksh06167eac8ettamvk6xsyf","ts":"2026-05-25T21:00:44","dur":0.3,"dur_s":18,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_9201ksh0fe1wfpd8vwzkd6r7gj35","ts":"2026-05-25T21:05:46","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6901ksh0fwmmfg1tk5adat7b4h87","ts":"2026-05-25T21:06:05","dur":0.88,"dur_s":53,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_9201ksh0gfhgf39bt1w6f3x18t93","ts":"2026-05-25T21:06:24","dur":0.63,"dur_s":38,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6801ksh0wy0nf2mr7a574yvptcrw","ts":"2026-05-25T21:13:34","dur":0.35,"dur_s":21,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6401ksh0y6epe2ws178wv1hbnq4h","ts":"2026-05-25T21:14:10","dur":0.3,"dur_s":18,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3001ksh0z8mvf9ntnpqzdshs1pqc","ts":"2026-05-25T21:14:15","dur":0.98,"dur_s":59,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8701ksh12v1ge9drvp46maz7b5gh","ts":"2026-05-25T21:16:16","dur":2.07,"dur_s":124,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2001ksh133kgf8zv8g51s6wkayc3","ts":"2026-05-25T21:16:37","dur":0.35,"dur_s":21,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_4801ksh13r39fr6tnpyez8npf979","ts":"2026-05-25T21:17:39","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1101ksh187ggetvaxhtp64whswz4","ts":"2026-05-25T21:19:24","dur":0.65,"dur_s":39,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6501ksh18vk4fdzrcyb7808fnshm","ts":"2026-05-25T21:19:39","dur":0.45,"dur_s":27,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_9301ksh19a6het09hc49e75mbb68","ts":"2026-05-25T21:19:43","dur":2.02,"dur_s":121,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2401ksh1e9k9f13sx7vgkk51k07c","ts":"2026-05-25T21:22:26","dur":0.32,"dur_s":19,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3801ksh1ed22f6zve3fvqkhx9pgz","ts":"2026-05-25T21:22:30","dur":1.12,"dur_s":67,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3501ksh1eghafmpat9mk1xz58nag","ts":"2026-05-25T21:22:34","dur":1.47,"dur_s":88,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6301ksh1mnaafdevtd9888qcea1s","ts":"2026-05-25T21:26:08","dur":0.3,"dur_s":18,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_3401ksh1n5hfehkr2mpk5gjfy5md","ts":"2026-05-25T21:26:20","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8301ksh1nhmxf1trtewksq7eepfe","ts":"2026-05-25T21:26:45","dur":0.82,"dur_s":49,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4901ksh1sd02ec18st75vmrnvb6e","ts":"2026-05-25T21:28:30","dur":0.3,"dur_s":18,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5501ksh1sh59f43br6rxb71kk34j","ts":"2026-05-25T21:29:11","dur":1.18,"dur_s":71,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3401ksh1vf2sf5gt3vrq8s3nfbwa","ts":"2026-05-25T21:29:51","dur":0.43,"dur_s":26,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_1101ksjmc8nreb2rsh982m5eb63m","ts":"2026-05-26T12:12:46","dur":0.28,"dur_s":17,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_8601ksjmgq6refsagj6gwqfpp1gt","ts":"2026-05-26T12:16:02","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8801ksjmjw9xfswrn4hqwse2gga8","ts":"2026-05-26T12:16:24","dur":0.72,"dur_s":43,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_7501ksjmqz3ye36spbfq6geqzx5r","ts":"2026-05-26T12:19:21","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1801ksjmx6gjf51r16wasxnyq8y7","ts":"2026-05-26T12:21:57","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6301ksjmxxvpfnn8mpgexedzdhws","ts":"2026-05-26T12:23:15","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9901ksjmzvb4ege9f0aqnx9nz4vy","ts":"2026-05-26T12:23:28","dur":0.12,"dur_s":7,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4601ksjn0x2ceex83hw0hfd8mcv5","ts":"2026-05-26T12:24:42","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9001ksjn377kfzqvewtav606q958","ts":"2026-05-26T12:25:18","dur":0.17,"dur_s":10,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4701ksjn9k1aea59tefdmzm99gk9","ts":"2026-05-26T12:28:41","dur":0.43,"dur_s":26,"b":"human substantive","agent":"Restaurant Inquiries","audio":"dessert","audioLabel":"Dessert Place — full call (names muted)"},{"id":"conv_9201ksjnrndfedz8chrwftzxw43w","ts":"2026-05-26T12:36:52","dur":2.07,"dur_s":124,"b":"human substantive","agent":"Restaurant Inquiries"},{"id":"conv_9701ksjnrsahesc9mystjdx1pdtq","ts":"2026-05-26T12:37:25","dur":0.6,"dur_s":36,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4801ksjth2qwerktfprttkwm0m5k","ts":"2026-05-26T14:00:08","dur":0.67,"dur_s":40,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3801ksjth959e2cvmmrpmsma4c4x","ts":"2026-05-26T14:00:30","dur":0.5,"dur_s":30,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_7901ksjthxzzfey90ftn6tga6j5z","ts":"2026-05-26T14:00:35","dur":0.75,"dur_s":45,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6001ksjtmdfcej2sxxj7246rzt9y","ts":"2026-05-26T14:02:14","dur":0.62,"dur_s":37,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5401ksjtn3wwetnsgtyntdfgjk0v","ts":"2026-05-26T14:02:50","dur":0.3,"dur_s":18,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_0801ksjv80vzfgmsdrkk3wnnta5p","ts":"2026-05-26T14:12:49","dur":0.38,"dur_s":23,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_1901ksjv8f0tf0tb133vrkfjfnb1","ts":"2026-05-26T14:12:53","dur":4.87,"dur_s":292,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_3101ksjv8k6xe1cvd6ks2j8gq63c","ts":"2026-05-26T14:12:57","dur":0.3,"dur_s":18,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_4701ksjvj7e4ef3rf6eqtsqgsfj5","ts":"2026-05-26T14:18:12","dur":0.62,"dur_s":37,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5101ksjvja80fxyaj9e4nh7049x7","ts":"2026-05-26T14:18:16","dur":0.5,"dur_s":30,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9101ksjvq30demqs136a4bqcftxg","ts":"2026-05-26T14:20:53","dur":2.15,"dur_s":129,"b":"human substantive","agent":"Restaurant Inquiries"},{"id":"conv_8801ksjvq8b8eddaxen210hpmqfd","ts":"2026-05-26T14:21:16","dur":0.22,"dur_s":13,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6701ksjvqyt5evyb9bv6wx378me1","ts":"2026-05-26T14:21:20","dur":0.68,"dur_s":41,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1301ksjwnfbqfjrs5sba85qdmb1j","ts":"2026-05-26T14:37:46","dur":0.47,"dur_s":28,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_2701ksjwp4atezmtjryhwrgdzjhe","ts":"2026-05-26T14:38:03","dur":1.03,"dur_s":62,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_1301ksjwr023ea896ewzb6g3dg56","ts":"2026-05-26T14:39:07","dur":0.22,"dur_s":13,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9801ksjwrmh7ek6ttn5qhxkptczk","ts":"2026-05-26T14:39:24","dur":2.73,"dur_s":164,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2101ksjxprsqewzvk4gdk5ke2xpa","ts":"2026-05-26T14:55:43","dur":1.15,"dur_s":69,"b":"AI response","agent":"Restaurant Inquiries"},{"id":"conv_7901ksjxs077ebebxy13z4axgva6","ts":"2026-05-26T14:57:16","dur":0.63,"dur_s":38,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_5301ksjydmdpfekaann6b6j2mata","ts":"2026-05-26T15:08:14","dur":12.05,"dur_s":723,"b":"AI response","agent":"AI Boutique Call","audio":"luna","audioLabel":"AI Boutique — the full 12-minute conversation, exactly as recorded"},{"id":"conv_7701ksjydy9gejjbyjawtrc392mg","ts":"2026-05-26T15:08:18","dur":7.18,"dur_s":431,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_5001ksjye2sjevv93qzvemhcmhqe","ts":"2026-05-26T15:08:23","dur":5.65,"dur_s":339,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_7601ksjyeehsfnksn1pr761vxdp2","ts":"2026-05-26T15:08:33","dur":0.0,"dur_s":0,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_0201ksjyfd83ejysy3g3yt029z2b","ts":"2026-05-26T15:09:05","dur":0.0,"dur_s":0,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_3101ksjyg3h2fcvrgkzgrfm9258a","ts":"2026-05-26T15:09:28","dur":0.0,"dur_s":0,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_7301ksjz1b47ervrbz02xna611q2","ts":"2026-05-26T15:18:53","dur":3.12,"dur_s":187,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_7401ksjzacnner3ab3n25yw0kh8d","ts":"2026-05-26T15:24:15","dur":0.6,"dur_s":36,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_2301ksk58qzxfmwry330bryw8zc6","ts":"2026-05-26T17:07:53","dur":6.45,"dur_s":387,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_3901ksk591csfngts83vxx4e3a43","ts":"2026-05-26T17:07:57","dur":5.45,"dur_s":327,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_2601ksk594she5wtm5p7qpdsxhjr","ts":"2026-05-26T17:08:01","dur":5.93,"dur_s":356,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_5301ksk598b6f419njf54y1c8zcp","ts":"2026-05-26T17:08:03","dur":0.0,"dur_s":0,"b":"no human response","agent":"AI Boutique Call"},{"id":"conv_5901ksk68a2de74taqh3367mpm86","ts":"2026-05-26T17:25:09","dur":3.77,"dur_s":226,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_9301ksk6whm6es1r9wvpg02w4wvz","ts":"2026-05-26T17:36:05","dur":0.0,"dur_s":0,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_5701ksk6xb40fdmtjgj809ykanvh","ts":"2026-05-26T17:36:31","dur":0.37,"dur_s":22,"b":"no human response","agent":"Other Inquiries"},{"id":"conv_1301ksk7yhp8e7ns2y87nwvz1tnw","ts":"2026-05-26T17:54:39","dur":1.53,"dur_s":92,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_4401ksk80e6afqtah56gchwcawyf","ts":"2026-05-26T17:55:41","dur":1.53,"dur_s":92,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_3701ksk815nzehyanjp0c89yz7jj","ts":"2026-05-26T17:56:05","dur":1.53,"dur_s":92,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_6801ksk81vz8eapb07f5kf0qzvkz","ts":"2026-05-26T17:56:28","dur":1.53,"dur_s":92,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_5501ksk82evsf3nrfj4rye1a1gb1","ts":"2026-05-26T17:56:46","dur":0.0,"dur_s":0,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_7901ksk8c2yyfa39k4588940fssm","ts":"2026-05-26T18:02:03","dur":2.48,"dur_s":149,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_0501ksk8kj3ffnn8bggrgdm21jrk","ts":"2026-05-26T18:06:08","dur":2.48,"dur_s":149,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_1701ksk8vsfbesn82mf13nh8d7xt","ts":"2026-05-26T18:10:37","dur":3.27,"dur_s":196,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_5601ksk93fjrf2yvvn9sdrd39677","ts":"2026-05-26T18:14:49","dur":2.5,"dur_s":150,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_8401ksk9a4theaxt0ez0kma1gtk4","ts":"2026-05-26T18:18:28","dur":1.72,"dur_s":103,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_2201ksk9fjs3fyks9xn9hhcv86jw","ts":"2026-05-26T18:21:26","dur":2.48,"dur_s":149,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_2301kskdazvbeskae0mgkj78vbvh","ts":"2026-05-26T19:28:50","dur":1.47,"dur_s":88,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_6901kskdk8eeeqv8y9dq768nqtzv","ts":"2026-05-26T19:33:21","dur":1.47,"dur_s":88,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_6001kskdrjmvends2qzndb5qs32d","ts":"2026-05-26T19:36:15","dur":1.37,"dur_s":82,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_4201kskdxy6rfe1vb5e3k03xes9z","ts":"2026-05-26T19:39:11","dur":1.37,"dur_s":82,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_9301kske37hdebj9n84n8nn49v8h","ts":"2026-05-26T19:42:04","dur":1.37,"dur_s":82,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_2001kskf5dbye1fsa1hpjxn53ann","ts":"2026-05-26T20:00:52","dur":0.7,"dur_s":42,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6501kskf5rzne4vabxfj023718xa","ts":"2026-05-26T20:01:05","dur":0.72,"dur_s":43,"b":"human substantive","agent":"Restaurant Inquiries","audio":"indian","audioLabel":"Indian Restaurant — full call, terse but substantive"},{"id":"conv_1201kskg0w71fzdsf4xqcqcysndf","ts":"2026-05-26T20:15:49","dur":0.45,"dur_s":27,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_5801kskh1qrse6m9sbm393n1tamd","ts":"2026-05-26T20:33:50","dur":0.48,"dur_s":29,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6701kskkmyvbeats1ztabwca3k3a","ts":"2026-05-26T21:19:30","dur":0.33,"dur_s":20,"b":"profanity abuse","agent":"Restaurant Inquiries"},{"id":"conv_4301kskm2tnwe0csh9bghb87sf0t","ts":"2026-05-26T21:26:53","dur":0.28,"dur_s":17,"b":"profanity abuse","agent":"Pizza Place Call","audio":"prof1","audioLabel":"Pizza Place — full call (identifying details muted): 'Yeah, fuck off, AI.'"},{"id":"conv_8101kskmf9tde9ta4jakscpc8te4","ts":"2026-05-26T21:33:44","dur":0.23,"dur_s":14,"b":"no human response","agent":"Pizza Place Call"},{"id":"conv_4901kskmktyqebsbkegc6n0yf7mf","ts":"2026-05-26T21:36:12","dur":0.35,"dur_s":21,"b":"profanity abuse","agent":"Pizza Place Call","audio":null},{"id":"conv_6101kskpkj9vfk3rq1dnxna9cf6e","ts":"2026-05-26T22:10:48","dur":1.07,"dur_s":64,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_9701kskpknjxfthbtqwvjxvhez8r","ts":"2026-05-26T22:10:51","dur":0.73,"dur_s":44,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_8501kskpm1mgf60sg9wssr731e2x","ts":"2026-05-26T22:11:04","dur":1.55,"dur_s":93,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_1401kskprskye9hatwm6xzb5v0xk","ts":"2026-05-26T22:13:58","dur":0.58,"dur_s":35,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_2401kskpsrkeetct73jxksvjn797","ts":"2026-05-26T22:14:16","dur":1.23,"dur_s":74,"b":"human substantive","agent":"Restaurant Inquiries"},{"id":"conv_7701kskpt8hnfj7azhnr1gzcj72b","ts":"2026-05-26T22:14:52","dur":0.25,"dur_s":15,"b":"human minimal","agent":"Restaurant Inquiries"},{"id":"conv_6401kskpywwbecvv0t536557y29h","ts":"2026-05-26T22:16:59","dur":1.27,"dur_s":76,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_2901kskpz6x4ft9sn5jzhd27h95v","ts":"2026-05-26T22:17:40","dur":0.43,"dur_s":26,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_0001kskq0edyeb28bdf2jqmpdv9h","ts":"2026-05-26T22:18:29","dur":0.68,"dur_s":41,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_6301kskq551ffdnszw352xe3fqzy","ts":"2026-05-26T22:20:25","dur":0.0,"dur_s":0,"b":"no human response","agent":"Restaurant Inquiries"},{"id":"conv_5501kskqs2q0ffdvqe2nqn42je4b","ts":"2026-05-26T22:31:23","dur":1.02,"dur_s":61,"b":"AI response","agent":"Restaurant Inquiries"},{"id":"conv_4001kskrc8xmf6wa89kg8f1mzs96","ts":"2026-05-26T22:41:55","dur":6.2,"dur_s":372,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_2701kskswdqpeyxbft1dt7e84dz4","ts":"2026-05-26T23:08:12","dur":4.13,"dur_s":248,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_0801kskvegcfe0sra79dy0fkph42","ts":"2026-05-26T23:35:37","dur":6.53,"dur_s":392,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_1201kskwb28ve65a8s2jcqxnq23y","ts":"2026-05-26T23:51:06","dur":7.15,"dur_s":429,"b":"AI response","agent":"AI Boutique Call"},{"id":"conv_2401ksn7dxevfh48ty0hybfjcq3n","ts":"2026-05-27T12:24:03","dur":1.38,"dur_s":83,"b":"no human response","agent":"IVR Stress Test"},{"id":"conv_8101ksnas24pe4vt4zcefj0bt63x","ts":"2026-05-27T13:22:50","dur":0.6,"dur_s":36,"b":"human minimal","agent":"AI Boutique Call"},{"id":"conv_8001ksnasr8nepdssymdakk9n0y1","ts":"2026-05-27T13:23:02","dur":2.32,"dur_s":139,"b":"no human response","agent":"AI Boutique Call"},{"id":"conv_4201ksnat21qf9e9k1k9z3r07970","ts":"2026-05-27T13:23:07","dur":0.83,"dur_s":50,"b":"no human response","agent":"AI Boutique Call"}];
+
+const COLORS = {
+  'no human response': '#d4a940',
+  'human minimal': '#999',
+  'AI response': '#3b82f6',
+  'human substantive': '#22c55e',
+  'profanity abuse': '#ef4444',
+};
+
+// Full call recordings. The AI-boutique call is exactly as recorded; in the
+// human-business calls, spoken person/business names are muted.
+const AUDIO_FILES = {
+  dessert: 'assets/audio/full_dessert.mp3',
+  minimal: 'assets/audio/full_minimal.mp3',
+  prof1: 'assets/audio/full_pizza.mp3',
+  indian: 'assets/audio/full_indian.mp3',
+  luna: 'assets/audio/full_luna.mp3',
+};
+
+// Effective engagement, matching the narrated video: calls that never reached
+// anyone (IVR loops, busy, no answer) sit on the floor at 0 minutes.
+const effMin = d => d.b === 'no human response' ? 0 : d.dur;
+
+const canvas = document.getElementById('scatter-canvas');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+const player = document.getElementById('audio-player');
+const npPanel = document.getElementById('np-panel');
+const npIcon = document.getElementById('np-icon');
+const npLabel = document.getElementById('np-label');
+const npDetail = document.getElementById('np-detail');
+
+const DPR = window.devicePixelRatio || 1;
+let W, H, PAD_L, PAD_R, PAD_T, PAD_B, plotW, plotH;
+let dotPositions = [];
+let activeAudioId = null;
+let glowPhase = 0;
+
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+  W = rect.width;
+  H = rect.height;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  PAD_L = 60; PAD_R = 20; PAD_T = 20; PAD_B = 50;
+  plotW = W - PAD_L - PAD_R;
+  plotH = H - PAD_T - PAD_B;
+}
+
+const tMin = new Date('2026-05-25T19:00:00').getTime();
+const tMax = new Date('2026-05-27T14:30:00').getTime();
+const durMax = 13;
+
+function toX(ts) { return PAD_L + ((new Date(ts).getTime() - tMin) / (tMax - tMin)) * plotW; }
+function toY(dur) { return PAD_T + plotH - (dur / durMax) * plotH; }
+
+function drawAxes() {
+  ctx.strokeStyle = '#23263a';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(PAD_L, PAD_T);
+  ctx.lineTo(PAD_L, PAD_T + plotH);
+  ctx.lineTo(PAD_L + plotW, PAD_T + plotH);
+  ctx.stroke();
+
+  ctx.fillStyle = '#666';
+  ctx.font = '11px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+
+  const ticks = ['05-25 18:00','05-26 00:00','05-26 06:00','05-26 12:00','05-26 18:00','05-27 00:00','05-27 06:00','05-27 12:00'];
+  const tickDates = ['2026-05-25T18:00','2026-05-26T00:00','2026-05-26T06:00','2026-05-26T12:00','2026-05-26T18:00','2026-05-27T00:00','2026-05-27T06:00','2026-05-27T12:00'];
+  // On narrow plots (phones) thin the date ticks so labels never overlap:
+  // < 520px plot -> midnight + noon only; < 330px plot -> midnight only.
+  const tickStep = plotW < 330 ? 4 : plotW < 520 ? 2 : 1;
+  for (let i = (tickStep >= 2 ? 1 : 0); i < ticks.length; i += tickStep) {
+    const x = toX(tickDates[i]);
+    if (x > PAD_L && x < PAD_L + plotW) {
+      ctx.fillText(ticks[i], x, PAD_T + plotH + 18);
+      ctx.beginPath();
+      ctx.strokeStyle = '#1a1c2a';
+      ctx.moveTo(x, PAD_T);
+      ctx.lineTo(x, PAD_T + plotH);
+      ctx.stroke();
+    }
+  }
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#666';
+  for (let m = 0; m <= 12; m += 2) {
+    const y = toY(m);
+    ctx.fillText(m + ' min', PAD_L - 8, y + 4);
+    if (m > 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = '#1a1c2a';
+      ctx.moveTo(PAD_L, y);
+      ctx.lineTo(PAD_L + plotW, y);
+      ctx.stroke();
+    }
+  }
+
+  ctx.fillStyle = '#888';
+  ctx.font = '12px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Call start time (CDT)', PAD_L + plotW / 2, PAD_T + plotH + 40);
+  ctx.save();
+  ctx.translate(14, PAD_T + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Effective engagement (minutes)', 0, 0);
+  ctx.restore();
+}
+
+function draw() {
+  glowPhase += 0.03;
+  ctx.clearRect(0, 0, W, H);
+  drawAxes();
+
+  dotPositions = [];
+
+  const audioDots = [];
+  const regularDots = [];
+
+  DATA.forEach(d => {
+    if (d.audio) audioDots.push(d);
+    else regularDots.push(d);
+  });
+
+  regularDots.forEach(d => {
+    const x = toX(d.ts);
+    const y = toY(effMin(d));
+    const color = COLORS[d.b];
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = color + '60';
+    ctx.fill();
+    ctx.strokeStyle = color + '90';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    dotPositions.push({ x, y, r: 5, d });
+  });
+
+  const glowAlpha = 0.4 + 0.3 * Math.sin(glowPhase);
+  const glowSize = 12 + 3 * Math.sin(glowPhase);
+
+  audioDots.forEach(d => {
+    const x = toX(d.ts);
+    const y = toY(effMin(d));
+    const color = COLORS[d.b];
+    const isPlaying = activeAudioId === d.audio;
+
+    ctx.beginPath();
+    ctx.arc(x, y, glowSize, 0, Math.PI * 2);
+    ctx.fillStyle = color + (isPlaying ? '40' : Math.round(glowAlpha * 30).toString(16).padStart(2, '0'));
+    ctx.fill();
+
+    if (isPlaying) {
+      ctx.beginPath();
+      ctx.arc(x, y, glowSize + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = color + '80';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.arc(x, y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    const triSize = 4;
+    ctx.beginPath();
+    ctx.moveTo(x - triSize * 0.4, y - triSize);
+    ctx.lineTo(x - triSize * 0.4, y + triSize);
+    ctx.lineTo(x + triSize * 0.8, y);
+    ctx.closePath();
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    dotPositions.push({ x, y, r: Math.max(7, glowSize), d });
+  });
+
+  requestAnimationFrame(draw);
+}
+
+function findDot(mx, my) {
+  // Nearest dot wins (not the last one drawn), and audio dots take priority so
+  // overlapping glow dots are each reachable.
+  let best = null, bestScore = Infinity;
+  for (const p of dotPositions) {
+    const dx = mx - p.x, dy = my - p.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= (p.r + 4) * (p.r + 4)) {
+      const score = (p.d.audio ? 0 : 1e6) + d2;
+      if (score < bestScore) { bestScore = score; best = p; }
+    }
+  }
+  return best;
+}
+
+function formatDur(s) {
+  if (s < 60) return s + 's';
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return rem ? m + 'm ' + rem + 's' : m + 'm';
+}
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const hit = findDot(mx, my);
+  if (hit) {
+    canvas.style.cursor = hit.d.audio ? 'pointer' : 'default';
+    tooltip.style.display = 'block';
+    const d = hit.d;
+    let html = `<div style="font-weight:700;color:${COLORS[d.b]};margin-bottom:4px">${d.b}</div>`;
+    html += `<div>${d.agent} · ${formatDur(d.dur_s)}${d.b === 'no human response' ? ' on the line · no one reached' : ''}</div>`;
+    if (d.audio) html += `<div style="margin-top:6px;color:#f97316;font-size:12px">▶ Click to hear this call</div>`;
+    tooltip.innerHTML = html;
+    // Keep the tooltip fully inside the canvas: beside the dot on wide canvases,
+    // centred above/below it on narrow (phone) canvases.
+    const tw = tooltip.offsetWidth || 260, th = tooltip.offsetHeight || 60;
+    let tx = hit.x + 16, ty = hit.y - th - 12;
+    if (tx + tw > W - 4) tx = hit.x - tw - 16;
+    if (W < 520) tx = hit.x - tw / 2;
+    tx = Math.max(4, Math.min(tx, W - tw - 4));
+    if (ty < 4) ty = hit.y + 16;
+    if (ty + th > H - 4) ty = Math.max(4, hit.y - th - 12);
+    // tx/ty are canvas coordinates; the tooltip is positioned in the container's.
+    tooltip.style.left = (canvas.offsetLeft + tx) + 'px';
+    tooltip.style.top = (canvas.offsetTop + ty) + 'px';
+  } else {
+    canvas.style.cursor = 'crosshair';
+    tooltip.style.display = 'none';
+  }
+});
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const hit = findDot(e.clientX - rect.left, e.clientY - rect.top);
+  if (hit && hit.d.audio) playAudio(hit.d.audio, hit.d.audioLabel, hit.d);
+  tooltip.style.display = 'none';  // on touch screens there is no mouseleave to hide it
+});
+
+canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+
+function playAudio(clipId, label, d) {
+  player.pause();
+  player.src = AUDIO_FILES[clipId];
+  player.play();
+  activeAudioId = clipId;
+
+  npPanel.classList.add('active');
+  npIcon.textContent = d.b === 'profanity abuse' ? '🔴' : d.b === 'AI response' ? '🔵' : d.b === 'human substantive' ? '🟢' : '⚪';
+  npLabel.textContent = label;
+  npLabel.classList.remove('idle');
+  npDetail.textContent = `${d.agent} · full call · ${d.b}`;
+  player.style.display = 'block';  // native controls: pause, seek, volume
+}
+
+player.addEventListener('ended', () => {
+  activeAudioId = null;
+  npPanel.classList.remove('active');
+  npIcon.textContent = '📞';
+  npLabel.textContent = 'Click a glowing dot to hear another call';
+  npLabel.classList.add('idle');
+  npDetail.textContent = '';
+});
+
+function playCompare(type) {
+  const map = { ai: 'luna', human: 'dessert', hostile: 'prof1' };
+  const d = DATA.find(r => r.audio === map[type]);
+  if (d) playAudio(d.audio, d.audioLabel, d);
+}
+
+resize();
+window.addEventListener('resize', resize);
+requestAnimationFrame(draw);
+</script>
+
+</body>
+</html>
