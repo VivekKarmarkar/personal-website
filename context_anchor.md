@@ -44,3 +44,11 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 **Vivek's stated intent (via goosemcptest relay):** Metro page deployed 2026-09-01 then removed 2026-09-02 at Vivek's request (commit `9325cee`); do not redeploy without his explicit go. His words on the metro MCP: "is not working, it's not properly tested, I want that off my website."
 
 *Subordinate (Claude): the source stays on disk at `goose-mcp-tests/metro_lean_project_website.html` + `metro_tools_eli5_grid.png`; the removal reversed deployment commit `a95ee2b` exactly (route, shell, hub LIFE exit, `public/metro-app`). Live-verified: hub back to Flight / Phone Call / News.*
+
+---
+
+## 2026-09-02 17:47 EDT — ClaudeSense deployed as the new last D-line station
+
+**Vivek's placement (via goosemcptest relay):** ClaudeSense deployed 2026-09-02 (`f087a57`) on the D line after ClaudeCodeLM as the new last station, per Vivek's voice instruction; tags Claude Code → Agentic Coding / PhD Research / DevRel. His words: "deploy it on the AI demos line after Claude Code LM; the station is called ClaudeSense, C and S capital; it is the new last station on that line."
+
+*Subordinate (Claude): live at `/claudesense`; Pattern C — `public/claudesense-app/index.html` iframed whole from `tekscan-connector/tekscan_project_website_working.html` (Codex's original `tekscan_project_website.html` untouched), masthead rebuilt natively, three youtube-nocookie embeds; D array in `lines.js` ends with `claudesense` (position 55). Verified live at four device regimes + arrival board.*
