@@ -79,6 +79,14 @@ export const stations = {
     description: 'Paper podcasts on demand — built in-house when NotebookLM said no',
     url: '/claude-code-lm',
   },
+  'claudesense': {
+    id: 'claudesense',
+    name: 'ClaudeSense',
+    fullName: 'ClaudeSense — From Sensor to Answer',
+    position: 55, // D-line new last station, after Claude Code LM (Vivek, 2026-09-02)
+    description: 'Giving Claude a sense of touch — from a force sensor to a scientific answer',
+    url: '/claudesense',
+  },
   'dancer-claude': {
     id: 'dancer-claude',
     name: 'Dancer Claude',

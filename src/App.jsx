@@ -37,6 +37,7 @@ import VmClaude from './pages/VmClaude'
 import Rcp from './pages/Rcp'
 import ClaudeCaudio from './pages/ClaudeCaudio'
 import ClaudeCodeLM from './pages/ClaudeCodeLM'
+import ClaudeSense from './pages/ClaudeSense'
 import AgenticAlgorithmDiscovery from './pages/AgenticAlgorithmDiscovery'
 import AgenticResearchVsProduct from './pages/AgenticResearchVsProduct'
 
@@ -82,6 +83,7 @@ function App() {
         <Route path="/rcp" element={<Rcp />} />
         <Route path="/claude-caudio" element={<ClaudeCaudio />} />
         <Route path="/claude-code-lm" element={<ClaudeCodeLM />} />
+        <Route path="/claudesense" element={<ClaudeSense />} />
         <Route path="/agentic-algorithm-discovery" element={<AgenticAlgorithmDiscovery />} />
         <Route path="/agentic-research-vs-product" element={<AgenticResearchVsProduct />} />
       </Routes>
