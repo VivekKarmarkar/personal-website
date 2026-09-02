@@ -44,18 +44,29 @@ function Code({ children }) {
 
 const FLOW_STEPS = ['Hand', 'Sensor strip', 'Tekscan electronics', 'USB', 'Python', 'Claude Code']
 
+// The source's flow chart, reproduced faithfully: framed near-black panel (#010409, 1px #30363d,
+// 12px radius), boxed steps (#161b22 on #30363d, 8px radius, 14px bold), bright green arrows (#7ee787).
+// Desktop: a wrapping chain, exactly like the source. Phone (<640px): the source's single-column
+// stack with centered steps and the arrows rotated to point down.
 function FlowChart() {
   return (
     <div
-      className="flex flex-wrap items-center gap-2.5 my-6 px-5 py-4 rounded-xl"
-      style={{ background: '#161822', border: '1px solid #2e3140' }}
+      className="grid grid-cols-1 sm:flex sm:flex-wrap sm:items-center gap-2.5 my-6 text-center sm:text-left"
+      style={{ padding: '18px 20px', background: '#010409', border: '1px solid #30363d', borderRadius: '12px' }}
       role="img"
       aria-label="Hand to sensor strip to Tekscan electronics to USB to Python to Claude Code"
     >
       {FLOW_STEPS.map((step, i) => (
         <span key={step} className="contents">
-          <span className="px-2.5 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap" style={{ color: '#e6edf3', background: '#0f1019', border: '1px solid #2e3140' }}>{step}</span>
-          {i < FLOW_STEPS.length - 1 && <span className="font-bold" style={{ color: '#f97316' }} aria-hidden="true">→</span>}
+          <span
+            className="block sm:inline-block sm:whitespace-nowrap"
+            style={{ padding: '7px 10px', color: '#e6edf3', background: '#161b22', border: '1px solid #30363d', borderRadius: '8px', fontSize: '14px', fontWeight: 700, lineHeight: 1.5 }}
+          >
+            {step}
+          </span>
+          {i < FLOW_STEPS.length - 1 && (
+            <span className="inline-block rotate-90 sm:rotate-0" style={{ color: '#7ee787', fontWeight: 700, fontSize: '18px', lineHeight: 1 }} aria-hidden="true">→</span>
+          )}
         </span>
       ))}
     </div>
