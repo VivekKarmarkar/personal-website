@@ -36,3 +36,11 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 - Tag updates across five pages: Professor Claude (LiveKit/DevRel/AI Startups green row), three life pages (Agent Skills/MCPs/Agentic Coding orange + Life Automation blue + DevRel green), Claude Code LM (+Workflow Automation blue, EdTech demoted), ARPD (AAD's rows + Product Development blue).
 - All prior fixes from the Aug 27 deployment round remain live: layered Claude Code OS hub, three Pattern C life pages with AutoHeightIframe, device-first ResolutionNotice across 12 pages, additive SKILL.md cards with privacy redactions, NNLego PyTorch comma fix.
 - Open items unchanged: stale-tab caching fix deferred (do NOT build until green-lit); data portrait sub-350px internal overflow awaiting Vivek's call.
+
+---
+
+## 2026-09-02 02:19 EDT — Metro page removed; do not redeploy without Vivek's go
+
+**Vivek's stated intent (via goosemcptest relay):** Metro page deployed 2026-09-01 then removed 2026-09-02 at Vivek's request (commit `9325cee`); do not redeploy without his explicit go. His words on the metro MCP: "is not working, it's not properly tested, I want that off my website."
+
+*Subordinate (Claude): the source stays on disk at `goose-mcp-tests/metro_lean_project_website.html` + `metro_tools_eli5_grid.png`; the removal reversed deployment commit `a95ee2b` exactly (route, shell, hub LIFE exit, `public/metro-app`). Live-verified: hub back to Flight / Phone Call / News.*
