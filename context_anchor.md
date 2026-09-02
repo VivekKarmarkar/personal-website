@@ -52,3 +52,11 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 **Vivek's placement (via goosemcptest relay):** ClaudeSense deployed 2026-09-02 (`f087a57`) on the D line after ClaudeCodeLM as the new last station, per Vivek's voice instruction; tags Claude Code → Agentic Coding / PhD Research / DevRel. His words: "deploy it on the AI demos line after Claude Code LM; the station is called ClaudeSense, C and S capital; it is the new last station on that line."
 
 *Subordinate (Claude): live at `/claudesense`; Pattern C — `public/claudesense-app/index.html` iframed whole from `tekscan-connector/tekscan_project_website_working.html` (Codex's original `tekscan_project_website.html` untouched), masthead rebuilt natively, three youtube-nocookie embeds; D array in `lines.js` ends with `claudesense` (position 55). Verified live at four device regimes + arrival board.*
+
+---
+
+## 2026-09-02 18:46 EDT — Native rebuild round (Vivek's order): 1/4 ClaudeSense
+
+**Vivek's order (via goosemcptest, close to his words):** "It needs to build all: the three in the Claude Code OS life layer, those three websites, and this one. Do things properly, systematically, which means all four websites will now be rebuilt." Sequence: ClaudeSense, then Flight (Kiwi), Phone Call (VOYP), News (Reddit) — native Pattern A via /port-reference-site, no iframes, prose verbatim, site typography, site YouTube embeds, tags unchanged; each page its own commit.
+
+**1/4 ClaudeSense — done, commit `12576ba`.** Native rebuild of `tekscan-connector/tekscan_project_website_working.html`; text fidelity 45/45 source blocks verbatim at 1440 and 390 (script: scratchpad `fidelity.mjs`); `public/claudesense-app` removed.
