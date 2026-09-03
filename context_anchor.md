@@ -84,3 +84,9 @@ Append-only, timestamped, Vivek-dictated load-bearing context. Newest entry is c
 - Device-first ResolutionNotice on every project page; AutoHeightIframe only where iframes remain (`/claude-code-os/main`).
 - Andon showcase: preview branch `preview/andon-showcase` + Vercel preview 6232703242 still exist, gated by Vercel Authentication — teardown staged, awaiting Vivek's word. Housing and Claude-art showcases: no deliverables yet; nothing ships without his go.
 - Open: Vivek says the ClaudeSense chain is "not the flowchart" he means — awaiting his pointer; ClaudeSense untouched until relayed. Deferred: stale-tab chunk-load recovery (do not build until green-lit); data portrait sub-350px internal overflow.
+
+---
+
+## 2026-09-03 00:50 EDT — Session close (Vivek wrapping up for the night)
+
+**State at close — unchanged since `03ce4e7`:** four native pages live (ClaudeSense `12576ba`/`79a861b`, Flight `123a084`, Phone Call `f1693a0`, News `48843a1`); main == origin/main, tree clean. **Still open:** Andon preview branch `preview/andon-showcase` (`19e34b4`) + Vercel preview 6232703242 (gated) awaiting his tear-down word — teardown steps staged in the 2026-09-02 entries above; ClaudeSense "not the flowchart" — awaiting his pointer, page untouched; stale-tab chunk-load recovery deferred (do not build until green-lit); data portrait sub-350px overflow awaiting his call; housing + Claude-art showcases pending his review before any deploy. Local preview server stopped; browser tabs closed. No push of any kind without his explicit go.
